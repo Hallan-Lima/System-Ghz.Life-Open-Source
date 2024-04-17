@@ -322,8 +322,8 @@ function substituirElementoFooter_nav() {
             <div class="mb-2 mb-md-0">
             ©
             `+anoAtual+`
-            , made with ❤️ by
-            <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder">ThemeSelection</a>
+            , Desenvolvido por HallTech
+            <a href="https://themeselection.com" target="_blank" class="footer-link fw-bolder"> | Tema</a>
             </div>
             <div>
             <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
