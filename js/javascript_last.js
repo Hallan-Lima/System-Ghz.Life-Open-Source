@@ -18,15 +18,15 @@ function substituirElementoNavbar_first() {
                   <span class="menu-header-text">Financeiro</span>
                 </li>
                 <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
+                  <a href="modulo_financeiro.html" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-collection"></i>
                     <div data-i18n="Contas">Contas</div>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
+                  <a href="revenue.html" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Basic">Receber</div>
+                    <div data-i18n="Receber">Receber</div>
                   </a>
                 </li>
                 <li class="menu-item">
@@ -257,9 +257,9 @@ function substituirElementoNavbar_first() {
                   <span class="menu-header-text">Configurações</span>
                 </li>
                 <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
+                  <a href="account.html" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Basic">Perfil</div>
+                    <div data-i18n="Perfil">Perfil</div>
                   </a>
                 </li>
                 <li class="menu-item">
