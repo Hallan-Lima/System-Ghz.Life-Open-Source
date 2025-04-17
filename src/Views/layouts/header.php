@@ -27,6 +27,19 @@
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet" />
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Perfect Scrollbar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/css/perfect-scrollbar.css">
+
+    <!-- Perfect Scrollbar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/dist/perfect-scrollbar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <!-- Icons -->
     <link rel="stylesheet" href="assets/css/fonts/boxicons.css" />
 
@@ -34,10 +47,6 @@
     <link rel="stylesheet" href="assets/css/core.css" class="template-customizer-core-css" />
     <link rel="stylesheet" href="assets/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="assets/css/demo.css" />
-
-    <!-- Vendors CSS -->
-    <link rel="stylesheet" href="assets/css/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="assets/css/apex-charts.css" />
 
     <!-- Helpers -->
     <script src="assets/js/helpers.js"></script>
@@ -47,9 +56,7 @@
     <link rel="stylesheet" href="assets/css/pages/page-misc.css" />
     <link rel="stylesheet" href="assets/css/pages/page-icons.css" />
     <link rel="stylesheet" href="assets/css/pages/page-account-settings.css" />
-
-    <script src="assets/js/javascript_first.js"></script>
-    <script src="assets/js/loadend.js"></script>
+    
 </head>
 
 <body>

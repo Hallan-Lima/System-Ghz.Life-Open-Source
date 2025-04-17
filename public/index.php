@@ -20,6 +20,7 @@ $request = substr($request, $ProjetoPos+strlen('/Projeto/public/'));
 $routers = [
     'home' => '../src/Views/pages/home.php',
     'login' => '../src/Views/pages/login.php',
+    'account' => '../src/Views/pages/account.php',
 ];
 
 if (array_key_exists($request, $routers)) {
