@@ -9,7 +9,7 @@
             <div class="card-body">
               <!-- Logo -->
               <div class="app-brand justify-content-center">
-                <a href="index.html" class="app-brand-link gap-2">
+                <a href="#" class="app-brand-link gap-2">
                   <span class="app-brand-text demo text-body fw-bolder" id="Brand-Logo">Sneat</span>
                 </a>
               </div>
@@ -32,7 +32,7 @@
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
                     <label class="form-label" for="password">Password</label>
-                    <a href="forgot-password.html">
+                    <a href="forgot-password">
                       <small>Forgot Password?</small>
                     </a>
                   </div>
@@ -56,7 +56,7 @@
                 </div>
                 <div>
                   <button class="btn btn-primary d-grid w-100 mb-2" type="submit">Entrar</button>
-                  <a href="register-basic.html" class="btn btn-secondary d-grid w-100 mb-2">Cadastrar</a>
+                  <a href="register-basic" class="btn btn-secondary d-grid w-100 mb-2">Cadastrar</a>
                 </div>
               </form>
             </div>
