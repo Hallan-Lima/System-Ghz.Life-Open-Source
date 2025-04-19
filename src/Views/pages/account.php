@@ -14,7 +14,7 @@
         </div>
 
         <div class="menu-inner-shadow"></div>
-        
+
         <ul class="menu-inner py-1" id="navbar_first">
         </ul>
       </aside>
@@ -24,12 +24,11 @@
       <div class="layout-page">
 
 
-              <!-- Navbar -->
+        <!-- Navbar -->
 
-              <nav
+        <nav
           class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-          id="layout-navbar"
-        >
+          id="layout-navbar">
           <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
             <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
               <i class="bx bx-menu bx-sm"></i>
@@ -45,8 +44,7 @@
                   type="text"
                   class="form-control border-0 shadow-none"
                   placeholder="Search..."
-                  aria-label="Search..."
-                />
+                  aria-label="Search..." />
               </div>
             </div>
             <!-- /Search -->
@@ -60,9 +58,7 @@
                   data-icon="octicon-star"
                   data-size="large"
                   data-show-count="true"
-                  aria-label="Star themeselection/sneat-html-admin-template-free on GitHub"
-                  >Star</a
-                >
+                  aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
               </li>
 
               <!-- User -->
@@ -134,7 +130,7 @@
         <div class="content-wrapper">
           <!-- Content -->
 
-          <div class="container-xxl flex-grow-1 container-p-y" style="margin-top: 15%;">
+          <div class="container-xxl flex-grow-1 container-p-y">
             <div class="row">
               <div class="col-md-12">
                 <div class="card mb-4">
@@ -148,8 +144,7 @@
                         class="d-block rounded"
                         height="100"
                         width="100"
-                        id="uploadedAvatar"
-                      />
+                        id="uploadedAvatar" />
                       <div class="button-wrapper">
                         <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
                           <span class="d-none d-sm-block">Upload new photo</span>
@@ -159,8 +154,7 @@
                             id="upload"
                             class="account-file-input"
                             hidden
-                            accept="image/png, image/jpeg"
-                          />
+                            accept="image/png, image/jpeg" />
                         </label>
                         <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
                           <i class="bx bx-reset d-block d-sm-none"></i>
@@ -182,8 +176,7 @@
                             id="firstName"
                             name="firstName"
                             value="John"
-                            autofocus
-                          />
+                            autofocus />
                         </div>
                         <div class="mb-3 col-md-6">
                           <label for="lastName" class="form-label">Last Name</label>
@@ -197,8 +190,7 @@
                             id="email"
                             name="email"
                             value="john.doe@example.com"
-                            placeholder="john.doe@example.com"
-                          />
+                            placeholder="john.doe@example.com" />
                         </div>
                         <div class="mb-3 col-md-6">
                           <label for="organization" class="form-label">Organization</label>
@@ -207,8 +199,7 @@
                             class="form-control"
                             id="organization"
                             name="organization"
-                            value="ThemeSelection"
-                          />
+                            value="ThemeSelection" />
                         </div>
                         <div class="mb-3 col-md-6">
                           <label class="form-label" for="phoneNumber">Phone Number</label>
@@ -219,8 +210,7 @@
                               id="phoneNumber"
                               name="phoneNumber"
                               class="form-control"
-                              placeholder="202 555 0111"
-                            />
+                              placeholder="202 555 0111" />
                           </div>
                         </div>
                         <div class="mb-3 col-md-6">
@@ -239,8 +229,7 @@
                             id="zipCode"
                             name="zipCode"
                             placeholder="231465"
-                            maxlength="6"
-                          />
+                            maxlength="6" />
                         </div>
                         <div class="mb-3 col-md-6">
                           <label class="form-label" for="country">Country</label>
@@ -340,11 +329,8 @@
                           class="form-check-input"
                           type="checkbox"
                           name="accountActivation"
-                          id="accountActivation"
-                        />
-                        <label class="form-check-label" for="accountActivation"
-                          >I confirm my account deactivation</label
-                        >
+                          id="accountActivation" />
+                        <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
                       </div>
                       <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
                     </form>
@@ -374,5 +360,3 @@
 
   <nav class="navbar fixed-bottom navbar-light bg-light" id="navbar_two">
   </nav>
-
-
