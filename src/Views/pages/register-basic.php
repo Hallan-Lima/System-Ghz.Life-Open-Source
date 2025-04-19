@@ -14,7 +14,7 @@
           <h4 class="mb-2">Cadastra-se 🚀</h4>
           <p class="mb-4">Comece agora o seu agente pessoal!</p>
 
-          <form id="formAuthentication" class="mb-3" action="home" method="POST">
+          <form id="formAuthentication" class="mb-3" action="account" method="POST">
             <div class="mb-3">
               <input
                 type="text"
@@ -75,18 +75,18 @@
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
                 <label class="form-check-label" for="terms-conditions">
-                  I agree to
-                  <a href="javascript:void(0);">privacy policy & terms</a>
+                  Eu aceito a
+                  <a href="javascript:void(0);">Política de Privacidade e termos</a>
                 </label>
               </div>
             </div>
-            <button class="btn btn-primary d-grid w-100">Sign up</button>
+            <button class="btn btn-primary d-grid w-100">Cadastrar</button>
           </form>
 
           <p class="text-center">
-            <span>Already have an account?</span>
+            <span>Você ja tem conta?</span>
             <a href="login">
-              <span>Sign in instead</span>
+              <span>Fazer Login</span>
             </a>
           </p>
         </div>
