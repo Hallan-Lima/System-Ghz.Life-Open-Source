@@ -197,7 +197,7 @@ function substituirElementoNavbar_first() {
     createMenuItem('#', 'bx bx-collection', 'Funcionalidades', [], currentPage)
   );
   navbarFirst.appendChild(
-    createMenuItem('#', 'bx bx-collection', 'Pagina Principa', [], currentPage)
+    createMenuItem('#', 'bx bx-collection', 'Pagina Principal', [], currentPage)
   );
   navbarFirst.appendChild(
     createMenuItem('#', 'bx bx-collection', 'IA', [], currentPage)
