@@ -51,22 +51,22 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="profile">
                             <i class="bx bx-user me-2"></i>
-                            <span class="align-middle">My Profile</span>
+                            <span class="align-middle">Meu Perfil</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="config">
                             <i class="bx bx-cog me-2"></i>
-                            <span class="align-middle">Settings</span>
+                            <span class="align-middle">Configurações</span>
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="#">
                             <span class="d-flex align-items-center align-middle">
-                                <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
-                                <span class="flex-grow-1 align-middle">Billing</span>
+                                <i class="flex-shrink-0 bx bx-alarm me-2"></i>
+                                <span class="flex-grow-1 align-middle">Notificações</span>
                                 <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
                             </span>
                         </a>
@@ -77,7 +77,7 @@
                     <li>
                         <a class="dropdown-item" href="login">
                             <i class="bx bx-power-off me-2"></i>
-                            <span class="align-middle">Log Out</span>
+                            <span class="align-middle">Sair</span>
                         </a>
                     </li>
                 </ul>
