@@ -20,6 +20,7 @@ $request = substr($request, $ProjetoPos+strlen('/Projeto/public/'));
 $routers = [
     'home' => '../src/Views/pages/home.php',
     'login' => '../src/Views/pages/login.php',
+    'profile' => '../src/Views/pages/profile.php',
     'account' => '../src/Views/pages/account.php',
     'overview' => '../src/Views/pages/overview.php',
     'forgot-password' => '../src/Views/pages/forgot-password.php',

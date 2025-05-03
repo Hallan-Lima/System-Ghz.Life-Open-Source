@@ -73,9 +73,8 @@ function substituirElementoNavbar_first() {
   const navbarFirst = document.getElementById('navbar_first');
   navbarFirst.innerHTML = '';
 
-  // Simulação de dados (substituir com sua lógica real)
-  const currentPage = 'home'; // Exemplo
-  const idProfile = 1; // Exemplo
+  const currentPage = window.location.pathname.split('/').pop();
+  const idProfile = 1;
 
   // Item Home
   navbarFirst.appendChild(
@@ -191,7 +190,7 @@ function substituirElementoNavbar_first() {
   // Módulo 7 - Listas de itens relacionados a configurações
   navbarFirst.appendChild(createMenuHeader('Configurações'));
   navbarFirst.appendChild(
-    createMenuItem('#', 'bx bx-collection', 'Perfil', [], currentPage)
+    createMenuItem('profile', 'bx bx-collection', 'Perfil', [], currentPage)
   );
   navbarFirst.appendChild(
     createMenuItem('#', 'bx bx-collection', 'Funcionalidades', [], currentPage)
