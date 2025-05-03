@@ -15,8 +15,7 @@
 
         <div class="menu-inner-shadow"></div>
 
-        <ul class="menu-inner py-1" id="navbar_first">
-        </ul>
+        <ul class="menu-inner py-1 overflow-auto" id="navbar_first"></ul>
       </aside>
       <!-- / Menu -->
 

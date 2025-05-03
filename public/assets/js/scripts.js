@@ -1,291 +1,162 @@
+function createMenuItem(href, iconClass, text, subItems = [], currentPage) {
+  const isActive = (href === currentPage) ? 'active' : '';
+  const isSubmenu = subItems.length > 0;
+
+  // Cria o elemento <li> do menu
+  const menuItem = document.createElement('li');
+  menuItem.className = `menu-item ${isActive}`; // Removido 'menu-toggle'
+
+  // Cria o link do menu
+  const link = document.createElement('a');
+  link.className = 'menu-link';
+  if (!isSubmenu) {
+    link.href = href;
+  } else {
+    link.setAttribute('data-bs-toggle', 'collapse');
+    const submenuId = `submenu-${text.toLowerCase().replace(/\s+/g, '-')}`;
+    link.setAttribute('data-bs-target', `#${submenuId}`);
+  }
+
+  // Adiciona o ícone e o texto do menu
+  link.innerHTML = `
+      <i class="menu-icon tf-icons ${iconClass}"></i>
+      <div data-i18n="${text}">${text}</div>
+  `;
+
+  // Adiciona a seta apenas se for um submenu
+  if (isSubmenu) {
+    const arrowIcon = document.createElement('i');
+    arrowIcon.className = 'bx bx-chevron-down ms-auto';
+    link.appendChild(arrowIcon);
+
+    // Cria o submenu
+    const submenu = document.createElement('ul');
+    submenu.className = 'collapse';
+    submenu.id = `submenu-${text.toLowerCase().replace(/\s+/g, '-')}`;
+
+    subItems.forEach(subItem => {
+      const subListItem = document.createElement('li');
+      subListItem.className = 'menu-item';
+
+      const subLink = document.createElement('a');
+      subLink.className = 'menu-link';
+      subLink.href = subItem.href;
+      subLink.innerHTML = `<div data-i18n="${subItem.text}">${subItem.text}</div>`;
+
+      subListItem.appendChild(subLink);
+      submenu.appendChild(subListItem);
+    });
+
+    menuItem.appendChild(link);
+    menuItem.appendChild(submenu);
+
+    // Adiciona evento de clique para alternar a seta
+    link.addEventListener('click', function () {
+      arrowIcon.classList.toggle('bx-chevron-down');
+      arrowIcon.classList.toggle('bx-chevron-up');
+    });
+  } else {
+    menuItem.appendChild(link);
+  }
+
+  return menuItem;
+}
+
+function createMenuHeader(text) {
+  const header = document.createElement('li');
+  header.className = 'menu-header small text-uppercase';
+  header.innerHTML = `<span class="menu-header-text">${text}</span>`;
+  return header;
+}
+
 function substituirElementoNavbar_first() {
-    // Seleciona o elemento span existente
-    var spanElement = document.getElementById('navbar_first');
+  const navbarFirst = document.getElementById('navbar_first');
+  navbarFirst.innerHTML = '';
 
+  // Simulação de dados (substituir com sua lógica real)
+  const currentPage = 'home'; // Exemplo
+  const idProfile = 1; // Exemplo
 
-    // Define o novo conteúdo HTML que substituirá o elemento span
+  // Item Home
+  navbarFirst.appendChild(
+      createMenuItem('home', 'bx bx-home-circle', 'Home', [], currentPage)
+  );
 
-    var novo = `
-            <li class="menu-item active">
-              <a href="home" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Analytics">Home</div>
-              </a>
-            </li>
+  // Módulo 1 - Financeiro
+  navbarFirst.appendChild(createMenuHeader('Financeiro'));
+  navbarFirst.appendChild(
+      createMenuItem('account', 'bx bx-collection', 'Contas', [], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Receber', [], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Pagar', [], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Transações', [], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Cartão de Credito', [], currentPage)
+  );
 
-            <div id="Modulo_1">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Financeiro</span>
-              </li>
-              <li class="menu-item">
-                <a href="account" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Contas">Contas</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="revenue.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Receber">Receber</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Pagar</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Transações</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Cartão de Credito</div>
-                </a>
-              </li>
-            </div>
+  // Módulo 2 - Listas com submenus
+  navbarFirst.appendChild(createMenuHeader('Listas'));
+  navbarFirst.appendChild(
+      createMenuItem('javascript:void(0);', 'bx bx-dock-top', 'Metas Pessoais', [
+          { href: '#', text: 'Itens' },
+          { href: '#', text: 'Cadastrar' }
+      ], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('javascript:void(0);', 'bx bx-dock-top', 'Comprar', [
+          { href: '#', text: 'Itens' },
+          { href: '#', text: 'Cadastrar' }
+      ], currentPage)
+  );
 
-            
-            <div id="Modulo_2">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Listas</span>
-              </li>
-              <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle" data-bs-toggle="collapse" data-bs-target="#submenu-metas">
-                  <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                  <div data-i18n="Metas Pessoais">Metas Pessoais</div>
-                </a>
-                <ul class="collapse" id="submenu-metas">
-                  <li class="menu-item">
-                    <a href="pages-account-settings-account.html" class="menu-link">
-                      <div data-i18n="Itens">Itens</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Cadastrar">Cadastrar</div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                  <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                  <div data-i18n="Comprar">Comprar</div>
-                </a>
-                <ul class="menu-sub">
-                  <li class="menu-item">
-                    <a href="pages-account-settings-account.html" class="menu-link">
-                      <div data-i18n="Itens">Itens</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Cadastrar">Cadastrar</div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </div>
+  // Módulo 3 - Timer
+  navbarFirst.appendChild(createMenuHeader('Timer'));
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Pomodoro', [], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('#', 'bx bx-collection', 'Cronometro', [], currentPage)
+  );
 
-            <div id="Modulo_3">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Timer</span>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Pomodoro</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Basic">Cronometro</div>
-                </a>
-              </li>
-            </div>
-
-            <div id="Modulo_4">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Calendário</span>
-              </li>
-              <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                  <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                  <div data-i18n="Acompanhar">Acompanhar</div>
-                </a>
-                <ul class="menu-sub">
-                  <li class="menu-item">
-                    <a href="pages-account-settings-account.html" class="menu-link">
-                      <div data-i18n="Academia">Academia</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Alimentação">Alimentação</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Controle de Marcações">Controle de Marcações</div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="menu-item">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                  <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                  <div data-i18n="Despertador">Despertador</div>
-                </a>
-                <ul class="menu-sub">
-                  <li class="menu-item">
-                    <a href="pages-account-settings-account.html" class="menu-link">
-                      <div data-i18n="Monitoramento Sono">Monitoramento Sono</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Listar Itens">Listar Itens</div>
-                    </a>
-                  </li>
-                  <li class="menu-item">
-                    <a href="pages-account-settings-notifications.html" class="menu-link">
-                      <div data-i18n="Incluir Itens">Incluir Itens</div>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Acompanhar Menstruação">Acompanhar Menstruação</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Agenda">Agenda</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Tarefas">Tarefas</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Lembretes">Lembretes</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Eventos">Eventos</div>
-                </a>
-              </li>
-
-            </div>
-
-            <div id="Modulo_5">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Calculadora</span>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Básica">Básica</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Cientifica">Cientifica</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Financeira">Financeira</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Conversores">Conversores</div>
-                </a>
-              </li>
-            </div>
-
-            <div id="Modulo_6">
-              <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Social</span>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Assistente Pessoal">Assistente Pessoal</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Enquetes">Enquetes</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Pesquisas">Pesquisas</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="cards-basic.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-collection"></i>
-                  <div data-i18n="Sugestões">Sugestões</div>
-                </a>
-              </li>
-            </div>
-
-            <div id="Modulo_geral">
-                <li class="menu-header small text-uppercase">
-                  <span class="menu-header-text">Configurações</span>
-                </li>
-                <li class="menu-item">
-                  <a href="account.html" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Perfil">Perfil</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Basic">Funcionalidades</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Basic">Pagina Principal</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="cards-basic.html" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-collection"></i>
-                    <div data-i18n="Basic">IA</div>
-                  </a>
-                </li>
-            </div>
+  // Módulo 4 - Listas de itens relacionados a calendario
+  navbarFirst.appendChild(createMenuHeader('Calendário'));
+  navbarFirst.appendChild(
+      createMenuItem('javascript:void(0);', 'bx bx-dock-top', 'Acompanhar', [
+          { href: '#', text: 'Academia' },
+          { href: '#', text: 'Controle de Marcações' },
+          { href: '#', text: 'Alimentação' }
+      ], currentPage)
+  );
+  navbarFirst.appendChild(
+      createMenuItem('javascript:void(0);', 'bx bx-dock-top', 'Despertador', [
+          { href: '#', text: 'Monitoramento Sono' },
+          { href: '#', text: 'Listar Itens' },
+          { href: '#', text: 'Incluir Itens' }
+      ], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Acompanhar Menstruação', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Agenda', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Tarefas', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Lembretes', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Eventos', [], currentPage)
+  );
   
-    `
-    // Substitui o conteúdo do elemento span pelo novo conteúdo HTML
-    spanElement.innerHTML = novo;
+
 }
 
 function substituirElementoNavbara_first() {
