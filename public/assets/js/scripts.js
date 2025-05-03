@@ -155,6 +155,53 @@ function substituirElementoNavbar_first() {
   navbarFirst.appendChild(
     createMenuItem('#', 'bx bx-collection', 'Eventos', [], currentPage)
   );
+
+  // Módulo 5 - Listas de itens relacionados a matematica
+  navbarFirst.appendChild(createMenuHeader('Calculadora'));
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Básica', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Cientifica', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Financeira', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Conversores', [], currentPage)
+  );
+  
+
+  // Módulo 6 - Listas de itens relacionados a Social
+  navbarFirst.appendChild(createMenuHeader('Social'));
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Assistente Pessoal', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Enquetes', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Pesquisas', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Sugestões', [], currentPage)
+  );
+  
+
+  // Módulo 7 - Listas de itens relacionados a configurações
+  navbarFirst.appendChild(createMenuHeader('Configurações'));
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Perfil', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Funcionalidades', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Pagina Principa', [], currentPage)
+  );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'IA', [], currentPage)
+  );
   
 
 }
