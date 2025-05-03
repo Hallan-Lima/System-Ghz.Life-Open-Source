@@ -7,12 +7,25 @@
         </a>
     </div>
 
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+    <div class="navbar-nav-right d-flex align-items-center w-100" id="navbar-collapse">
+        <!-- Notificação -->
+        <div class="d-flex align-items-center position-relative">
+            <a href="javascript:void(0);" class="nav-link">
+                <i class="bx bx-bell bx-sm"></i>
+            </a>
+        </div>
 
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
- 
-            <!-- User -->
-            <li class="nav-item navbar-dropdown dropdown-user dropdown">
+        <!-- Saldo -->
+        <div class="d-flex align-items-center justify-content-center flex-grow-1">
+            <a href="javascript:void(0);" id="toggle-saldo" class="ms-2 d-flex align-items-center">
+                <i class="bx bx-show bx-sm"></i>
+            </a>
+            <span id="saldo-value" class="ms-2">****</span>
+        </div>
+        
+        <!-- User -->
+        <div class="d-flex align-items-center">
+            <div class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
                         <img src="assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
@@ -68,8 +81,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-            <!--/ User -->
-        </ul>
+            </div>
+        </div>
+        <!--/ User -->
     </div>
 </nav>
