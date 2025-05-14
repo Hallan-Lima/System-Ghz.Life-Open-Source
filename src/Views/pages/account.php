@@ -10,7 +10,9 @@ $content = '
             <button class="btn btn-primary btn-sm me-2">Transferir Saldo</button>
             <button class="btn btn-primary btn-sm me-2">Importar</button>
             <button class="btn btn-primary btn-sm me-2">Incluir Despesa</button>
-            <button class="btn btn-success btn-sm me-2">Incluir Receita</button>
+            <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#incluirReceitaModal">Incluir Receita</button>
+
+           
             <button class="btn btn-secondary btn-sm me-2">Abrir Filtro</button>
             <button class="btn btn-info btn-sm me-2">Selecionar Período</button>
             <button class="btn btn-warning btn-sm">Limpar Filtros</button>
@@ -632,4 +634,5 @@ $content = '
 
 ';
 include '../src/Views/layouts/layout.php';
+include '../src/Views/layouts/modal-financial-launch.php';
 ?>
