@@ -14,3 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     });
+
+
+document.getElementById('recorrencia').addEventListener('change', function () {
+    const customFields = document.querySelectorAll('#recorrenciaCustomizada, #recorrenciaUnidade');
+    if (this.value === 'customizado') {
+        customFields.forEach(field => field.classList.remove('d-none'));
+    } else {
+        customFields.forEach(field => field.classList.add('d-none'));
+    }
+});
+    
