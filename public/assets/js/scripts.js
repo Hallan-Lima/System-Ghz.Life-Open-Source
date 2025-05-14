@@ -193,10 +193,7 @@ function substituirElementoNavbar_first() {
     createMenuItem('profile', 'bx bx-collection', 'Perfil', [], currentPage)
   );
   navbarFirst.appendChild(
-    createMenuItem('#', 'bx bx-collection', 'Funcionalidades', [], currentPage)
-  );
-  navbarFirst.appendChild(
-    createMenuItem('#', 'bx bx-collection', 'Pagina Principal', [], currentPage)
+    createMenuItem('config-functions-system', 'bx bx-collection', 'Funcionalidades', [], currentPage)
   );
   navbarFirst.appendChild(
     createMenuItem('#', 'bx bx-collection', 'IA', [], currentPage)
