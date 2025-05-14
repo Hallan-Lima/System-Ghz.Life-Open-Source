@@ -98,6 +98,10 @@ function substituirElementoNavbar_first() {
   navbarFirst.appendChild(
       createMenuItem('#', 'bx bx-collection', 'Cartão de Credito', [], currentPage)
   );
+  navbarFirst.appendChild(
+    createMenuItem('#', 'bx bx-collection', 'Configuração', [], currentPage)
+);
+
 
   // Módulo 2 - Listas com submenus
   navbarFirst.appendChild(createMenuHeader('Listas'));
