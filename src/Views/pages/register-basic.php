@@ -14,7 +14,7 @@
           <h4 class="mb-2">Cadastra-se 🚀</h4>
           <p class="mb-4">Comece agora o seu agente pessoal!</p>
 
-          <form id="formAuthentication" class="mb-3" action="account" method="POST">
+          <form class="mb-3" action="user-register" method="POST">
             <div class="mb-3">
               <input
                 type="text"
@@ -55,11 +55,11 @@
             <div class="mb-3">
               <select id="language" class="select2 form-select">
                 <option value="">Selecione seu gênero</option>
-                <option value="male">Masculino</option>
-                <option value="female">Feminino</option>
-                <option value="non_binary">Não-binário</option>
-                <option value="prefer_not_to_say">Prefiro não informar</option>
-                <option value="other">Outro</option>
+                <option value="1">Masculino</option>
+                <option value="2">Feminino</option>
+                <option value="3">Não-binário</option>
+                <option value="4">Prefiro não informar</option>
+                <option value="5">Outro</option>
               </select>
             </div>
 
@@ -80,7 +80,7 @@
                 </label>
               </div>
             </div>
-            <button class="btn btn-primary d-grid w-100">Cadastrar</button>
+            <button type="submit" class="btn btn-primary d-grid w-100"  >Cadastrar</button>
           </form>
 
           <p class="text-center">

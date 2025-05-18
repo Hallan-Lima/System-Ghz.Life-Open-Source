@@ -26,6 +26,7 @@ $routers = [
     'forgot-password' => '../src/Views/pages/forgot-password.php',
     'register-basic' => '../src/Views/pages/register-basic.php',
     'config-functions-system' => '../src/Views/pages/config-functions-system.php',
+    'user-register' => '../src/Controllers/UserRegisterController.php',
 ];
 
 if (array_key_exists($request, $routers)) {
