@@ -50,6 +50,20 @@ CREATE TABLE module (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Funcionalidades dentro dos módulos, agora com suporte a menus e submenus hierárquicos
+CREATE TABLE functionality (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    module_id INT NOT NULL,
+    parent_id INT DEFAULT NULL, -- Referência para o menu pai (null = menu principal)
+    name VARCHAR(50) NOT NULL,
+    url VARCHAR(255) DEFAULT NULL, -- Pode ser null para menus sem ação direta
+    description TEXT DEFAULT NULL,
+    order_index INT DEFAULT 0, -- Para ordenar menus e submenus
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (module_id) REFERENCES module(id),
+    FOREIGN KEY (parent_id) REFERENCES functionality(id)
+);
+
 -- Tabela principal dos usuários contendo dados pessoais e credenciais de acesso
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -67,16 +81,7 @@ CREATE TABLE user (
     FOREIGN KEY (level_id) REFERENCES user_level(id)
 );
 
--- Funcionalidades dentro dos módulos, cada uma com sua URL e descrição
-CREATE TABLE functionality (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    module_id INT NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    url VARCHAR(255) NOT NULL,
-    description TEXT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (module_id) REFERENCES module(id)
-);
+
 
 -- Tabela que armazena os e-mails de cada usuário, podendo indicar qual é o principal
 CREATE TABLE user_email (
@@ -122,6 +127,7 @@ CREATE TABLE group_user (
     FOREIGN KEY (invited_by) REFERENCES user(id),
     UNIQUE (group_id, user_id)
 );
+
 
 -- Permissões de acesso do usuário por funcionalidade: leitura, criação, atualização, exclusão
 CREATE TABLE user_functionality (

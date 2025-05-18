@@ -379,12 +379,94 @@ function substituirElementoNavbar_collapse() {
     
 }
 
-substituirElementoNavbar_first();
-substituirElementoNavbar_two();
-substituirElementoFooter_nav();
+function createMenuFromData(menuData, currentPage) {
+  const navbarFirst = document.getElementById('navbar_first');
+  navbarFirst.innerHTML = '';
 
-// scripts.js (adicionar no final)
+  menuData.forEach(item => {
+    if (item.type === 'header') {
+      navbarFirst.appendChild(createMenuHeader(item.text));
+    } else if (item.type === 'item') {
+      navbarFirst.appendChild(
+        createMenuItem(item.href, item.icon, item.text, item.subItems || [], currentPage)
+      );
+    }
+  });
+}
+
+// Funções auxiliares (mantidas iguais)
+function createMenuItem(href, iconClass, text, subItems = [], currentPage) {
+  const isActive = (href === currentPage) ? 'active' : '';
+  const isSubmenu = subItems.length > 0;
+  const menuItem = document.createElement('li');
+  menuItem.className = `menu-item ${isActive}`;
+  const link = document.createElement('a');
+  link.className = 'menu-link';
+  if (!isSubmenu) {
+    link.href = href;
+  } else {
+    link.setAttribute('data-bs-toggle', 'collapse');
+    const submenuId = `submenu-${text.toLowerCase().replace(/\s+/g, '-')}`;
+    link.setAttribute('data-bs-target', `#${submenuId}`);
+  }
+  link.innerHTML = `
+      <i class="menu-icon tf-icons ${iconClass}"></i>
+      <div data-i18n="${text}">${text}</div>
+  `;
+  if (isSubmenu) {
+    const arrowIcon = document.createElement('i');
+    arrowIcon.className = 'bx bx-chevron-down ms-auto';
+    link.appendChild(arrowIcon);
+    const submenu = document.createElement('ul');
+    submenu.className = 'collapse';
+    submenu.id = `submenu-${text.toLowerCase().replace(/\s+/g, '-')}`;
+    subItems.forEach(subItem => {
+      const subListItem = document.createElement('li');
+      subListItem.className = 'menu-item';
+      const subLink = document.createElement('a');
+      subLink.className = 'menu-link';
+      subLink.href = subItem.href;
+      subLink.innerHTML = `<div data-i18n="${subItem.text}">${subItem.text}</div>`;
+      subListItem.appendChild(subLink);
+      submenu.appendChild(subListItem);
+    });
+    menuItem.appendChild(link);
+    menuItem.appendChild(submenu);
+    link.addEventListener('click', function () {
+      arrowIcon.classList.toggle('bx-chevron-down');
+      arrowIcon.classList.toggle('bx-chevron-up');
+    });
+  } else {
+    menuItem.appendChild(link);
+  }
+  return menuItem;
+}
+
+function createMenuHeader(text) {
+  const header = document.createElement('li');
+  header.className = 'menu-header small text-uppercase';
+  header.innerHTML = `<span class="menu-header-text">${text}</span>`;
+  return header;
+}
+
+// Nova função para montar o menu a partir do span oculto
+function montarMenuDinamico() {
+  const span = document.getElementById('menu_data');
+  if (!span) return;
+  let menuData;
+  try {
+    menuData = JSON.parse(span.textContent || span.innerText);
+  } catch (e) {
+    console.error('Erro ao interpretar menu_data:', e);
+    return;
+  }
+  const currentPage = window.location.pathname.split('/').pop();
+  createMenuFromData(menuData, currentPage);
+}
+
+// Chame a função após o DOM estar pronto
 document.addEventListener('DOMContentLoaded', function() {
+  montarMenuDinamico();
   // Inicializa todos os dropdowns do Bootstrap
   var dropdowns = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
   dropdowns.map(function(dropdownToggle) {
@@ -393,6 +475,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+substituirElementoNavbar_first();
+substituirElementoNavbar_two();
+substituirElementoFooter_nav();
+
+// scripts.js (adicionar no final)
 
 
 
