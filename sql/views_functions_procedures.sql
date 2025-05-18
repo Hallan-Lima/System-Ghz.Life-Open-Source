@@ -1,6 +1,41 @@
 USE application;
 
--- (demais definições de tabelas aqui...)
+-- ======================
+-- FUNCTIONS
+-- ======================
+
+
+DELIMITER $$
+
+CREATE PROCEDURE create_user_with_all_functionalities (
+    IN p_nickname VARCHAR(50),
+    IN p_password_hash VARCHAR(255),
+    IN p_gender_id INT,
+    IN p_birthdate DATE,
+    IN p_status_id INT,
+    IN p_level_id INT,
+    OUT v_user_id INT
+)
+BEGIN
+    -- Inserir usuário e obter o ID gerado
+    INSERT INTO user (nickname, password_hash, gender_id, birthdate, status_id, level_id)
+    VALUES (p_nickname, p_password_hash, p_gender_id, p_birthdate, p_status_id, p_level_id);
+
+    SET v_user_id = LAST_INSERT_ID();
+
+    -- Conceder todas as funcionalidades como ativas
+    INSERT INTO user_functionality (
+        user_id, functionality_id, can_read, can_create, can_update, can_delete, granted_by
+    )
+    SELECT
+        v_user_id, f.id, 1, 1, 1, 1, v_user_id
+    FROM functionality f;
+END$$
+
+DELIMITER ;
+
+
+
 
 -- =====================
 -- VIEWS
