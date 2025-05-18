@@ -64,3 +64,20 @@ function getMenuAccess($userId) {
 
     return $menuData;
 }
+
+function postMenuAccess($userId, $menuData) {
+    global $db;
+
+    // Limpa os acessos existentes
+    $db->query("DELETE FROM user_functionality WHERE user_id = ?", [$userId]);
+
+    // Insere os novos acessos
+    foreach ($menuData as $menu) {
+        if ($menu['type'] === 'item') {
+            $db->query(
+                "INSERT INTO user_functionality (user_id, functionality_id, can_read) VALUES (?, ?, 1)",
+                [$userId, $menu['id']]
+            );
+        }
+    }
+}
