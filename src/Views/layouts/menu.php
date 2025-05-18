@@ -11,15 +11,15 @@
 
     <div class="menu-inner-shadow"></div>
 
-    <ul class="menu-inner py-1 overflow-auto" id="navbar_first">
+    <ul class="menu-inner py-1 overflow-auto">
 
     <?php
     // Exibe os menus
     $userId = $_SESSION['user_id'] ?? 1; // ID do usuário logado
     if ($userId != null) {
-        // require_once __DIR__ . '/../Models/MenuAccess.php';
-        // $menuData = getMenuAccess($userId);
-        // echo "<span>".json_encode($menuData)."</span>";
+        require_once __DIR__ . '/../../Models/MenuAccess.php';
+        $menuData = getMenuAccess($userId);
+        echo "<span id='menu_data'>".json_encode($menuData)."</span>";
     }
     ?>
 

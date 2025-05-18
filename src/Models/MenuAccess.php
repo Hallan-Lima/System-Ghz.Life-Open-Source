@@ -16,7 +16,7 @@ function getMenuAccess($userId) {
         JOIN functionality f ON uf.functionality_id = f.id
         JOIN module m ON f.module_id = m.id
         WHERE uf.user_id = ? AND uf.can_read = 1
-        ORDER BY m.name, f.parent_id, f.order_index, f.name
+        ORDER BY m.id, f.order_index, f.id
     ";
     $rows = $db->fetchAll($sql, [$userId]);
 

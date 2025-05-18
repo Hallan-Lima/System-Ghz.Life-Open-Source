@@ -10,12 +10,13 @@ class Database
     private $pdo;
 
     public function __construct(
-        $host = 'homelab.local',
+        $host = 'localhost',
         $dbname = 'application',
         $user = 'root',
-        $pass = 'root'
+        $pass = '',
+        $port = 3307
     ) {
-        $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
         try {
             $this->pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

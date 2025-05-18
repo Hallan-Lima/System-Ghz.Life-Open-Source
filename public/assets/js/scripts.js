@@ -380,7 +380,7 @@ function substituirElementoNavbar_collapse() {
 }
 
 function createMenuFromData(menuData, currentPage) {
-  const navbarFirst = document.getElementById('navbar_first');
+  const navbarFirst = document.getElementById('menu_data');
   navbarFirst.innerHTML = '';
 
   menuData.forEach(item => {
@@ -478,8 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
 substituirElementoNavbar_first();
 substituirElementoNavbar_two();
 substituirElementoFooter_nav();
-
-// scripts.js (adicionar no final)
 
 
 
