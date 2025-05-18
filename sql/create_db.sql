@@ -105,15 +105,6 @@ CREATE TABLE user_phone (
     UNIQUE (user_id, phone)
 );
 
--- Histórico de senhas do usuário para fins de auditoria e segurança
-CREATE TABLE user_password_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id)
-);
-
 -- Associação entre usuários e grupos, com possibilidade de designar administradores
 CREATE TABLE group_user (
     id INT AUTO_INCREMENT PRIMARY KEY,
