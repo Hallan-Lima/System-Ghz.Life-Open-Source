@@ -17,13 +17,12 @@ function registerUser($data)
 
     // Validação básica (pode ser expandida)
     if (
-        empty($data['Apelido']) ||
-        empty($data['email']) ||
-        empty($data['password']) ||
-        empty($data['idade']) ||
-        empty($data['terms'])
+        empty($data['nickname']) &&
+        empty($data['email']) &&
+        empty($data['password']) &&
+        empty($data['gender_id']) &&
+        empty($data['birthdate'])
     ) {
-        
         echo "<script>alert('Falha ao cadastrar o usuário, tente novamente.'); window.location.href = 'register-basic';</script>";
         exit;
     }
@@ -31,27 +30,28 @@ function registerUser($data)
     // Hash da senha
     $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
 
-    // Gênero: adapte conforme o valor enviado pelo select
-    $gender = $data['language'] ?? null;
-
-    // Exemplo de insert (ajuste os campos conforme sua tabela)
-    $sql = "INSERT INTO user (nickname, password_hash, gender_id, birthdate)
-            VALUES (?, ?, ?, ?)";
-
-    $params = [
-        $data['Apelido'],
-        $passwordHash,
-        1,
-        $data['idade']
-    ];
+    // Ajuste os valores conforme o formulário e o esperado pela procedure
+    $nickname = $data['nickname'];
+    $gender_id = $data['gender_id']; // Ajuste conforme o valor real do formulário
+    $birthdate = $data['birthdate'];
+    $status_id = 1; // Exemplo: Ativo
+    $level_id = 2;  // Exemplo: Usuário comum
 
     try {
-        var_dump($data);
-        echo "<br>";
-        var_dump($sql);
+        // Chama a procedure (último parâmetro é OUT para o id gerado)
+        $sql = "CALL create_user_with_all_functionalities(?, ?, ?, ?, ?, ?, @new_user_id)";
+        $params = [
+            $nickname,
+            $passwordHash,
+            $gender_id,
+            $birthdate,
+            $status_id,
+            $level_id
+        ];
 
         $db->query($sql, $params);
-        echo "<script> window.location.href = 'home';</script>";
+
+        echo "<script>window.location.href = 'home';</script>";
         exit;
     } catch (\Exception $e) {
         echo "<script>alert('Erro: ".$e->getMessage()."'); window.location.href = 'register-basic';</script>";

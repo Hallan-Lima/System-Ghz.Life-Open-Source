@@ -19,10 +19,10 @@
               <input
                 type="text"
                 class="form-control"
-                id="Apelido"
-                name="Apelido"
+                id="nickname"
+                name="nickname"
                 placeholder="Como gostaria de ser chamado?"
-                aria-describedby="Apelido"
+                aria-describedby="nickname"
                 autofocus />
             </div>
             <div class="mb-3">
@@ -53,7 +53,7 @@
               </div>
             </div>
             <div class="mb-3">
-              <select id="language" class="select2 form-select">
+              <select id="gender_id" name="gender_id" class="select2 form-select">
                 <option value="">Selecione seu gênero</option>
                 <option value="1">Masculino</option>
                 <option value="2">Feminino</option>
@@ -68,12 +68,12 @@
             </div>
 
             <div class="mb-3">
-              <input type="date" class="form-control" id="idade" name="idade" placeholder="Idade" min="01-01-1900" max="17-04-2025" />
+              <input type="date" class="form-control" id="birthdate" name="birthdate" placeholder="birthdate" min="01-01-1900" max="17-04-2025" />
             </div>
 
             <div class="mb-3">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
+                <input class="form-check-input" type="checkbox" id="terms-conditions"  required/>
                 <label class="form-check-label" for="terms-conditions">
                   Eu aceito a
                   <a href="javascript:void(0);">Política de Privacidade e termos</a>
