@@ -20,13 +20,14 @@ O foco principal é entregar um MVP (Produto Mínimo Viável) funcional, com fun
 
 Este é um projeto focado na criação de um software que atenda a necessidades básicas e diárias de forma simples e eficiente. O objetivo é criar um sistema **open source**, começando com um MVP utilizando tecnologias ágeis e acessíveis, como:
 
-- **PHP**
+- **REACT**
+- **C# .NET**
 - **SQL**
 - **HTML**
 - **CSS**
 - **JavaScript**
 
-O projeto utiliza os templates **Bootstrap 5** e **Sneat** (ThemeSelection) para acelerar o desenvolvimento e garantir uma interface moderna e responsiva.
+O projeto utiliza os templates **coreui.io** para acelerar o desenvolvimento e garantir uma interface moderna e responsiva.
 
 ---
 
@@ -34,10 +35,10 @@ O projeto utiliza os templates **Bootstrap 5** e **Sneat** (ThemeSelection) para
 
 A princípio, o projeto será desenvolvido com tecnologias simples para garantir agilidade e entrega de uma versão estável:
 
-- **Backend**: PHP  
-- **Frontend**: HTML, CSS, JavaScript  
+- **Backend**: C# .NET  
+- **Frontend**: HTML, CSS, JavaScript, REACT  
 - **Banco de Dados**: SQL  
-- **Frameworks e Templates**: Bootstrap 5, Sneat  
+- **Frameworks e Templates**: coreui.io
 
 ---
 
@@ -46,30 +47,35 @@ A princípio, o projeto será desenvolvido com tecnologias simples para garantir
 A organização do projeto segue uma estrutura modular e clara, conforme descrito abaixo:
 
 ```
-Projeto/
-├── theme/                 # Arquivos do template utilizado
-├── public/                # Arquivos acessíveis publicamente (ponto de entrada)
-│   ├── index.php          # Arquivo principal (ponto de entrada)
-│   ├── assets/            # Arquivos estáticos
-│   │   ├── css/           # Estilos CSS
-│   │   ├── js/            # Scripts JavaScript
-│   │   └── img/           # Imagens
-│   └── .htaccess          # Configuração do servidor (URLs amigáveis, etc.)
-├── src/                   # Código-fonte do projeto
-│   ├── Controllers/       # Controladores (lógica de negócio)
-│   ├── Models/            # Modelos (interação com o banco de dados)
-│   ├── Views/             # Arquivos HTML/PHP (templates)
-│   │   ├── layouts/       # Layouts principais (header, footer, etc.)
-│   │   └── pages/         # Páginas específicas
-│   └── Helpers/           # Funções auxiliares ou utilitárias
-├── config/                # Configurações do projeto
-│   ├── database.php       # Configuração do banco de dados
-│   └── app.php            # Configurações gerais
-├── vendor/                # Dependências instaladas via Composer
-├── tests/                 # Testes automatizados
-├── .env                   # Variáveis de ambiente (credenciais, etc.)
-├── composer.json          # Gerenciador de dependências PHP
-└── README.md              # Documentação do projeto
+
+PROJETO/
+├── apps/                        # Núcleo das aplicações
+│   ├── api/                     # Backend BFF (C# .NET) - Regra de Negócio
+│   ├── desktop/                 # Aplicação Desktop
+│   ├── mobile/                  # Aplicação Mobile
+│   └── web/                     # Frontend Web (React)
+│
+├── config/                      # Arquivos de configuração globais
+│
+├── public/                      # Pontos de entrada e assets públicos
+│   ├── api/
+│   ├── desktop/
+│   ├── mobile/
+│   └── web/
+│
+├── sql/                         # Scripts de Banco de Dados
+│   ├── create_db.sql            # Criação do banco
+│   ├── insert.sql               # Carga inicial de dados
+│   └── views_functions_procedures.sql # Lógica de banco (Procedures/Views)
+│
+├── themes/                      # Estilos e temas compartilhados
+│   ├── api/
+│   └── frontend/
+│
+├── .gitignore
+├── LICENSE.md
+└── README.md                   # Documentação do projeto
+
 ```
 
 ---
