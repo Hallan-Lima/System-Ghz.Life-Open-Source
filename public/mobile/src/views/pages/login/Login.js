@@ -14,9 +14,24 @@ import {
   CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import { cilLockLocked, cilLockUnlocked, cilUser } from '@coreui/icons'
+import { useLogin } from './useLogin'
+import AppToast from '../../../components/AppToast'
 
 const Login = () => {
+  const {
+    email,
+    handleEmailChange,
+    password,
+    setPassword,
+    handleLogin,
+    toast,
+    toaster,
+    showPassword,
+    setShowPassword,
+    emailError
+  } = useLogin()
+  
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -32,21 +47,35 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="E-mail" autoComplete="email" />
+                      <CFormInput
+                        type="email"
+                        placeholder="E-mail"
+                        autoComplete="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        invalid={emailError}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
-                      <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
+                      <CInputGroupText
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{ cursor: 'pointer' }}
+                        title={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                      >
+                        <CIcon icon={showPassword ? cilLockUnlocked : cilLockLocked} />
                       </CInputGroupText>
+
                       <CFormInput
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
+                        <CButton color="primary" className="px-4" onClick={handleLogin}>
                           Continuar
                         </CButton>
                       </CCol>
@@ -79,6 +108,7 @@ const Login = () => {
           </CCol>
         </CRow>
       </CContainer>
+      <AppToast toaster={toaster} toast={toast} />
     </div>
   )
 }
