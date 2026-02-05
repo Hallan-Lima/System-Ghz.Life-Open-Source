@@ -208,6 +208,38 @@ const Dashboard: React.FC = () => {
             />
           </div>
         </section>
+        
+        {/* 3. Quick Notes Section */}
+        <section>
+          <SectionHeader 
+            title="Anotações Rápidas"
+            onSeeMore={() => navigate("/tasks")}
+          />
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
+            <div className="space-y-3 max-h-48 overflow-y-auto">
+              <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <i className="fas fa-sticky-note text-yellow-500 text-lg mt-1 flex-shrink-0"></i>
+                <div className="flex-grow">
+                  <p className="text-sm text-slate-700 dark:text-slate-300">Exemplo de anotação rápida salva</p>
+                  <p className="text-xs text-slate-400 mt-1">Há 2 horas</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <i className="fas fa-sticky-note text-amber-500 text-lg mt-1 flex-shrink-0"></i>
+                <div className="flex-grow">
+                  <p className="text-sm text-slate-700 dark:text-slate-300">Outra anotação importante</p>
+                  <p className="text-xs text-slate-400 mt-1">Ontem</p>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate("/tasks")}
+              className="w-full mt-4 py-2 text-indigo-600 hover:text-indigo-700 font-bold text-sm uppercase tracking-widest transition-colors"
+            >
+              + Adicionar Anotação
+            </button>
+          </div>
+        </section>
 
         {/* Configurar Widths Button */}
         <section className="flex justify-center">
