@@ -25,12 +25,12 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   // We split them to render around the central button
   const mobileLeftItems = [
     { to: '/', icon: 'fas fa-home', label: 'Home' },
-    { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas' }, // Representing "A definir" / Menu style
+    { to: '/modules', icon: 'fas fa-boxes-stacked', label: 'Modúlos' },
   ];
 
   const mobileRightItems = [
-    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças' }, // Representing "A definir" / Menu style
-    { to: '/health', icon: 'fas fa-chart-line', label: 'Evolução' }, // Representing "Evolução"
+    { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas' }, 
+    { to: '/ia', icon: 'fas fa-brain', label: 'IA' },
   ];
 
   if (hideNav) return <>{children}</>;

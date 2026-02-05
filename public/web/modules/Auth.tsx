@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 // --- Shared Components & Data ---
@@ -196,11 +196,11 @@ export const LoginPage: React.FC = () => {
       const elementLeft = element.offsetLeft;
       const elementWidth = element.offsetWidth;
 
-      const scrollTo = elementLeft - (containerWidth / 2) + (elementWidth / 2);
+      const scrollTo = elementLeft - containerWidth / 2 + elementWidth / 2;
 
       container.scrollTo({
         left: scrollTo,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   }, [slide.category]); // Executa sempre que a categoria do slide mudar
@@ -221,7 +221,7 @@ export const LoginPage: React.FC = () => {
             </button>
             <div className="space-y-1 pt-2">
               <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tighter">
-                Login Hub
+                Login Ghz.Life
               </h3>
               <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
                 Seja bem-vindo
@@ -231,7 +231,7 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <FormInput
-              label="E-mail Ghz"
+              label="E-mail"
               icon="fas fa-envelope"
               type="email"
               placeholder="seu@ghz.life"
@@ -419,6 +419,7 @@ interface RegisterState {
   lastName: string;
   email: string;
   password: string;
+  confirmPassword: string;
   gender: string;
   birthDate: string;
 
@@ -461,28 +462,89 @@ const MODULES = [
     color: "text-indigo-500",
     desc: "Tarefas e agenda inteligente.",
   },
-  {
-    id: "journal",
-    title: "Diário",
-    icon: "fas fa-book-open",
-    color: "text-amber-500",
-    desc: "Registro de pensamentos.",
-  },
 ];
 
 const INTERESTS = [
-  "Tecnologia",
-  "Investimentos",
-  "Musculação",
-  "Yoga",
-  "Leitura",
-  "Viagens",
-  "Culinária",
-  "Meditação",
-  "Artes",
-  "Games",
-  "Música",
-  "Estudos",
+  "Tecnologia",                   // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Investimentos",                // TODO: Funcionalidade futura, modulo financeiro
+  "Musculação",                   // TODO: Funcionalidade futura, modulo saúde
+  "Yoga",                         // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Leitura",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Viagens",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Culinária",                    // TODO: Funcionalidade futura, modulo saúde
+  "Meditação",                    // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Artes",                        // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Games",                        // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Música",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Estudos",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Rede Social",                  // TODO: Funcionalidade futura, modulo social
+  "Criação de enquetes",          // TODO: Funcionalidade futura, modulo social
+  "Encontrar serviços",           // TODO: Funcionalidade futura, modulo social
+  "Prestar serviços",             // TODO: Funcionalidade futura, modulo social
+  "Encontrar pessoas",            // TODO: Funcionalidade futura, modulo social
+  "Participar de comunidades",    // TODO: Funcionalidade futura, modulo social
+  "Chat aleatorio",               // TODO: Funcionalidade futura, modulo social
+  "Dicas Personalizadas",                // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Agenda",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Eventos",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Tarefas",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Lembretes",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Dispertador",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Metas Pessoais",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Cronômetro",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Pomodoro",                       // TODO: Funcionalidade futura, modulo Agenda
+  "Alimentação",                       // TODO: Funcionalidade futura, modulo Alimentação
+  "Plano Alimentar",                       // TODO: Funcionalidade futura, modulo Alimentação
+  "Controle de nutrientes",                       // TODO: Funcionalidade futura, modulo Alimentação
+  "Personal trainer",                       // TODO: Funcionalidade futura, modulo Alimentação
+  "Atividades Fisicas",                       // TODO: Funcionalidade futura, modulo Esportes
+  "Montar treinos",                       // TODO: Funcionalidade futura, modulo Esportes
+  "Acompanhar Academia",                       // TODO: Funcionalidade futura, modulo Esportes
+  "Acompanhar progresso",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Lembrete de beber água",                       // TODO: Funcionalidade futura, modulo saúde
+  "Lembrete médico",                       // TODO: Funcionalidade futura, modulo saúde
+  "Acompanhamento médico",                       // TODO: Funcionalidade futura, modulo saúde
+  "Ciclo Menstrual",                       // TODO: Funcionalidade futura, modulo saúde
+  "Monitoramento de Peso",                       // TODO: Funcionalidade futura, modulo saúde
+  "Monitoramento de Sono",                       // TODO: Funcionalidade futura, modulo saúde
+  "Monitoramento de Cardiaco",                       // TODO: Funcionalidade futura, modulo saúde
+  "Monitoramento de pressão cardiaca",                       // TODO: Funcionalidade futura, modulo saúde
+  "Monitoramento de temperatura corporal",                       // TODO: Funcionalidade futura, modulo saúde
+  "Estilo de vida Saudavel",                       // TODO: Funcionalidade futura, modulo saúde
+  "Dispositivos inteligentes",                       // TODO: Funcionalidade futura, modulo saúde
+  "Contas a Pagar",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Contas a Receber",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Controle de movimentações Financeira",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Objetivo Financeiro",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Cartão de Crédito",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Importação de movimentações",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Investimentos",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Integração com bancos",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Lista de compra",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Calculadora Basica",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Calculadora Cientifica",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Calculadora Financeira",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Planejamento e Orçamento",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Calculadora de Conversões",                       // TODO: Funcionalidade futura, modulo financeiro
+  "Noticias",                       // TODO: Funcionalidade futura, modulo social
+  "Rock",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "POP",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Eletronica",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Comedia",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Terror",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Drama",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Serie",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Filmes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Animes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Valores e crenças",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Experiencias",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Cultura e Ambiente",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Habilidades e talentos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Hobbies",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Esportes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Livros",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Jogos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+  "Eventos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
 ];
 
 export const RegisterPage: React.FC = () => {
@@ -495,6 +557,7 @@ export const RegisterPage: React.FC = () => {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     gender: "",
     birthDate: "",
     selectedModules: ["finance", "productivity"], // Default
@@ -507,6 +570,7 @@ export const RegisterPage: React.FC = () => {
     },
     interests: [],
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const updateForm = (key: keyof RegisterState, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -610,8 +674,7 @@ export const RegisterPage: React.FC = () => {
                 Quem é você?
               </h2>
               <p className="text-slate-400 text-sm">
-                Precisamos de alguns dados essenciais para criar seu perfil no
-                Hub.
+                Precisamos de alguns dados essenciais para criar seu perfil.
               </p>
             </div>
 
@@ -670,13 +733,35 @@ export const RegisterPage: React.FC = () => {
                 value={formData.email}
                 onChange={(e) => updateForm("email", e.target.value)}
               />
+              <div style={{ position: "relative" }}>
+                <FormInput
+                  label="Senha"
+                  icon="fas fa-lock"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mínimo 8 caracteres"
+                  value={formData.password}
+                  onChange={(e) => updateForm("password", e.target.value)}
+                />
+                <i
+                  className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "15px",
+                    top: "45px",
+                    cursor: "pointer",
+                    zIndex: 10,
+                  }}
+                />
+              </div>
+
               <FormInput
-                label="Senha"
+                label="Confirme a Senha"
                 icon="fas fa-lock"
-                type="password"
-                placeholder="Mínimo 8 caracteres"
-                value={formData.password}
-                onChange={(e) => updateForm("password", e.target.value)}
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirme sua senha"
+                value={formData.confirmPassword}
+                onChange={(e) => updateForm("confirmPassword", e.target.value)}
               />
             </div>
           </div>
@@ -690,8 +775,8 @@ export const RegisterPage: React.FC = () => {
                 Seu Foco
               </h2>
               <p className="text-slate-400 text-sm">
-                Selecione o que é importante para você agora. Liberaremos os
-                módulos conforme sua escolha.
+                Nosso foco! Selecione o que é importante para você agora.
+                Liberaremos as funcionalidades conforme sua escolha.
               </p>
             </div>
 
@@ -841,7 +926,7 @@ export const RegisterPage: React.FC = () => {
                     >
                       <p className="font-black text-sm mb-1">Simples</p>
                       <p className="text-[10px]">
-                        Entradas, Saídas e Saldo Geral.
+                        Controle mais simples, apenas entradas, Saídas e Saldo Geral.
                       </p>
                     </button>
                     <button
@@ -854,6 +939,7 @@ export const RegisterPage: React.FC = () => {
                     >
                       <p className="font-black text-sm mb-1">Avançado</p>
                       <p className="text-[10px]">
+                        Mais opções de personalização e controle, como: 
                         Categorias, cartões, metas e tags.
                       </p>
                     </button>
@@ -877,6 +963,7 @@ export const RegisterPage: React.FC = () => {
                       "Treinos",
                       "Sono",
                       "Calorias",
+                      "Academia",
                     ].map((goal) => (
                       <button
                         key={goal}
