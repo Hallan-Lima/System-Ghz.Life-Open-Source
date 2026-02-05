@@ -233,7 +233,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => navigate("/tasks")}
+              onClick={() => navigate("/tasks/new")}
               className="w-full mt-4 py-2 text-indigo-600 hover:text-indigo-700 font-bold text-sm uppercase tracking-widest transition-colors"
             >
               + Adicionar Anotação

@@ -465,6 +465,7 @@ const MODULES = [
 ];
 
 const INTERESTS = [
+  "Conta conjunta",                   // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
   "Tecnologia",                   // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
   "Investimentos",                // TODO: Funcionalidade futura, modulo financeiro
   "Musculação",                   // TODO: Funcionalidade futura, modulo saúde

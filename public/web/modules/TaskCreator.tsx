@@ -137,6 +137,11 @@ const TaskCreator: React.FC = () => {
 
          {/* 2. Main Input (Title) */}
          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+          <div className="space-y-2 mb-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+              Título <span className="text-rose-500">*</span>
+            </label>
+          </div>
             <div className="relative">
                <textarea 
                  placeholder={
@@ -179,22 +184,36 @@ const TaskCreator: React.FC = () => {
 
                 {(type === TaskType.GOAL || type === TaskType.DREAM) && (
                     <div className="grid grid-cols-5 gap-6">
-                       <div className="col-span-3 space-y-3">
+                         <div className="col-span-3 space-y-3">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Meta</label>
                           <input 
-                            type="number" 
-                            placeholder="100"
-                            value={targetValue}
-                            onChange={(e) => setTargetValue(e.target.value)}
-                            className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                          type="number" 
+                          placeholder="100"
+                          min="1"
+                          value={targetValue}
+                          onChange={(e) => setTargetValue(e.target.value)}
+                          className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                           />
-                       </div>
+                         </div>
                        <div className="col-span-2 space-y-3">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Unidade</label>
                           {type === TaskType.DREAM ? (
-                              <div className="w-full h-[60px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-400 font-bold text-sm border border-transparent">
-                                 R$
-                              </div>
+                              <select
+                                value={unit}
+                                onChange={(e) => setUnit(e.target.value)}
+                                className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-amber-500 outline-none transition-all appearance-none cursor-pointer"
+                              >
+                                <option value="">Selecionar</option>
+                                <option value="BRL">🇧🇷 Real (R$)</option>
+                                <option value="USD">🇺🇸 Dólar ($)</option>
+                                <option value="EUR">🇪🇺 Euro (€)</option>
+                                <option value="GBP">🇬🇧 Libra (£)</option>
+                                <option value="JPY">🇯🇵 Iene (¥)</option>
+                                <option value="BTC">₿ Bitcoin</option>
+                                <option value="ETH">Ξ Ethereum</option>
+                                <option value="USDT">₮ Tether</option>
+                                <option value="OTHER">Outra</option>
+                              </select>
                           ) : (
                              <input 
                                type="text" 
@@ -272,6 +291,23 @@ const TaskCreator: React.FC = () => {
                         value={dueDate}
                         onChange={(e) => setDueDate(e.target.value)}
                         className="w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-bold p-4 pl-16 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all appearance-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Product Link (Only for Shopping) */}
+                {isShopping && (
+                  <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Link do Produto</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:text-white transition-all">
+                        <i className="fas fa-link text-sm"></i>
+                      </div>
+                      <input 
+                        type="url" 
+                        placeholder="https://exemplo.com/produto"
+                        className="w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 pl-16 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all text-sm"
                       />
                     </div>
                   </div>
