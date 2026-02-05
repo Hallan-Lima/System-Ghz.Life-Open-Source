@@ -1,0 +1,8 @@
+{
+  "name": "Ghz.Life - Seu Hub de Vida Inteligente",
+  "description": "Uma plataforma integrada pela HallTech para gestão financeira, saúde e produtividade com auxílio de Inteligência Artificial.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
