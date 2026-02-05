@@ -63,6 +63,9 @@ PROJETO/
 │   ├── mobile/
 │   └── web/
 │
+├── docs/                      # Documentos e informações uteis
+│   └── ia/                    # Usar como base de conhecimento ao utilizar IA
+│
 ├── sql/                         # Scripts de Banco de Dados
 │   ├── create_db.sql            # Criação do banco
 │   ├── insert.sql               # Carga inicial de dados
