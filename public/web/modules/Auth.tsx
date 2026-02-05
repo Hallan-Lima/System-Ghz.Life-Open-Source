@@ -464,89 +464,135 @@ const MODULES = [
   },
 ];
 
-const INTERESTS = [
-  "Conta conjunta",                   // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Tecnologia",                   // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Investimentos",                // TODO: Funcionalidade futura, modulo financeiro
-  "Musculação",                   // TODO: Funcionalidade futura, modulo saúde
-  "Yoga",                         // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Leitura",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Viagens",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Culinária",                    // TODO: Funcionalidade futura, modulo saúde
-  "Meditação",                    // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Artes",                        // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Games",                        // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Música",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Estudos",                      // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Rede Social",                  // TODO: Funcionalidade futura, modulo social
-  "Criação de enquetes",          // TODO: Funcionalidade futura, modulo social
-  "Encontrar serviços",           // TODO: Funcionalidade futura, modulo social
-  "Prestar serviços",             // TODO: Funcionalidade futura, modulo social
-  "Encontrar pessoas",            // TODO: Funcionalidade futura, modulo social
-  "Participar de comunidades",    // TODO: Funcionalidade futura, modulo social
-  "Chat aleatorio",               // TODO: Funcionalidade futura, modulo social
-  "Dicas Personalizadas",                // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Agenda",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Eventos",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Tarefas",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Lembretes",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Dispertador",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Metas Pessoais",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Cronômetro",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Pomodoro",                       // TODO: Funcionalidade futura, modulo Agenda
-  "Alimentação",                       // TODO: Funcionalidade futura, modulo Alimentação
-  "Plano Alimentar",                       // TODO: Funcionalidade futura, modulo Alimentação
-  "Controle de nutrientes",                       // TODO: Funcionalidade futura, modulo Alimentação
-  "Personal trainer",                       // TODO: Funcionalidade futura, modulo Alimentação
-  "Atividades Fisicas",                       // TODO: Funcionalidade futura, modulo Esportes
-  "Montar treinos",                       // TODO: Funcionalidade futura, modulo Esportes
-  "Acompanhar Academia",                       // TODO: Funcionalidade futura, modulo Esportes
-  "Acompanhar progresso",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Lembrete de beber água",                       // TODO: Funcionalidade futura, modulo saúde
-  "Lembrete médico",                       // TODO: Funcionalidade futura, modulo saúde
-  "Acompanhamento médico",                       // TODO: Funcionalidade futura, modulo saúde
-  "Ciclo Menstrual",                       // TODO: Funcionalidade futura, modulo saúde
-  "Monitoramento de Peso",                       // TODO: Funcionalidade futura, modulo saúde
-  "Monitoramento de Sono",                       // TODO: Funcionalidade futura, modulo saúde
-  "Monitoramento de Cardiaco",                       // TODO: Funcionalidade futura, modulo saúde
-  "Monitoramento de pressão cardiaca",                       // TODO: Funcionalidade futura, modulo saúde
-  "Monitoramento de temperatura corporal",                       // TODO: Funcionalidade futura, modulo saúde
-  "Estilo de vida Saudavel",                       // TODO: Funcionalidade futura, modulo saúde
-  "Dispositivos inteligentes",                       // TODO: Funcionalidade futura, modulo saúde
-  "Contas a Pagar",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Contas a Receber",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Controle de movimentações Financeira",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Objetivo Financeiro",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Cartão de Crédito",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Importação de movimentações",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Investimentos",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Integração com bancos",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Lista de compra",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Calculadora Basica",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Calculadora Cientifica",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Calculadora Financeira",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Planejamento e Orçamento",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Calculadora de Conversões",                       // TODO: Funcionalidade futura, modulo financeiro
-  "Noticias",                       // TODO: Funcionalidade futura, modulo social
-  "Rock",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "POP",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Eletronica",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Comedia",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Terror",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Drama",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Serie",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Filmes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Animes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Valores e crenças",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Experiencias",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Cultura e Ambiente",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Habilidades e talentos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Hobbies",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Esportes",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Livros",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Jogos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
-  "Eventos",                       // TODO: Funcionalidade futura, modulo agente IA, perfil de usuario
+interface Interest {
+  id: string;
+  label: string;
+  category: "module" | "user_trait";
+  relatedModule?: string;
+}
+
+const INTERESTS: Interest[] = [
+  // --- MÓDULOS (Funcionalidades do Sistema) ---
+  // Módulo: Financeiro
+  { id: "contas_pagar", label: "Contas a Pagar", category: "module", relatedModule: "finance" },
+  { id: "contas_receber", label: "Contas a Receber", category: "module", relatedModule: "finance" },
+  { id: "controle_movimentacoes", label: "Controle de Movimentações", category: "module", relatedModule: "finance" },
+  { id: "objetivo_financeiro", label: "Objetivo Financeiro", category: "module", relatedModule: "finance" },
+  { id: "cartao_credito", label: "Cartão de Crédito", category: "module", relatedModule: "finance" },
+  { id: "importacao_movimentacoes", label: "Importação de Movimentações", category: "module", relatedModule: "finance" },
+  { id: "integracao_bancos", label: "Integração com Bancos", category: "module", relatedModule: "finance" },
+  { id: "planejamento_orcamento", label: "Planejamento e Orçamento", category: "module", relatedModule: "finance" },
+  { id: "lista_compra", label: "Lista de Compra", category: "module", relatedModule: "finance" },
+  { id: "calculadora_basica", label: "Calculadora Básica", category: "module", relatedModule: "finance" },
+  { id: "calculadora_cientifica", label: "Calculadora Científica", category: "module", relatedModule: "finance" },
+  { id: "calculadora_financeira", label: "Calculadora Financeira", category: "module", relatedModule: "finance" },
+  { id: "calculadora_conversoes", label: "Calculadora de Conversões", category: "module", relatedModule: "finance" },
+
+  // Módulo: Saúde
+  { id: "lembrete_agua", label: "Lembrete de Beber Água", category: "module", relatedModule: "health" },
+  { id: "lembrete_medicamento", label: "Lembrete Médico", category: "module", relatedModule: "health" },
+  { id: "acompanhamento_medico", label: "Acompanhamento Médico", category: "module", relatedModule: "health" },
+  { id: "ciclo_menstrual", label: "Ciclo Menstrual", category: "module", relatedModule: "health" },
+  { id: "monitoramento_peso", label: "Monitoramento de Peso", category: "module", relatedModule: "health" },
+  { id: "monitoramento_sono", label: "Monitoramento de Sono", category: "module", relatedModule: "health" },
+  { id: "monitoramento_cardiaco", label: "Monitoramento Cardíaco", category: "module", relatedModule: "health" },
+  { id: "monitoramento_pressao", label: "Monitoramento de Pressão", category: "module", relatedModule: "health" },
+  { id: "monitoramento_temperatura", label: "Monitoramento de Temperatura", category: "module", relatedModule: "health" },
+  { id: "dispositivos_inteligentes", label: "Dispositivos Inteligentes", category: "module", relatedModule: "health" },
+
+  // Módulo: Produtividade & Agenda
+  { id: "agenda", label: "Agenda", category: "module", relatedModule: "productivity" },
+  { id: "eventos", label: "Eventos", category: "module", relatedModule: "productivity" },
+  { id: "tarefas", label: "Tarefas", category: "module", relatedModule: "productivity" },
+  { id: "lembretes", label: "Lembretes", category: "module", relatedModule: "productivity" },
+  { id: "despertador", label: "Despertador", category: "module", relatedModule: "productivity" },
+  { id: "metas_pessoais", label: "Metas Pessoais", category: "module", relatedModule: "productivity" },
+  { id: "cronometro", label: "Cronômetro", category: "module", relatedModule: "productivity" },
+  { id: "pomodoro", label: "Pomodoro", category: "module", relatedModule: "productivity" },
+
+  // Módulo: Alimentação
+  { id: "alimentacao", label: "Alimentação", category: "module", relatedModule: "health" },
+  { id: "plano_alimentar", label: "Plano Alimentar", category: "module", relatedModule: "health" },
+  { id: "controle_nutrientes", label: "Controle de Nutrientes", category: "module", relatedModule: "health" },
+  { id: "personal_trainer", label: "Personal Trainer", category: "module", relatedModule: "health" },
+
+  // Módulo: Esportes & Fitness
+  { id: "atividades_fisicas", label: "Atividades Físicas", category: "module", relatedModule: "health" },
+  { id: "montar_treinos", label: "Montar Treinos", category: "module", relatedModule: "health" },
+  { id: "acompanhar_academia", label: "Acompanhar Academia", category: "module", relatedModule: "health" },
+  { id: "acompanhar_progresso", label: "Acompanhar Progresso", category: "module", relatedModule: "health" },
+
+  // Módulo: Social
+  { id: "rede_social", label: "Rede Social", category: "module", relatedModule: "social" },
+  { id: "criacao_enquetes", label: "Criação de Enquetes", category: "module", relatedModule: "social" },
+  { id: "encontrar_servicos", label: "Encontrar Serviços", category: "module", relatedModule: "social" },
+  { id: "prestar_servicos", label: "Prestar Serviços", category: "module", relatedModule: "social" },
+  { id: "encontrar_pessoas", label: "Encontrar Pessoas", category: "module", relatedModule: "social" },
+  { id: "participar_comunidades", label: "Participar de Comunidades", category: "module", relatedModule: "social" },
+  { id: "chat_aleatorio", label: "Chat Aleatório", category: "module", relatedModule: "social" },
+  { id: "noticias", label: "Notícias", category: "module", relatedModule: "social" },
+
+  // Módulo: Agente IA
+  { id: "conta_conjunta", label: "Conta Conjunta", category: "module", relatedModule: "ai_agent" },
+  { id: "dicas_personalizadas", label: "Dicas Personalizadas", category: "module", relatedModule: "ai_agent" },
+
+  // --- CARACTERÍSTICAS DO USUÁRIO (Personalização do Agente) ---
+  // Interesses Gerais
+  { id: "tecnologia", label: "Tecnologia", category: "user_trait" },
+  { id: "leitura", label: "Leitura", category: "user_trait" },
+  { id: "viagens", label: "Viagens", category: "user_trait" },
+  { id: "culinaria", label: "Culinária", category: "user_trait" },
+  { id: "meditacao", label: "Meditação", category: "user_trait" },
+  { id: "artes", label: "Artes", category: "user_trait" },
+  { id: "hobbies", label: "Hobbies", category: "user_trait" },
+
+  // Estilos de Vida & Saúde
+  { id: "estilo_vida_saudavel", label: "Estilo de Vida Saudável", category: "user_trait" },
+  { id: "musculacao", label: "Musculação", category: "user_trait" },
+  { id: "yoga", label: "Yoga", category: "user_trait" },
+  { id: "esportes", label: "Esportes", category: "user_trait" },
+
+  // Entretenimento & Mídia
+  { id: "games", label: "Games", category: "user_trait" },
+  { id: "musica", label: "Música", category: "user_trait" },
+  { id: "filmes", label: "Filmes", category: "user_trait" },
+  { id: "series", label: "Séries", category: "user_trait" },
+  { id: "animes", label: "Animes", category: "user_trait" },
+  { id: "livros", label: "Livros", category: "user_trait" },
+  { id: "jogos", label: "Jogos", category: "user_trait" },
+
+  // Gêneros Musicais
+  { id: "rock", label: "Rock", category: "user_trait" },
+  { id: "pop", label: "POP", category: "user_trait" },
+  { id: "eletronica", label: "Eletrônica", category: "user_trait" },
+
+  // Gêneros de Conteúdo
+  { id: "comedia", label: "Comédia", category: "user_trait" },
+  { id: "terror", label: "Terror", category: "user_trait" },
+  { id: "drama", label: "Drama", category: "user_trait" },
+
+  // Valores & Características Pessoais
+  { id: "valores_crencas", label: "Valores e Crenças", category: "user_trait" },
+  { id: "experiencias", label: "Experiências", category: "user_trait" },
+  { id: "cultura_ambiente", label: "Cultura e Ambiente", category: "user_trait" },
+  { id: "habilidades_talentos", label: "Habilidades e Talentos", category: "user_trait" },
+  { id: "investimentos", label: "Investimentos", category: "user_trait" },
+  { id: "estudos", label: "Estudos", category: "user_trait" },
 ];
+
+// Funções auxiliares para filtrar interesses
+export const getModuleInterests = () => 
+  INTERESTS.filter(interest => interest.category === "module");
+
+export const getUserTraitInterests = () => 
+  INTERESTS.filter(interest => interest.category === "user_trait");
+
+export const getInterestsByModule = (moduleId: string) => 
+  INTERESTS.filter(
+    interest => 
+      interest.category === "module" && 
+      interest.relatedModule === moduleId
+  );
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -982,26 +1028,69 @@ export const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-              {/* General Interests */}
-              <div>
+              {/* Module-specific Interests */}
+              {formData.selectedModules.length > 0 && (
+              <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
                 <h3 className="font-bold text-white text-sm uppercase tracking-wide mb-4 pl-1">
-                  Interesses Gerais
+                Funcionalidades de Interesse
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {INTERESTS.map((interest) => (
-                    <button
-                      key={interest}
-                      onClick={() => toggleInterest(interest)}
-                      className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all ${
-                        formData.interests.includes(interest)
-                          ? "bg-white text-indigo-600 scale-105 shadow-lg shadow-white/10"
-                          : "bg-slate-800 text-slate-400 hover:bg-slate-700"
-                      }`}
-                    >
-                      {interest}
-                    </button>
-                  ))}
+                {getModuleInterests().map((interest) => (
+                  <button
+                  key={interest.id}
+                  onClick={() => toggleInterest(interest.id)}
+                  className={`px-3 py-2 rounded-lg text-[11px] font-bold border transition-all whitespace-nowrap ${
+                    formData.interests.includes(interest.id)
+                    ? "bg-indigo-500/20 border-indigo-500 text-indigo-300"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
+                  }`}
+                  >
+                  {interest.label}
+                  </button>
+                ))}
                 </div>
+              </div>
+              )}
+
+              {/* User Traits & Preferences */}
+              <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
+              <h3 className="font-bold text-white text-sm uppercase tracking-wide mb-4 pl-1">
+                Seus Interesses & Hobbies
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {getUserTraitInterests().map((interest) => (
+                <button
+                  key={interest.id}
+                  onClick={() => toggleInterest(interest.id)}
+                  className={`px-3 py-2 rounded-lg text-[11px] font-bold border transition-all whitespace-nowrap ${
+                  formData.interests.includes(interest.id)
+                    ? "bg-white/20 border-white text-white"
+                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
+                  }`}
+                >
+                  {interest.label}
+                </button>
+                ))}
+              </div>
+              </div>
+
+              {/* Feedback Section */}
+              <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
+              <div className="flex items-center gap-2 mb-4">
+                <i className="fas fa-lightbulb text-amber-400"></i>
+                <h3 className="font-bold text-white text-sm uppercase tracking-wide">
+                Algo que Faltou?
+                </h3>
+              </div>
+              <textarea
+                placeholder="Nos conte se sentiu falta de algo, sugestões ou feedbacks..."
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-2xl text-white text-sm placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none resize-none transition-all"
+                rows={4}
+                maxLength={300}
+              />
+              <p className="text-[10px] text-slate-500 mt-2 text-right">
+                Máx. 300 caracteres
+              </p>
               </div>
             </div>
           </div>
