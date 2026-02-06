@@ -72,6 +72,24 @@ const initialTasks: Task[] = [
     estimatedCost: 2000,
     content: "Comprar monitor para melhorar produtividade",
   },
+  // Notes (if applicable)
+  {
+    id: "8",
+    title: "Ideias para Blog",
+    completed: false,
+    priority: TaskPriority.LOW,
+    type: TaskType.NOTE,
+    content: "Escrever sobre desenvolvimento web e dicas de produtividade",
+  },
+  {
+    id: "9",
+    title: "Receita de Panqueca",
+    completed: false,
+    priority: TaskPriority.LOW,
+    type: TaskType.NOTE,
+    content:
+      "Misturar 1 xícara de farinha, 1 ovo, 1 xícara de leite e uma pitada de sal. Cozinhar em fogo médio até dourar dos dois lados.",
+  },
 ];
 
 const Tasks: React.FC = () => {
@@ -84,6 +102,7 @@ const Tasks: React.FC = () => {
   const [config, setConfig] = useState({
     enableGoals: true,
     enableShopping: true,
+    enableNotes: true,
   });
 
   // Derived state for display
@@ -92,17 +111,23 @@ const Tasks: React.FC = () => {
       // Filter by type
       if (activeTab === TaskType.DAILY && t.type === TaskType.DAILY)
         return true;
+
       if (
         activeTab === TaskType.GOAL &&
         (t.type === TaskType.GOAL || t.type === TaskType.DREAM)
       )
         return true;
+
       if (activeTab === TaskType.SHOPPING && t.type === TaskType.SHOPPING)
         return true;
+
+      // Adicionado o filtro para Anotações
+      if (activeTab === TaskType.NOTE && t.type === TaskType.NOTE) return true;
+
       return false;
     })
     .filter((t) => {
-      // Filter by status
+      // Filter by status (Mantive igual ao seu original)
       if (filter === "all") return true;
       if (filter === "done") return t.completed;
       if (filter === "pending") return !t.completed;
@@ -171,6 +196,19 @@ const Tasks: React.FC = () => {
               }`}
             >
               <i className="fas fa-cart-shopping mr-2"></i> Listas & Compras
+            </button>
+          )}
+
+          {config.enableNotes && (
+            <button
+              onClick={() => setActiveTab(TaskType.NOTE)}
+              className={`flex-shrink-0 px-6 py-3 rounded-[2rem] font-black text-xs uppercase tracking-wider transition-all border ${
+                activeTab === TaskType.NOTE
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none"
+                  : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800"
+              }`}
+            >
+              <i className="fas fa-sticky-note mr-2"></i> Anotações
             </button>
           )}
         </div>
@@ -329,13 +367,13 @@ const Tasks: React.FC = () => {
                   >
                     <i className="fas fa-pen text-sm"></i>
                   </button>
-                <button
+                  <button
                     onClick={() => toggleTask(task.id)}
                     className={`px-3 py-2 rounded-lg text-sm transition-all ${task.completed ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600" : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"}`}
                     title="Concluir"
-                >
+                  >
                     <i className="fas fa-check text-sm"></i>
-                </button>
+                  </button>
                   <button
                     className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
                     title="Arquivar"
@@ -405,6 +443,50 @@ const Tasks: React.FC = () => {
                 </div>
               </div>
             ))}
+
+          {/* VIEW: NOTES */}
+          {activeTab === TaskType.NOTE &&
+            currentTasks.map((task: Task) => (
+              <div
+                key={task.id}
+                className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-6 rounded-[1.5rem] shadow-sm border border-yellow-200 dark:border-yellow-800/40 relative overflow-hidden"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-black text-slate-800 dark:text-white text-sm">
+                      {task.title}
+                    </h4>
+                  </div>
+                  <div
+                    className="flex-shrink-0 flex justify-end gap-1"
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                  >
+                    <button
+                      className="px-3 py-2 bg-white/50 dark:bg-slate-800/50 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                      title="Editar"
+                    >
+                      <i className="fas fa-pen text-sm"></i>
+                    </button>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-2 bg-white/50 dark:bg-slate-800/50 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
+                      title="Arquivar"
+                    >
+                      <i className="fas fa-archive text-sm"></i>
+                    </button>
+                    <button
+                      className="px-3 py-2 bg-white/50 dark:bg-slate-800/50 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all"
+                      title="Excluir"
+                    >
+                      <i className="fas fa-trash text-sm"></i>
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                  {(task as any).content || "Sem conteúdo"}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
 
@@ -449,6 +531,17 @@ const Tasks: React.FC = () => {
             className={`px-3 py-1 rounded-lg text-[10px] font-bold border ${config.enableShopping ? "bg-indigo-100 text-indigo-600 border-indigo-200" : "text-slate-400 border-slate-200"}`}
           >
             Shopping: {config.enableShopping ? "ON" : "OFF"}
+          </button>
+          <button
+            onClick={() =>
+              setConfig((prev) => ({
+                ...prev,
+                enableNotes: !prev.enableNotes,
+              }))
+            }
+            className={`px-3 py-1 rounded-lg text-[10px] font-bold border ${config.enableNotes ? "bg-indigo-100 text-indigo-600 border-indigo-200" : "text-slate-400 border-slate-200"}`}
+          >
+            Notes: {config.enableNotes ? "ON" : "OFF"}
           </button>
         </div>
       </div>
