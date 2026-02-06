@@ -36,6 +36,7 @@ export interface Task {
   priority: TaskPriority;
   dueDate?: string;
   type: TaskType;
+  content: string;
   
   // New Fields
   recurrence?: RecurrenceInterval;

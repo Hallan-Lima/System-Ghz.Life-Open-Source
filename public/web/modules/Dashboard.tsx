@@ -30,6 +30,7 @@ const mockTasks: Task[] = [
     priority: TaskPriority.HIGH,
     dueDate: "2023-10-30",
     type: TaskType.DAILY,
+    content: "",
   },
 ];
 const mockHealth: HealthStats = { waterIntake: 1.6, waterGoal: 2.0 };
@@ -217,12 +218,13 @@ const Dashboard: React.FC = () => {
           />
           <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800">
             <div className="space-y-3 max-h-48 overflow-y-auto">
-              <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <i className="fas fa-sticky-note text-yellow-500 text-lg mt-1 flex-shrink-0"></i>
-                <div className="flex-grow">
-                  <p className="text-sm text-slate-700 dark:text-slate-300">Exemplo de anotação rápida salva</p>
-                  <p className="text-xs text-slate-400 mt-1">Há 2 horas</p>
-                </div>
+              <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800 group">
+          <i className="fas fa-sticky-note text-yellow-500 text-lg mt-1 flex-shrink-0"></i>
+          <div className="flex-grow">
+            <p className="text-sm text-slate-700 dark:text-slate-300">Exemplo de anotação rápida salva</p>
+            <p className="text-xs text-slate-400 mt-1">Há 2 horas</p>
+          </div>
+          <i className="fas fa-edit text-slate-400 hover:text-indigo-600 cursor-pointer mt-1 flex-shrink-0"></i>
               </div>
               <div className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <i className="fas fa-sticky-note text-amber-500 text-lg mt-1 flex-shrink-0"></i>

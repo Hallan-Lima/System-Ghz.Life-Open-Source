@@ -343,16 +343,30 @@ const TaskCreator: React.FC = () => {
                     {/* Notes Textarea (Primary content for Note type) */}
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                        {isNote ? 'Conteúdo da Nota' : 'Notas & Detalhes'}
+                      {isNote ? 'Conteúdo da Nota' : 'Notas & Detalhes'}
                       </label>
                       <textarea 
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder={isNote ? "Escreva seus pensamentos..." : "Adicione descrições, links ou anotações importantes..."}
-                        rows={isNote ? 8 : 4}
-                        className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? 'text-lg' : ''}`}
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder={isNote ? "Escreva seus pensamentos..." : "Adicione descrições, links ou anotações importantes..."}
+                      rows={isNote ? 8 : 4}
+                      className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? 'text-lg' : ''}`}
                       />
                     </div>
+
+                    {/* Pin & Archive Options (Only for Notes) */}
+                    {isNote && (
+                      <div className="flex gap-3 border-t border-slate-200 dark:border-slate-700 pt-6">
+                      <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all border border-transparent hover:border-amber-300 dark:hover:border-amber-700">
+                        <i className="fas fa-thumbtack text-sm"></i>
+                        <span className="text-xs font-bold uppercase tracking-wide">Fixar</span>
+                      </button>
+                      <button className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-600">
+                        <i className="fas fa-box text-sm"></i>
+                        <span className="text-xs font-bold uppercase tracking-wide">Arquivar</span>
+                      </button>
+                      </div>
+                    )}
                 </div>
 
             </div>
