@@ -207,39 +207,54 @@ const Tasks: React.FC = () => {
 
           {/* VIEW: DAILY TASKS */}
           {activeTab === TaskType.DAILY &&
-            currentTasks.map((task) => (
+            currentTasks.map((task: Task) => (
               <div
                 key={task.id}
-                onClick={() => toggleTask(task.id)}
-                className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] flex items-center gap-5 shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all group cursor-pointer"
+                className={`p-5 rounded-[2rem] flex items-center gap-5 shadow-sm border-2 active:scale-[0.98] transition-all group cursor-pointer ${
+                  task.priority === TaskPriority.HIGH
+                    ? "bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800"
+                    : task.priority === TaskPriority.MEDIUM
+                      ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800"
+                      : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800"
+                }`}
               >
                 <div
                   className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${task.completed ? "bg-indigo-600 border-indigo-600 shadow-lg shadow-indigo-100 dark:shadow-none" : "border-slate-300 dark:border-slate-700"}`}
+                  onClick={() => toggleTask(task.id)}
                 >
                   {task.completed && (
                     <i className="fas fa-check text-white text-xs"></i>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1" onClick={() => toggleTask(task.id)}>
                   <p
                     className={`font-bold text-sm ${task.completed ? "line-through text-slate-400" : "text-slate-800 dark:text-slate-100"}`}
                   >
                     {task.title}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        task.priority === TaskPriority.HIGH
-                          ? "bg-rose-500"
-                          : task.priority === TaskPriority.MEDIUM
-                            ? "bg-amber-500"
-                            : "bg-slate-300"
-                      }`}
-                    ></div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">
-                      {task.priority}
-                    </span>
-                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                    title="Editar"
+                  >
+                    <i className="fas fa-pen text-sm"></i>
+                  </button>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
+                    title="Arquivar"
+                  >
+                    <i className="fas fa-archive text-sm"></i>
+                  </button>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all"
+                    title="Excluir"
+                  >
+                    <i className="fas fa-trash text-sm"></i>
+                  </button>
                 </div>
               </div>
             ))}
@@ -307,10 +322,31 @@ const Tasks: React.FC = () => {
                     />
                   </div>
                 )}
-
                 <div className="mt-4 flex justify-end gap-2">
-                  <button className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:text-indigo-600">
-                    Atualizar Progresso
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                    title="Editar"
+                  >
+                    <i className="fas fa-pen text-sm"></i>
+                  </button>
+                <button
+                    onClick={() => toggleTask(task.id)}
+                    className={`px-3 py-2 rounded-lg text-sm transition-all ${task.completed ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600" : "bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"}`}
+                    title="Concluir"
+                >
+                    <i className="fas fa-check text-sm"></i>
+                </button>
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
+                    title="Arquivar"
+                  >
+                    <i className="fas fa-archive text-sm"></i>
+                  </button>
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all"
+                    title="Excluir"
+                  >
+                    <i className="fas fa-trash text-sm"></i>
                   </button>
                 </div>
               </div>
@@ -321,10 +357,12 @@ const Tasks: React.FC = () => {
             currentTasks.map((task) => (
               <div
                 key={task.id}
-                onClick={() => toggleTask(task.id)}
                 className="bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] flex items-center justify-between shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all cursor-pointer"
               >
-                <div className="flex items-center gap-4">
+                <div
+                  className="flex items-center gap-4 flex-1"
+                  onClick={() => toggleTask(task.id)}
+                >
                   <div
                     className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? "bg-emerald-500 border-emerald-500" : "border-slate-300 dark:border-slate-700"}`}
                   >
@@ -345,9 +383,26 @@ const Tasks: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <button className="w-8 h-8 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
-                  <i className="fas fa-pen text-xs"></i>
-                </button>
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+                    title="Editar"
+                  >
+                    <i className="fas fa-pen text-sm"></i>
+                  </button>
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all"
+                    title="Arquivar"
+                  >
+                    <i className="fas fa-archive text-sm"></i>
+                  </button>
+                  <button
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all"
+                    title="Excluir"
+                  >
+                    <i className="fas fa-trash text-sm"></i>
+                  </button>
+                </div>
               </div>
             ))}
         </div>
