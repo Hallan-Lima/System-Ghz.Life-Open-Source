@@ -490,23 +490,6 @@ const Tasks: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Action Button */}
-      {/* <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-[320px] z-40">
-        <button
-          onClick={() =>
-            navigate("/tasks/new", { state: { defaultType: activeTab } })
-          }
-          className="w-full bg-slate-900 dark:bg-indigo-600 text-white py-4 rounded-2xl shadow-xl font-black text-sm flex items-center justify-center gap-3 active:scale-95 transition-transform"
-        >
-          <i className="fas fa-plus"></i>
-          {activeTab === TaskType.DAILY
-            ? "Nova Tarefa"
-            : activeTab === TaskType.GOAL
-              ? "Nova Meta"
-              : "Novo Item"}
-        </button>
-      </div> */}
-
       {/* Simulation of Configuration Toggle (Dev Mode) */}
       <div className="mt-20 p-4 border-t border-slate-200 dark:border-slate-800">
         <p className="text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest mb-4">
