@@ -124,14 +124,16 @@ const Tasks: React.FC = () => {
              </div>
           )}
 
-          {/* VIEW: DAILY TASKS */}
-          {activeTab === TaskType.DAILY && currentTasks.map(task => (
-            <div key={task.id} onClick={() => toggleTask(task.id)} className="bg-white dark:bg-slate-900 p-5 rounded-[2rem] flex items-center gap-5 shadow-sm border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all group cursor-pointer">
-              <div className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-indigo-600 border-indigo-600 shadow-lg shadow-indigo-100 dark:shadow-none' : 'border-slate-300 dark:border-slate-700'}`}>
-                {task.completed && <i className="fas fa-check text-white text-xs"></i>}
-              </div>
-              <div className="flex-1">
-                <p className={`font-bold text-sm ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                    {/* VIEW: NOTES */}
+                    {activeTab === TaskType.NOTE &&
+                        currentTasks.map((task: Task) => (
+                            <div
+                                key={task.id}
+                                className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-6 rounded-[1.5rem] shadow-sm border border-yellow-200 dark:border-yellow-800/40 relative overflow-hidden"
+                            >
+                                <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h4 className="font-black text-slate-800 dark:text-white text-sm">
                   {task.title}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
