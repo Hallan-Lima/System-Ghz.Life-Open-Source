@@ -32,6 +32,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
     { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas' }, 
     { to: '/ia', icon: 'fas fa-brain', label: 'IA' },
   ];
+  
 
   if (hideNav) return <>{children}</>;
 
@@ -40,6 +41,32 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
     setShowQuickMenu(false);
     // Here you can add logic to open modals or navigate
     if (action === 'ai') navigate('/'); // Example: Go to dashboard for AI
+  };
+  
+  const handleFabClick = () => {
+    const isDashboard = location.pathname === '/' || location.pathname === '/dashboard';
+
+    // Se estiver na Dashboard, abre/fecha o menu (comportamento original)
+    if (isDashboard) {
+      setShowQuickMenu(!showQuickMenu);
+      return;
+    }
+
+    // Se NÃO estiver na Dashboard, redireciona direto e NÃO abre o menu
+    // Aqui fazemos uma lógica inteligente baseada na rota atual:
+    if (location.pathname.includes('/finance')) {
+      navigate('/finance/new');
+    } else if (location.pathname.includes('/tasks')) {
+      navigate('/tasks/new');
+    } else if (location.pathname.includes('/health')) {
+      navigate('/health/new');
+    } else {
+      // Fallback padrão se não identificar a seção (ex: vai para nova tarefa)
+      navigate('/tasks/new');
+    }
+    
+    // Garante que o menu esteja fechado
+    setShowQuickMenu(false);
   };
 
   return (
@@ -192,7 +219,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           {/* Central FAB */}
           <div className="relative -top-6 flex justify-center">
             <button 
-              onClick={() => setShowQuickMenu(!showQuickMenu)}
+              onClick={handleFabClick}
               className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl shadow-indigo-600/30 transition-all duration-300 transform ${showQuickMenu ? 'bg-slate-800 rotate-45' : 'bg-indigo-600 hover:scale-105 active:scale-95'}`}
             >
               <i className="fas fa-plus text-white text-xl"></i>
