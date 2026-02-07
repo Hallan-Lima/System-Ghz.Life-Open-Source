@@ -9,8 +9,9 @@ import { HealthStats } from "../domain/health.types";
  * Responsável por gerar insights cruzando dados de Finanças, Saúde e Produtividade.
  */
 
-// Inicialização do cliente Gemini com a chave de API do ambiente
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Inicialização do cliente Gemini com a chave de API via variável de ambiente process.env.API_KEY
+// Feito por IA: Atualizado para seguir as diretrizes do @google/genai (uso direto de process.env.API_KEY)
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Gera um insight curto e motivacional com base no estado atual do usuário.
@@ -52,9 +53,15 @@ export const getGhzAssistantInsights = async (
     
     // Retorna o texto gerado ou uma mensagem padrão caso venha vazio
     return response.text || "Mantenha o equilíbrio. Estou analisando seus dados para insights futuros!";
-  } catch (error) {
+  } catch (error: any) {
+    // Tratamento específico para erro de Cota (429)
+    if (error.status === 429 || error.code === 429 || error.message?.includes('429') || error.message?.includes('quota')) {
+      console.warn("Ghz AI: Cota de requisições excedida (429). Retornando fallback.");
+      return "A IA está descansando um pouco (Cota excedida). Continue focado nas suas metas diárias!";
+    }
+
     console.error("Erro no serviço Ghz AI:", error);
-    // Fallback gracioso em caso de erro (ex: sem chave de API ou erro de rede)
+    // Fallback gracioso para outros erros
     return "Concentre-se no hoje! Beba água, revise suas metas e mantenha o controle financeiro.";
   }
 };

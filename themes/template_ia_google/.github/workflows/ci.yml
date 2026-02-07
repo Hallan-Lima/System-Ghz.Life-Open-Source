@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    # Executa o Lint para garantir qualidade de código
+    # Certifique-se que existe um script "lint" no package.json, caso contrário remova este passo
+    - name: Run Lint
+      run: npm run lint --if-present
+
+    # Executa o Build
+    - name: Build project
+      run: npm run build
+      env:
+        # Injeta variáveis necessárias para o build, se houver segredos, use ${{ secrets.VITE_API_KEY }}
+        VITE_API_BASE_URL: https://api.ghz.life/v1
+        CI: true
