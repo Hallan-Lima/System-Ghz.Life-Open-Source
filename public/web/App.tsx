@@ -1,13 +1,13 @@
-
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './modules/Dashboard';
-import Finance from './modules/Finance';
-import Tasks from './modules/Tasks';
-import TaskCreator from './modules/TaskCreator';
-import Health from './modules/Health';
-import Settings from './modules/Settings';
-import { LoginPage, RegisterPage } from './modules/Auth';
+import DashboardPage from './pages/DashboardPage';
+import FinancePage from './pages/FinancePage';
+import TasksPage from './pages/TasksPage';
+import TaskCreatorPage from './pages/TaskCreatorPage';
+import HealthPage from './pages/HealthPage';
+import SettingsPage from './pages/SettingsPage';
+import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 
 const App: React.FC = () => {
   return (
@@ -16,12 +16,12 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/finance" element={<Finance />} />
-          <Route path="/health" element={<Health />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/tasks/new" element={<TaskCreator />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/health" element={<HealthPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/tasks/new" element={<TaskCreatorPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
