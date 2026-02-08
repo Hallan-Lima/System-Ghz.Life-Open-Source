@@ -33,7 +33,6 @@ class TaskController
             'errors' => []
         ]);
     }
-
     public function create(): void
     {
         $payload = TaskPayload::fromRequest($this->getJsonBody());
@@ -56,7 +55,6 @@ class TaskController
             'errors' => []
         ], 201);
     }
-
     public function update(string $id): void
     {
         $payload = TaskPayload::fromRequest($this->getJsonBody());
@@ -69,7 +67,6 @@ class TaskController
             'errors' => []
         ]);
     }
-
     public function toggle(string $id): void
     {
         $data = $this->service->toggle($id);
@@ -81,7 +78,6 @@ class TaskController
             'errors' => []
         ]);
     }
-
     public function updateProgress(string $id): void
     {
         $body = $this->getJsonBody();
@@ -105,7 +101,6 @@ class TaskController
             'errors' => []
         ]);
     }
-
     public function delete(string $id): void
     {
         $this->service->delete($id);
@@ -117,7 +112,6 @@ class TaskController
             'errors' => []
         ]);
     }
-
     private function getJsonBody(): array
     {
         $raw = file_get_contents('php://input');

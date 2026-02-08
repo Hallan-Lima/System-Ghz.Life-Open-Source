@@ -8,6 +8,18 @@ API BFF em PHP + MySQL com estrutura modular e DDD leve.
 php -S localhost:3333 -t public
 ```
 
+## Test
+
+e preciso instalar o xdebug, subir a aplicacao e acompanhar alguma requisicao realizada, tipo:
+
+```bash
+curl http://localhost:3333/health
+Resposta esperada (envelope padrão):
+```
+
+{"success":true,"data":{"status":"ok"},"message":"","errors":[]}
+O endpoint /health está mapeado no public/index.php.
+
 ## Swagger
 
 A especificação OpenAPI está em `docs/api/openapi.yaml`.
