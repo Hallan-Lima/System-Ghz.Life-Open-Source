@@ -1,20 +1,19 @@
 /**
  * @author HallTech AI
- * Centraliza o acesso às variáveis de ambiente do projeto.
- * Garante tipagem e fallback caso as variáveis não estejam definidas.
+ * Centraliza o acesso às variáveis de ambiente do projeto (Vite).
  */
 
 interface Config {
   apiBaseUrl: string;
-  apiKey: string;
+  geminiApiKey: string;
   isProduction: boolean;
 }
 
 const config: Config = {
-  // Feito por IA: Substituição de import.meta.env por process.env para corrigir erros de tipagem e atender aos requisitos da API Key
-  apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000',
-  apiKey: process.env.API_KEY || '',
-  isProduction: process.env.NODE_ENV === 'production',
+  // No Vite, usamos import.meta.env
+  apiBaseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+  isProduction: import.meta.env.MODE === 'production',
 };
 
 export default config;

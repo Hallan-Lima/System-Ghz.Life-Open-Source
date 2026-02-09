@@ -15,8 +15,6 @@ CALL sp_register_complete_user(
     2,                             -- Gênero
     '1995-05-20',                  -- Data Nascimento
     'teste.nolevel@ghz.life',      -- Email
-    1,                             -- Status (1=Ativo)
-    1,                             -- Plano (1=Free)
     '[1, 2, 5]',                   -- Funcionalidades
     @uuid,                         -- Saída UUID
     @token                         -- Saída Token

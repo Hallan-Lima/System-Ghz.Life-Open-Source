@@ -4,6 +4,7 @@ import { tasksService } from "../../tasks/services/tasks.service";
 import { healthService } from "../../health/services/health.service";
 import { settingsService } from "../../settings/services/settings.service";
 import { ChatMessage } from "../ai.types";
+import config from "../../../src/config";
 
 /**
  * @author HallTech AI
@@ -15,7 +16,7 @@ class AiService {
 
   constructor() {
     // Inicializa o cliente com a chave de API do ambiente
-    this.client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    this.client = new GoogleGenAI({ apiKey: config.geminiApiKey });
   }
 
   /**

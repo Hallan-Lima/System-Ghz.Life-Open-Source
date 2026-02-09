@@ -108,10 +108,6 @@ USE ghz_life_AMBIENTE;
             -- Dados de Contato
             IN p_email VARCHAR(100),
             
-            -- Configuração Inicial
-            IN p_sys_status_id INT,           -- Ex: 1 (Ativo)
-            IN p_subscription_plan_id INT,    -- Ex: 1 (Free)
-            
             -- Permissões
             IN p_functionality_ids JSON, 
             
@@ -137,60 +133,55 @@ USE ghz_life_AMBIENTE;
                 ROLLBACK;
                 RESIGNAL; 
             END;
-
-            -- 1. Validação de Email
-            SELECT COUNT(*) INTO v_email_check FROM user_email WHERE email = p_email;
             
-            IF v_email_check > 0 THEN
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Erro: E-mail já cadastrado.';
-            ELSE
-                -- 2. Gerar UUID e Token
-                SET v_uuid_str = UUID(); 
-                SET v_user_bin = UNHEX(REPLACE(v_uuid_str, '-', ''));
-                SET v_token_str = SHA2(CONCAT(v_uuid_str, RAND(), NOW()), 256);
-                
-                -- Outputs
-                SET p_new_uuid = v_uuid_str;
-                SET p_generated_token = v_token_str;
+            -- 2. Gerar UUID e Token
+            SET v_uuid_str = UUID(); 
+            SET v_user_bin = UNHEX(REPLACE(v_uuid_str, '-', ''));
+            SET v_token_str = SHA2(CONCAT(v_uuid_str, RAND(), NOW()), 256);
+            
+            -- Outputs
+            SET p_new_uuid = v_uuid_str;
+            SET p_generated_token = v_token_str;
 
-                START TRANSACTION;
+            START TRANSACTION;
 
-                    -- A. Insert na Tabela User (SEM LEVEL_ID)
-                    INSERT INTO user (
-                        id, nickname, password_hash, sys_gender_id, birthdate, 
-                        sys_status_id, sys_subscription_plan_id
-                    ) VALUES (
-                        v_user_bin, p_nickname, p_password_hash, p_gender_id, p_birthdate, 
-                        p_sys_status_id, p_subscription_plan_id
-                    );
+                -- A. Insert na Tabela User
+                -- sys_status_id = 1 (Ativo)
+                -- sys_subscription_plan_id = 1 (Free)
+                INSERT INTO user (
+                    id, nickname, password_hash, sys_gender_id, birthdate, 
+                    sys_status_id, sys_subscription_plan_id
+                ) VALUES (
+                    v_user_bin, p_nickname, p_password_hash, p_gender_id, p_birthdate, 
+                    1, 1
+                );
 
-                    -- B. Insert Email
-                    INSERT INTO user_email (user_id, email, is_primary) 
-                    VALUES (v_user_bin, p_email, TRUE);
+                -- B. Insert Email
+                INSERT INTO user_email (user_id, email, is_primary) 
+                VALUES (v_user_bin, p_email, TRUE);
 
-                    -- C. Insert Token
-                    INSERT INTO sys_user_token (user_id, refresh_token, expires_at) 
-                    VALUES (v_user_bin, v_token_str, DATE_ADD(NOW(), INTERVAL 30 DAY));
+                -- C. Insert Token
+                INSERT INTO sys_user_token (user_id, refresh_token, expires_at) 
+                VALUES (v_user_bin, v_token_str, DATE_ADD(NOW(), INTERVAL 30 DAY));
 
-                    -- D. Insert Permissões (Loop JSON)
-                    IF p_functionality_ids IS NOT NULL THEN
-                        SET v_json_count = JSON_LENGTH(p_functionality_ids);
-                        SET v_i = 0;
+                -- D. Insert Permissões (Loop JSON)
+                IF p_functionality_ids IS NOT NULL THEN
+                    SET v_json_count = JSON_LENGTH(p_functionality_ids);
+                    SET v_i = 0;
 
-                        WHILE v_i < v_json_count DO
-                            SET v_func_val = JSON_UNQUOTE(JSON_EXTRACT(p_functionality_ids, CONCAT('$[', v_i, ']')));
-                            
-                            IF v_func_val IS NOT NULL AND v_func_val != 'null' THEN
-                                INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id)
-                                VALUES (v_user_bin, CAST(v_func_val AS UNSIGNED));
-                            END IF;
+                    WHILE v_i < v_json_count DO
+                        SET v_func_val = JSON_UNQUOTE(JSON_EXTRACT(p_functionality_ids, CONCAT('$[', v_i, ']')));
+                        
+                        IF v_func_val IS NOT NULL AND v_func_val != 'null' THEN
+                            INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id)
+                            VALUES (v_user_bin, CAST(v_func_val AS UNSIGNED));
+                        END IF;
 
-                            SET v_i = v_i + 1;
-                        END WHILE;
-                    END IF;
+                        SET v_i = v_i + 1;
+                    END WHILE;
+                END IF;
 
-                COMMIT;
-            END IF;
+            COMMIT;
         END$$
 
     -- ------------------------------------------------------------------------------

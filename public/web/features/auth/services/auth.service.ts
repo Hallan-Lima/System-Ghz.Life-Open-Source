@@ -1,5 +1,6 @@
 import { authMetadata } from "../auth.data";
 import { RegisterState } from "../auth.types";
+import { api } from "../../../services/api";
 
 /**
  * @author HallTech AI
@@ -7,7 +8,7 @@ import { RegisterState } from "../auth.types";
  */
 class AuthService {
   /**
-   * Simula o login do usuário.
+   * login do usuário.
    * @param email Email do usuário.
    * @param password Senha do usuário.
    * @returns Promise que resolve se o login for bem-sucedido.
@@ -16,32 +17,44 @@ class AuthService {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // Validação contra os dados mockados
-        const user = authMetadata.testUsers.find(u => u.email === email && u.password === password);
-        
+        const user = authMetadata.testUsers.find(
+          (u) => u.email === email && u.password === password,
+        );
+
         // Verifica se o usuário existe nos mocks
         if (user) {
-            resolve();
+          resolve();
         } else {
-            reject(new Error(authMetadata.messages.loginError));
+          reject(new Error(authMetadata.messages.loginError));
         }
       }, 1200);
     });
   }
 
   /**
-   * Simula o registro de um novo usuário.
+   * registro de um novo usuário.
    * @param data Dados do formulário de registro.
    * @returns Promise que resolve se o registro for bem-sucedido.
    */
   async register(data: RegisterState): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Dados de registro enviados:", data);
-        localStorage.setItem("userConfig", JSON.stringify(data));
-        resolve();
-      }, 2000);
-    });
+    const response = await api.post("/auth/register", data);
+    if (response.status === 200) {
+      localStorage.setItem("userConfig", JSON.stringify(data));
+      //TODO: Salvar token de autenticação retornado
+      return;
+    } else {
+      throw new Error("Erro no registro. Tente novamente.");
+    }
   }
+  // async register(data: RegisterState): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       console.log("Dados de registro enviados:", data);
+  //       localStorage.setItem("userConfig", JSON.stringify(data));
+  //       resolve();
+  //     }, 2000);
+  //   });
+  // }
 }
 
 export const authService = new AuthService();

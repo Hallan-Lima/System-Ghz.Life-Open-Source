@@ -14,9 +14,9 @@ class Connection
     {
         $host = getenv('DB_HOST') ?: 'localhost';
         $port = getenv('DB_PORT') ?: '3307';
-        $database = getenv('DB_NAME') ?: 'test';
+        $database = getenv('DB_NAME') ?: 'ghz_life_ambiente';
         $user = getenv('DB_USER') ?: 'root';
-        $password = getenv('DB_PASSWORD') ?: 'root';
+        $password = getenv('DB_PASSWORD') ?: '';
 
         $dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";
 

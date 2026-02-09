@@ -5,7 +5,7 @@ API BFF em PHP + MySQL com estrutura modular e DDD leve.
 ## Como rodar
 
 ```bash
-php -S localhost:3333 -t public
+P:\xampp\php\php.exe -S localhost:3333 -t public
 ```
 
 ## Test

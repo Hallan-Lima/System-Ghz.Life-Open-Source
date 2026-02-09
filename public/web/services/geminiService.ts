@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Transaction } from "../domain/finance.types";
 import { Task } from "../domain/tasks.types";
 import { HealthStats } from "../domain/health.types";
+import config from "../src/config";
 
 /**
  * @author HallTech AI
@@ -9,9 +10,8 @@ import { HealthStats } from "../domain/health.types";
  * Responsável por gerar insights cruzando dados de Finanças, Saúde e Produtividade.
  */
 
-// Inicialização do cliente Gemini com a chave de API via variável de ambiente process.env.API_KEY
-// Feito por IA: Atualizado para seguir as diretrizes do @google/genai (uso direto de process.env.API_KEY)
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Inicialização do cliente Gemini com a chave de API via variável de ambiente
+const ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
 
 /**
  * Gera um insight curto e motivacional com base no estado atual do usuário.
