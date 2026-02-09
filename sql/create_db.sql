@@ -1,233 +1,218 @@
--- Criação do banco de dados e uso do mesmo
-DROP DATABASE IF EXISTS application;
-CREATE DATABASE IF NOT EXISTS application CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE application;
+-- ==============================================================================
+-- SCRIPT DE CRIAÇÃO DO BANCO DE DADOS
+-- Versão: 1.0
+-- Estrutura: UUID Binário (Otimizado), RBAC Simples, Multi-plataforma
+-- ==============================================================================
 
--- Tabela que armazena os gêneros possíveis para um usuário. Exemplo: 'Masculino', 'Feminino', 'Outro'
-CREATE TABLE gender (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(20) NOT NULL UNIQUE
-);
+-- Criar o Banco de Dados com suporte total a caracteres (UTF-8 MB4)
+CREATE DATABASE IF NOT EXISTS ghz_life_AMBIENTE
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+USE ghz_life_AMBIENTE;
+SET default_storage_engine = InnoDB;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- Tabela que define os status de um usuário no sistema. Exemplo: 'Ativo', 'Inativo', 'Pendente'
-CREATE TABLE user_status (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(30) NOT NULL UNIQUE
-);
+-- ==============================================================================
+-- TABELAS DE ESTRUTURA DO SISTEMA
+-- ==============================================================================
 
--- Tabela que define os níveis de acesso de um usuário. Exemplo: 'Administrador', 'Usuário', 'Convidado'
-CREATE TABLE user_level (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(30) NOT NULL UNIQUE
-);
+-- ##START_SYS## 
+    -- ESTRUTURA DE SISTEMA (Domínios, Configurações e Catálogos)
 
--- Tabela que representa um grupo de usuários. Pode ser uma empresa, família, etc.
-CREATE TABLE `group` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description TEXT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
-);
+    -- 1. Gêneros
+    CREATE TABLE sys_gender (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(30) NOT NULL UNIQUE
+    );
 
--- Tipos de categoria financeira (ex: receita, despesa, transferência)
-CREATE TABLE category_type (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(20) NOT NULL UNIQUE
-);
+    -- 2. Status (Usado globalmente: Usuários, Módulos, Tarefas)
+    CREATE TABLE sys_status (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(30) NOT NULL UNIQUE
+    );
 
--- Tipos de transações financeiras (ex: pagamento, recebimento, cartão de crédito)
-CREATE TABLE transaction_type (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
+    -- 3. Planos de Assinatura
+    CREATE TABLE sys_subscription_plan (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(50) NOT NULL UNIQUE,
+        description TEXT DEFAULT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        expires_at DECIMAL(10,2) NOT NULL, -- Duração em dias ou meses (definir na lógica)
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
--- Representa módulos do sistema, utilizados para organizar funcionalidades
-CREATE TABLE module (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    -- 4. Interesses / Hobbies (Catálogo)
+    -- UTILIZAR EM FUTURAS VERSÕES
+    --  CREATE TABLE sys_interest (
+    --     id INT AUTO_INCREMENT PRIMARY KEY,
+    --     name VARCHAR(50) NOT NULL UNIQUE,
+    --     description TEXT DEFAULT NULL,
+    --     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -- );
 
--- Funcionalidades dentro dos módulos, agora com suporte a menus e submenus hierárquicos
-CREATE TABLE functionality (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    module_id INT NOT NULL,
-    parent_id INT DEFAULT NULL, -- Referência para o menu pai (null = menu principal)
-    name VARCHAR(50) NOT NULL,
-    url VARCHAR(255) DEFAULT NULL, -- Pode ser null para menus sem ação direta
-    description TEXT DEFAULT NULL,
-    order_index INT DEFAULT 0, -- Para ordenar menus e submenus
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (module_id) REFERENCES module(id),
-    FOREIGN KEY (parent_id) REFERENCES functionality(id)
-);
+    -- 6. Módulos do Sistema (Agrupadores de funcionalidades)
+    CREATE TABLE sys_module (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(50) NOT NULL UNIQUE,
+        sys_status_id INT NOT NULL,
+        sys_subscription_plan_id INT DEFAULT NULL,
+        icon VARCHAR(100) DEFAULT NULL,
+        color VARCHAR(20) DEFAULT NULL,
+        description TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (sys_status_id) REFERENCES sys_status(id),
+        FOREIGN KEY (sys_subscription_plan_id) REFERENCES sys_subscription_plan(id)
+    );
 
--- Tabela principal dos usuários contendo dados pessoais e credenciais de acesso
-CREATE TABLE user (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nickname VARCHAR(50) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    gender_id INT DEFAULT NULL,
-    birthdate DATE DEFAULT NULL,
-    status_id INT DEFAULT NULL,
-    level_id INT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (gender_id) REFERENCES gender(id),
-    FOREIGN KEY (status_id) REFERENCES user_status(id),
-    FOREIGN KEY (level_id) REFERENCES user_level(id)
-);
+    -- 7. Funcionalidades dos Módulos (Telas, Menus, Ações)
+    CREATE TABLE sys_module_functionality (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        sys_module_id INT NOT NULL,
+        title VARCHAR(50) NOT NULL,
+        sys_status_id INT NOT NULL,
+        url VARCHAR(255) DEFAULT NULL,
+        sys_subscription_plan_id INT DEFAULT NULL,
+        icon VARCHAR(100) DEFAULT NULL,
+        color VARCHAR(20) DEFAULT NULL,
+        description TEXT DEFAULT NULL,
+        router_link VARCHAR(255) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (sys_module_id) REFERENCES sys_module(id),
+        FOREIGN KEY (sys_subscription_plan_id) REFERENCES sys_subscription_plan(id),
+        FOREIGN KEY (sys_status_id) REFERENCES sys_status(id)
+    );
 
-
-
--- Tabela que armazena os e-mails de cada usuário, podendo indicar qual é o principal
-CREATE TABLE user_email (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    is_primary BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    UNIQUE (user_id, email)
-);
-
--- Tabela que armazena os telefones dos usuários, com indicação do número principal
-CREATE TABLE user_phone (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    is_primary BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    UNIQUE (user_id, phone)
-);
-
--- Associação entre usuários e grupos, com possibilidade de designar administradores
-CREATE TABLE group_user (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT NOT NULL,
-    user_id INT NOT NULL,
-    is_admin BOOLEAN DEFAULT FALSE,
-    invited_by INT DEFAULT NULL,
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (group_id) REFERENCES `group`(id),
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (invited_by) REFERENCES user(id),
-    UNIQUE (group_id, user_id)
-);
+-- ##END_SYS##
 
 
--- Permissões de acesso do usuário por funcionalidade: leitura, criação, atualização, exclusão
-CREATE TABLE user_functionality (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    functionality_id INT NOT NULL,
-    can_read BOOLEAN DEFAULT FALSE,
-    can_create BOOLEAN DEFAULT FALSE,
-    can_update BOOLEAN DEFAULT FALSE,
-    can_delete BOOLEAN DEFAULT FALSE,
-    granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    granted_by INT DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (functionality_id) REFERENCES functionality(id),
-    FOREIGN KEY (granted_by) REFERENCES user(id)
-);
+-- ##START_USER## 
+    -- ESTRUTURA DO USUÁRIO
+    -- Tabelas que armazenam dados de quem utiliza o sistema.
 
--- Contas financeiras vinculadas a um grupo (ex: conta corrente, carteira, etc.)
-CREATE TABLE account (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    description TEXT DEFAULT NULL,
-    balance DECIMAL(15,2) DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (group_id) REFERENCES `group`(id)
-);
+    -- 8. Tabela Mestra de Usuários
+    CREATE TABLE user (
+        id BINARY(16) NOT NULL PRIMARY KEY, -- UUID v7 ou v4 Binário
+        nickname VARCHAR(50) NOT NULL,
+        password_hash VARCHAR(500) NOT NULL,
+        sys_gender_id INT NOT NULL,
+        birthdate DATE NOT NULL,
+        sys_status_id INT NOT NULL,
+        sys_subscription_plan_id INT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (sys_gender_id) REFERENCES sys_gender(id),
+        FOREIGN KEY (sys_status_id) REFERENCES sys_status(id),
+        FOREIGN KEY (sys_subscription_plan_id) REFERENCES sys_subscription_plan(id)
+    );
+
+    -- 9. Autenticação (Refresh Tokens)
+    CREATE TABLE sys_user_token (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BINARY(16) NOT NULL,
+        refresh_token VARCHAR(255) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES user(id)
+    );
+
+    -- 10. E-mails do Usuário
+    CREATE TABLE user_email (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BINARY(16) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        is_primary BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (user_id) REFERENCES user(id),
+        UNIQUE (user_id, email)
+    );
+
+    -- 11. Telefones do Usuário
+    CREATE TABLE user_phone (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BINARY(16) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
+        is_primary BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (user_id) REFERENCES user(id),
+        UNIQUE (user_id, phone)
+    );
+
+    -- 12. Interesses do Usuário (N:N)
+    -- TODO: TALVEZ UTILIZAR EM FUTURAS VERSÕES
+    -- CREATE TABLE user_interest (
+    --     id INT AUTO_INCREMENT PRIMARY KEY,
+    --     user_id BINARY(16) NOT NULL,
+    --     sys_interest_id INT NOT NULL,
+    --     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    --     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    --     deleted_at TIMESTAMP NULL,
+    --     FOREIGN KEY (user_id) REFERENCES user(id),
+    --     FOREIGN KEY (sys_interest_id) REFERENCES sys_interest(id),
+    --     UNIQUE (user_id, sys_interest_id)
+    -- );
+
+-- ##END_USER##
 
 
--- Categorias financeiras definidas por grupo (ex: alimentação, salário, transporte)
-CREATE TABLE category (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT DEFAULT NULL,
-    name VARCHAR(50) NOT NULL,
-    type_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (group_id) REFERENCES `group`(id),
-    FOREIGN KEY (type_id) REFERENCES category_type(id),
-    UNIQUE (group_id, name, type_id)
-);
+-- ##START_RELATIONS## 
+    -- RELACIONAMENTOS ESPECÍFICOS (Permissões e Vínculos de Módulo)
 
--- Etiquetas que podem ser associadas às transações para facilitar a busca e classificação
-CREATE TABLE tag (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT NOT NULL,
-    name VARCHAR(30) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (group_id) REFERENCES `group`(id),
-    UNIQUE (group_id, name)
-);
+    -- 13. Permissões Específicas por Usuário (Exceções ou vínculos diretos)
+    CREATE TABLE sys_module_functionality_user (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id BINARY(16) NOT NULL,
+        sys_module_functionality_id INT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP NULL,
+        FOREIGN KEY (sys_module_functionality_id) REFERENCES sys_module_functionality(id),
+        FOREIGN KEY (user_id) REFERENCES user(id),
+        UNIQUE (sys_module_functionality_id, user_id)
+    );
+
+-- ##END_RELATIONS##
 
 
+-- ##START_MODULE_TASK## 
+    -- MÓDULO DE TAREFAS
 
--- Registro de movimentações financeiras com valor, data, categoria, e tipo
-CREATE TABLE `transaction` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT NOT NULL,
-    user_id INT NOT NULL,
-    account_id INT NOT NULL,
-    category_id INT NOT NULL,
-    transaction_type_id INT NOT NULL,
-    value DECIMAL(15,2) NOT NULL,
-    description TEXT DEFAULT NULL,
-    installment_count INT DEFAULT 1,
-    performed_at DATE DEFAULT NULL,
-    due_at DATE DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (group_id) REFERENCES `group`(id),
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (account_id) REFERENCES account(id),
-    FOREIGN KEY (category_id) REFERENCES category(id),
-    FOREIGN KEY (transaction_type_id) REFERENCES transaction_type(id)
-);
+    -- 14. Tarefas e Metas
+    CREATE TABLE app_tasks (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        sys_module_functionality_id INT NOT NULL, -- Vincula a tarefa à funcionalidade "Tarefas" ou "Metas"
+        user_id BINARY(16) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        sys_status_id INT NOT NULL, -- Status: Pendente, Concluído, etc.
+        priority INT NOT NULL DEFAULT 0,
+        content TEXT NULL,
+        notes TEXT NULL,
+        tags JSON NULL, -- Tags flexíveis (Ex: ["urgente", "pessoal"])
+        isPinned BOOLEAN DEFAULT FALSE,
+        due_date DATETIME NULL,
+        recurrence VARCHAR(50) NULL, -- Ex: 'daily', 'weekly', 'cron_format'
+        progress DECIMAL(5,2) DEFAULT 0.00,
+        target_value DECIMAL(18,2) NULL, -- Para metas financeiras ou numéricas
+        current_value DECIMAL(18,2) NULL,
+        estimated_cost DECIMAL(18,2) NULL,
+        unit VARCHAR(20) NULL, -- 'R$', 'km', 'kg'
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+        deleted_at DATETIME NULL,
+        FOREIGN KEY (sys_module_functionality_id) REFERENCES sys_module_functionality(id),
+        FOREIGN KEY (user_id) REFERENCES user(id),
+        FOREIGN KEY (sys_status_id) REFERENCES sys_status(id)
+    );
 
--- Controle de recorrência para transações agendadas ou periódicas
-CREATE TABLE transaction_recurrence (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_id INT NOT NULL,
-    recurrence_type_id INT NOT NULL,
-    interval_days INT DEFAULT NULL,
-    next_run DATE DEFAULT NULL,
-    end_date DATE DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (transaction_id) REFERENCES `transaction`(id),
-    FOREIGN KEY (recurrence_type_id) REFERENCES transaction_type(id)
-);
+-- ##END_MODULE_TASK##
 
--- Associação N:N entre transações e etiquetas (tags)
-CREATE TABLE transaction_tag (
-    transaction_id INT NOT NULL,
-    tag_id INT NOT NULL,
-    PRIMARY KEY (transaction_id, tag_id),
-    FOREIGN KEY (transaction_id) REFERENCES `transaction`(id),
-    FOREIGN KEY (tag_id) REFERENCES tag(id)
-);
+SET FOREIGN_KEY_CHECKS = 1;
 
--- Histórico de saldo das contas após cada transação, utilizado para fins de auditoria
-CREATE TABLE account_statement (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    account_id INT NOT NULL,
-    transaction_id INT NOT NULL,
-    balance_after DECIMAL(15,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (account_id) REFERENCES account(id),
-    FOREIGN KEY (transaction_id) REFERENCES `transaction`(id)
-);
+
