@@ -12,7 +12,7 @@ const INITIAL_STATE: RegisterState = {
   confirmPassword: "",
   gender: "",
   birthDate: "",
-  selectedModules: ["finance", "productivity"],
+  selectedModules: [],
   financeMode: null,
   healthGoals: [],
   productivityConfig: {
@@ -67,6 +67,7 @@ export const useRegister = () => {
         !!lastName?.trim() &&
         !!email?.trim() &&
         !!birthDate &&
+        birthDate <= new Date().toISOString().split("T")[0] && 
         !!gender &&
         !!password &&
         password === confirmPassword

@@ -38,23 +38,14 @@ class AuthService {
    */
   async register(data: RegisterState): Promise<void> {
     const response = await api.post("/auth/register", data);
-    if (response.status === 200) {
+    if (response.status === 201) {
       localStorage.setItem("userConfig", JSON.stringify(data));
-      //TODO: Salvar token de autenticação retornado
       return;
     } else {
+      // TODO: Implementar notificação no frontend
       throw new Error("Erro no registro. Tente novamente.");
     }
   }
-  // async register(data: RegisterState): Promise<void> {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       console.log("Dados de registro enviados:", data);
-  //       localStorage.setItem("userConfig", JSON.stringify(data));
-  //       resolve();
-  //     }, 2000);
-  //   });
-  // }
 }
 
 export const authService = new AuthService();
