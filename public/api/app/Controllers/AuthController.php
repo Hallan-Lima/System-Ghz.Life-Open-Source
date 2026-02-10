@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\DTOs\RegisterPayload;
+use App\DTOs\LoginPayload;
 use Domain\Services\AuthService;
 use Exception;
 
@@ -111,6 +112,48 @@ class AuthController
                 'success' => false,
                 'message' => $message
             ], $statusCode);
+        }
+    }
+
+    public function login(): void {
+        $body = $this->getJsonBody();
+        $payload = LoginPayload::fromRequest($body);
+
+        #region Validações
+        $errors = [];
+        if (empty($payload['email'])) $errors[] = "E-mail é obrigatório.";
+        if (empty($payload['password'])) $errors[] = "Senha é obrigatória.";
+        #endregion
+
+        if (!empty($errors)) {
+            responseJson([
+                'success' => false,
+                'message' => 'Erro de validação',
+                'errors' => $errors
+            ], 400);
+            return;
+        }
+
+        try {
+            $data = $this->service->login($payload);
+            if (isset($data['status']) && $data['status'] === true) {
+                responseJson([
+                    'success' => true,
+                    'data'    => $data['data'] ?? null,
+                    'message' => 'Login realizado!'
+                ], 201);
+            } else {
+                // Caso de Erro retornado pelo Service
+                $rawMessage = $data['message'] ?? '';
+                $statusCode = 400; // Padrão para erro de requisição
+
+                responseJson([
+                    'success' => false,
+                    'message' => $rawMessage,
+                ], $statusCode);
+            }
+        } catch (\Throwable $th) {
+            error_log($th->getMessage());
         }
     }
 }

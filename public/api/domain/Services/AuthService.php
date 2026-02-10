@@ -1,4 +1,5 @@
 <?php
+
 namespace Domain\Services;
 
 use Error;
@@ -77,6 +78,39 @@ class AuthService
                 'status' => false,
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    public function login(array $payload): array
+    {
+        try {
+            // 1. Busca os dados do usuário pelo e-mail
+            $stmt = $this->db->prepare("CALL sp_auth_login(:email)");
+            $stmt->execute([':email' => $payload['email']]);
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
+
+            // 2. Verifica se o usuário existe
+            if (!$user) {
+                return ['status' => false, 'message' => 'E-mail ou senha inválidos.'];
+            }
+
+            if (password_verify($payload['password'], $user['password_hash'])) {
+
+                unset($user['password_hash']); 
+                
+                return [
+                    'status' => true,
+                    'data'   => $user,
+                    'message' => 'Login realizado com sucesso!'
+                ];
+            }
+
+            // Senha incorreta
+            return ['status' => false, 'message' => 'E-mail ou senha inválidos.'];
+        } catch (Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
         }
     }
 }

@@ -42,6 +42,7 @@ $routes = [
 
     // --- Módulo: Auth ---
     ['POST', '#^/api/auth/register$#', AuthController::class, 'register'],
+    ['POST', '#^/api/auth/login$#', AuthController::class, 'login'],
 ];
 
 // --- 4. Dispatcher (O Motor da API) ---

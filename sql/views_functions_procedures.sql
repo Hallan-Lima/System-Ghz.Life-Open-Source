@@ -205,7 +205,8 @@ USE ghz_life_AMBIENTE;
                     HEX(SUBSTR(u.id, 11, 6))
                 )) AS user_id,
                 u.nickname,
-                u.sys_status_id
+                u.sys_status_id,
+                u.password_hash
             FROM user u
             JOIN user_email ue ON u.id = ue.user_id
             WHERE ue.email = p_email
