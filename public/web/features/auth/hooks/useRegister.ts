@@ -66,6 +66,7 @@ export const useRegister = () => {
         !!firstName?.trim() &&
         !!lastName?.trim() &&
         !!email?.trim() &&
+        email.includes("@") &&
         !!birthDate &&
         birthDate <= new Date().toISOString().split("T")[0] && 
         !!gender &&
