@@ -172,7 +172,7 @@ USE ghz_life_AMBIENTE;
                     WHILE v_i < v_json_count DO
                         SET v_func_val = JSON_UNQUOTE(JSON_EXTRACT(p_functionality_ids, CONCAT('$[', v_i, ']')));
                         
-                        IF v_func_val IS NOT NULL AND v_func_val != 'null' THEN
+                        IF v_func_val IS NOT NULL AND v_func_val != 'null' AND v_func_val != '0' THEN
                             INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id)
                             VALUES (v_user_bin, CAST(v_func_val AS UNSIGNED));
                         END IF;

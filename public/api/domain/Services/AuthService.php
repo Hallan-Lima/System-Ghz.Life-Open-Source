@@ -1,6 +1,7 @@
 <?php
 namespace Domain\Services;
 
+use Error;
 use Infrastructure\Database\Connection;
 use PDO;
 use Exception;
@@ -16,22 +17,24 @@ class AuthService
 
     public function register(array $payload): array
     {
-        // 1. Mapeamento de Gênero (Frontend String -> Banco ID)
-        // Baseado no seu create_db.sql: 1=Não Info, 2=Masc, 3=Fem, 4=Outro
+        // 1. Mapeamento de Gênero
         $genderMap = [
-            'male' => 2, 'masculino' => 2,
-            'female' => 3, 'feminino' => 3,
-            'other' => 4, 'outro' => 4
+            'male' => 2,
+            'masculino' => 2,
+            'female' => 3,
+            'feminino' => 3,
+            'other' => 4,
+            'outro' => 4
         ];
-        $genderId = $genderMap[strtolower($payload['gender'])] ?? 1;
+        $genderId = $genderMap[strtolower($payload['gender'] ?? '')] ?? 1;
 
         // 2. Hash da Senha
         $passwordHash = password_hash($payload['password'], PASSWORD_DEFAULT);
 
-        // 3. Preparar JSON de funcionalidades
-        // Se o frontend mandar strings, garantimos que sejam inteiros para o JSON do MySQL
-        $functionalities = array_map('intval', $payload['selectedModules']);
-        $jsonFunc = json_encode($functionalities);
+        // 3. Preparar funcionalidades
+        // O array_map garante que os IDs sejam inteiros
+        $functionalitiesArray = array_map('intval', $payload['selectedModules'] ?? []);
+        $jsonFunctionalities = json_encode($functionalitiesArray);
 
         try {
             // Prepara a chamada da Procedure
@@ -42,47 +45,38 @@ class AuthService
                     :gender, 
                     :birthDate, 
                     :email, 
-                    :jsonFunc, 
+                    :functionalities, 
                     @uuid, 
                     @token
                 )
             ");
 
-            // Executa
+            // Execução com os parâmetros mapeados
             $stmt->execute([
-                ':nickname' => $payload['nickname'],
-                ':password' => $passwordHash,
-                ':gender' => $genderId,
-                ':birthDate' => $payload['birthDate'],
-                ':email' => $payload['email'],
-                ':jsonFunc' => $jsonFunc
+                ':nickname'        => $payload['nickname'],
+                ':password'        => $passwordHash,
+                ':gender'          => $genderId,
+                ':birthDate'       => $payload['birthDate'],
+                ':email'           => $payload['email'],
+                ':functionalities' => $jsonFunctionalities // Agora enviamos a string JSON
             ]);
-            
-            // Fecha o cursor anterior para poder rodar o SELECT das variáveis de saída
+
+            // Limpa o cursor para permitir a próxima query de leitura dos OUT params
             $stmt->closeCursor();
 
-            // Recupera os valores de saída (@uuid e @token)
+            // Recupera os valores de saída
             $result = $this->db->query("SELECT @uuid AS uuid, @token AS token")->fetch(PDO::FETCH_ASSOC);
 
-            if (!$result || empty($result['uuid'])) {
-                throw new Exception("Erro ao registrar usuário: Retorno vazio do banco.");
-            }
-
             return [
-                'user' => [
-                    'id' => $result['uuid'],
-                    'name' => $payload['nickname'],
-                    'email' => $payload['email']
-                ],
-                'token' => $result['token']
+                'status' => true,
+                'data'   => $result
             ];
-
-        } catch (\PDOException $e) {
-            // Tratamento básico de erro de duplicidade (SQLState 23000)
-            if ($e->getCode() == '23000') {
-                throw new Exception("Este e-mail já está cadastrado.");
-            }
-            throw $e;
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 }
