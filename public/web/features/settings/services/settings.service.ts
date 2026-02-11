@@ -1,4 +1,5 @@
 import { settingsMocks } from "../settings.data";
+import { storage } from "../../../services/storage";
 import { UserProfile } from "../settings.types";
 
 /**
@@ -12,12 +13,9 @@ export const settingsService = {
    * usando o mock (settings.data.ts) apenas como valor inicial/fallback.
    */
   getUserProfile: async (): Promise<UserProfile> => {
-    // Simulação de delay imperceptível
-    // await new Promise(resolve => setTimeout(resolve, 50));
-
     try {
       // Busca dados salvos pelo EditProfile (useEditProfile.ts)
-      const storedData = localStorage.getItem("userConfig");
+      const storedData = storage.getItem("userConfig");
       
       if (storedData) {
         const parsed = JSON.parse(storedData);

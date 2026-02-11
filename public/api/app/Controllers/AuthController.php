@@ -15,6 +15,14 @@ class AuthController
         $this->service = new AuthService();
     }
 
+    protected function responseJson(array $data, int $statusCode = 200): void
+    {
+        header('Content-Type: application/json');
+        http_response_code($statusCode);
+        echo json_encode($data);
+        exit;
+    }
+
     // Auxiliar para pegar o corpo da requisição
     private function getJsonBody(): array
     {
@@ -117,6 +125,8 @@ class AuthController
 
     public function login(): void {
         $body = $this->getJsonBody();
+        
+        // Se você não tiver a classe LoginPayload, use: $payload = $body;
         $payload = LoginPayload::fromRequest($body);
 
         #region Validações
@@ -126,7 +136,7 @@ class AuthController
         #endregion
 
         if (!empty($errors)) {
-            responseJson([
+            $this->responseJson([
                 'success' => false,
                 'message' => 'Erro de validação',
                 'errors' => $errors
@@ -135,25 +145,30 @@ class AuthController
         }
 
         try {
+            // Aqui chamamos o serviço que fará toda a mágica
             $data = $this->service->login($payload);
-            if (isset($data['status']) && $data['status'] === true) {
-                responseJson([
-                    'success' => true,
-                    'data'    => $data['data'] ?? null,
-                    'message' => 'Login realizado!'
-                ], 201);
-            } else {
-                // Caso de Erro retornado pelo Service
-                $rawMessage = $data['message'] ?? '';
-                $statusCode = 400; // Padrão para erro de requisição
 
-                responseJson([
+            if (isset($data['status']) && $data['status'] === true) {
+                // Retorno 200 ou 201
+                $this->responseJson([
+                    'success' => true,
+                    'data'    => $data['data'], // O JSON formatado vem aqui
+                    'message' => 'Login realizado!'
+                ], 200);
+            } else {
+                $rawMessage = $data['message'] ?? 'Erro ao realizar login.';
+                $this->responseJson([
                     'success' => false,
                     'message' => $rawMessage,
-                ], $statusCode);
+                ], 401); // 401 = Unauthorized
             }
         } catch (\Throwable $th) {
             error_log($th->getMessage());
+            $this->responseJson([
+                'success' => false,
+                'message' => 'Erro interno no servidor.',
+                'debug'   => $th->getMessage() // Remova em produção
+            ], 500);
         }
     }
 }

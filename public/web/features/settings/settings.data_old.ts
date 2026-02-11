@@ -8,8 +8,8 @@ import { UserProfile } from "./settings.types";
  */
 export const settingsMocks: { user: UserProfile } = {
   user: {
-    name: "", // Nome padrão inicial
-    plan: "",
-    avatarIcon: ""
+    name: "Usuário Ghz", // Nome padrão inicial
+    plan: "Plano Pro",
+    avatarIcon: "fas fa-user"
   }
 };
