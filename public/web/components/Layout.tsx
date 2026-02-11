@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useModules } from '../features/modules/hooks/useModules';
+import { authService } from '../features/auth/services/auth.service';
 
 // Sub-components
 import Sidebar from './layout/Sidebar';
 import MobileHeader from './layout/MobileHeader';
 import MobileBottomNav from './layout/MobileBottomNav';
 import QuickActionMenu from './layout/QuickActionMenu';
+import { storage } from '@/services/storage';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,6 +32,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const isModulesPage = location.pathname === '/modules';
   const isDashboard = location.pathname === '/' || location.pathname === '/dashboard';
 
+  // Pega o nome do usuário autenticado ou usa "Convidado"
+  const currentUserName = authService.isAuthenticated() 
+  ? (storage.getItem("user_profile_name") || "Convidado")
+  : "Convidado";
+
   // --- Helper de Verificação de Módulo ---
   const isModuleEnabled = (moduleId: string) => {
     const mod = modules.find(m => m.id === moduleId);
@@ -39,7 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   // --- Configuration ---
 
   const allSidebarItems = [
-    { to: '/', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
+    { to: '/dashboard', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
     { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: 'finance' },
     { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: 'health' },
     { to: '/tasks', icon: 'fas fa-list-check', label: 'Tarefas', moduleId: 'productivity' },
@@ -49,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   ];
 
   const allMobileItems = [
-    { to: '/', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
+    { to: '/dashboard', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
     { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas', moduleId: 'productivity' }, 
     { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: 'finance' },
     { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: 'health' },
@@ -146,7 +153,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
       {/* Mobile Header */}
       <MobileHeader 
-        onSettingsClick={() => navigate('/settings')} 
+        onSettingsClick={() => navigate('/settings')}
+        userName={currentUserName}
       />
 
       {/* Main Content */}

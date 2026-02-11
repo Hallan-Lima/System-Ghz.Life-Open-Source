@@ -99,7 +99,7 @@ export const useRegister = () => {
     setLoading(true);
     try {
       await authService.register(formData);
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Erro no registro", error);
     } finally {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { settingsService } from "../services/settings.service";
 import { UserProfile } from "../settings.types";
+import { authService } from "@/features/auth/services/auth.service";
 
 /**
  * @author HallTech AI
@@ -42,8 +43,8 @@ export const useSettings = () => {
   };
 
   const handleLogout = () => {
-    // Aqui poderia haver lógica de limpeza de token/sessão
-    navigate('/login');
+    authService.logout();
+    navigate('/auth'); 
   };
 
   return {

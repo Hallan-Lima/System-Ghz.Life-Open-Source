@@ -84,7 +84,6 @@ class AuthService
     public function login(array $payload): array
     {
         // 1. Busca o usuário pelo E-mail para verificar senha
-        // Nota: Ajuste os nomes das tabelas (user, user_email) conforme seu banco real
         $sqlUser = "
             SELECT 
                 u.id as raw_id,
@@ -114,6 +113,40 @@ class AuthService
         if (!$user || !password_verify($payload['password'], $user['password_hash'])) {
             return ['status' => false, 'message' => 'E-mail ou senha inválidos.'];
         }
+
+        // ==================================================================
+        // 2.5. GERA E SALVA O TOKEN (A Parte que Faltava)
+        // ==================================================================
+
+        // A. Gera um token aleatório seguro (Ex: um hash de 64 caracteres)
+        $refreshToken = bin2hex(random_bytes(32));
+
+        // B. Define a validade (Ex: 30 dias a partir de agora)
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+        // C. Salva no banco (sys_user_token)
+        // Usamos ON DUPLICATE KEY UPDATE para: Se já tiver token, atualiza. Se não, cria.
+        // Nota: Como sys_user_token não tem chave única no user_id por padrão no seu create anterior,
+        // o ideal é deletar os antigos ou garantir que user_id seja UNIQUE na tabela de tokens.
+        // Vamos assumir aqui a estratégia de limpar tokens antigos desse usuário para garantir uma sessão única (simples)
+
+        // C.1 Limpa tokens antigos (opcional, mas recomendado para evitar lixo)
+        $sqlDel = "DELETE FROM sys_user_token WHERE user_id = :uid";
+        $stmtDel = $this->db->prepare($sqlDel);
+        $stmtDel->bindValue(':uid', $user['raw_id']);
+        $stmtDel->execute();
+
+        // C.2 Insere o novo token
+        $sqlInsertToken = "
+            INSERT INTO sys_user_token (user_id, refresh_token, expires_at)
+            VALUES (:uid, :token, :expires)
+        ";
+
+        $stmtToken = $this->db->prepare($sqlInsertToken);
+        $stmtToken->bindValue(':uid', $user['raw_id']);
+        $stmtToken->bindValue(':token', $refreshToken);
+        $stmtToken->bindValue(':expires', $expiresAt);
+        $stmtToken->execute();
 
         // 3. Busca Módulos e Funcionalidades (SQL Simples)
         // Traz tudo 'achatado' e o PHP organiza depois
@@ -145,7 +178,7 @@ class AuthService
         // 4. Processamento PHP: Montar a estrutura JSON
         $modulesConfig = [];
         $selectedModules = [];
-        
+
         // Mapa para converter ID numérico do banco em ID string do Front
         $idMap = [1 => 'productivity', 2 => 'finance', 3 => 'health', 4 => 'ai_assistant', 5 => 'social'];
 
@@ -171,7 +204,7 @@ class AuthService
             // Gera ID da feature baseado na rota (lógica do seu JSON)
             // TODO: Alterar para uma estrutura menos engessada
             $featId = strtolower(str_replace(' ', '_', $row['feat_title']));
-            $route = $row['feat_route'] ?? ''; 
+            $route = $row['feat_route'] ?? '';
             if (strpos($route, 'DAILY') !== false) $featId = 'daily_tasks';
             elseif (strpos($route, 'GOAL') !== false) $featId = 'goals';
             elseif (strpos($route, 'DREAM') !== false) $featId = 'dreams';
@@ -196,7 +229,7 @@ class AuthService
             'firstName' => $names[0],
             'lastName' => end($names),
             'email' => $user['email'],
-            'password' => '', 
+            'password' => '',
             'confirmPassword' => '',
             'gender' => ($user['sys_gender_id'] == 2 ? 'male' : ($user['sys_gender_id'] == 3 ? 'female' : 'other')),
             'birthDate' => $user['birthdate'],
@@ -212,7 +245,8 @@ class AuthService
             'status' => true,
             'data' => [
                 'userConfig' => $userConfig,
-                'modulesConfig' => array_values($modulesConfig) // Remove chaves associativas
+                'refresh_token' => $refreshToken,
+                'modulesConfig' => array_values($modulesConfig),
             ]
         ];
     }

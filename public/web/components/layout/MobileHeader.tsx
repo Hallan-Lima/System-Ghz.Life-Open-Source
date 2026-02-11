@@ -12,7 +12,7 @@ interface MobileHeaderProps {
  * MobileHeader Component
  * Exibe o cabeçalho em dispositivos móveis com acesso rápido ao perfil e notificações.
  */
-const MobileHeader: React.FC<MobileHeaderProps> = ({ onSettingsClick, userName = "Usuário Ghz" }) => {
+const MobileHeader: React.FC<MobileHeaderProps> = ({ onSettingsClick, userName = "Visitante" }) => {
   const navigate = useNavigate();
   const { unreadCount } = useNotifications();
 

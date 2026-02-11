@@ -16,13 +16,14 @@ class AuthService {
         storage.setJson("userConfig", responseData.userConfig);
       }
 
+      if (responseData.refresh_token) {
+        storage.setJson("refresh_token", responseData.refresh_token);
+      }
+
       // 4. Salva a configuração dos módulos (Menu dinâmico)
       if (responseData.modulesConfig) {
         storage.setJson("modulesConfig", responseData.modulesConfig);
       }
-
-      // Se você implementar JWT no futuro, salvaria o token aqui:
-      // if (responseData.token) storage.setItem("auth_token", responseData.token);
 
       return;
     } else {
@@ -31,14 +32,18 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    // Limpa tudo ao sair
     storage.clear();
-    window.location.href = "/login";
+    window.location.href = "/";
   }
-  
-  // Verifica se está logado (simples verificação se tem dados)
+
+  /**
+   * Verifica se o usuário está autenticado pela presença dos tokens no localStorage.
+   * @returns `true` se ambos os tokens estiverem presentes, `false` caso contrário.
+   */
   isAuthenticated(): boolean {
-    return !!storage.getItem("userConfig");
+    return (
+      !!storage.getItem("refresh_token")
+    );
   }
   /**
    * registro de um novo usuário.
