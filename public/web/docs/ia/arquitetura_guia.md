@@ -3,6 +3,12 @@
 ## 1. Visão Geral
 Este projeto utiliza uma arquitetura baseada em Features (Funcionalidades) com princípios de DDD (Domain-Driven Design) adaptados para Frontend. O objetivo é desacoplar a interface do usuário das regras de negócio, facilitando a escalabilidade.
 
+Sempre que possivel reutilizar alguma funcionalidade ou componente que ja existe no projeto afim de diminuir informacoes repetidas sem a necessidade.
+
+Foque tambem em sempre desenvolver alguma coisa com um belo visual e que instigue o usuario a querer usar mais ou ficar mais na aplicacao.
+onde fasa realmente o usuario quere utilizar o software.
+
+
 ## 2. Estrutura de Diretórios
 
 ### `src/components/` (UI Library)
@@ -46,6 +52,21 @@ Todo novo arquivo criado ou bloco de documentação significativa gerado pela IA
  * @author HallTech AI
  */
 ```
+### Comentario
+Faca comentarios apenas no head da funcao ou componente, exemplo:
+
+```typescript
+/**
+ * @author HallTech AI
+ * 
+ * @description Esse e um caso de exemplo 
+ */
+```
+
+Explicando brevemente o que esta abaixo, considerando que ate um leigo consiga olhar e entender.
+Paragrafos curtos, caso veja que esta ficando muito grande a descricao quebre em outra funcao.
+
+
 
 ### Nomenclatura
 - **Componentes:** PascalCase (ex: `MobileHeader.tsx`).
@@ -53,12 +74,12 @@ Todo novo arquivo criado ou bloco de documentação significativa gerado pela IA
 - **Interfaces:** PascalCase (ex: `Transaction`).
 - **Arquivos de Tipo:** `[contexto].types.ts`.
 
-## 4. Gerenciamento de Autenticação
-A autenticação foi refatorada para a pasta `src/features/auth`.
-- **Estado:** O estado de login é gerenciado localmente pelo hook `useAuth`.
-- **Dados de Teste:** Os usuários mockados estão em `src/features/auth/auth.data.ts`.
+## 4. Informacoes mockadas para agilizar o gerenciamento
+ As informacoes precisam ficar em algum arquivo do tipo nome.data.ts, ja estruturado para que seja desaclopado futuramente caso precise para trazer as informacoes de um banco de dados ou estruturas de fora.
 
 ## 5. Histórico de Mudanças de Domínio
+
+sempre gere uma pasta do tipo docs/ia e um arquivo onde vc vai utilizar ele para montar sua estrutura de pensamento e logica, historio... exatamente como o exemplo abaixo:
 
 ### v1.6.0 - Refatoração Settings (Feature-Based)
 - **Migração:** `modules/Settings.tsx` refatorado para `features/settings`.
