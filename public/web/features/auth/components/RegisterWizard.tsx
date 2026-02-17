@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FormInput from "../../../components/ui/FormInput";
 import { getModuleInterests, getUserTraitInterests } from "../constants";
 import { useRegister } from "../hooks/useRegister";
-import { defaultModules } from "../../modules/modules.data";
+import { modulesService } from "../../modules/services/modules.service";
+import { AppModule } from "../../modules/modules.types";
 
 /**
  * @author HallTech AI
@@ -23,6 +24,27 @@ const RegisterWizard: React.FC = () => {
   } = useRegister();
 
   const [showPassword, setShowPassword] = useState(false);
+
+  // Estados para carregar os módulos da API
+  const [availableModules, setAvailableModules] = useState<AppModule[]>([]);
+  const [loadingModules, setLoadingModules] = useState(false);
+
+  // Busca os módulos ao iniciar a tela
+  useEffect(() => {
+    const fetchModules = async () => {
+      setLoadingModules(true);
+      try {
+        const modules = await modulesService.getModules();
+        setAvailableModules(modules);
+      } catch (error) {
+        console.error("Erro ao buscar módulos", error);
+      } finally {
+        setLoadingModules(false);
+      }
+    };
+
+    fetchModules();
+  }, []);
 
   const renderProgressBar = () => (
     <div className="flex gap-2 mb-8">
@@ -134,11 +156,13 @@ const RegisterWizard: React.FC = () => {
                   onChange={(e) => updateForm("password", e.target.value)}
                 />
                 <button
-                    type="button"
-                    className="absolute right-4 top-1/2 mt-1 text-slate-400 hover:text-indigo-500 transition-colors z-20"
-                    onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                  className="absolute right-4 top-1/2 mt-1 text-slate-400 hover:text-indigo-500 transition-colors z-20"
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                    <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                  <i
+                    className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+                  ></i>
                 </button>
               </div>
 
@@ -166,57 +190,100 @@ const RegisterWizard: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {defaultModules.map((module) => {
-                const isSelected = formData.selectedModules.includes(module.id);
-                return (
-                  <button
-                    key={module.id}
-                    onClick={() => toggleArrayItem("selectedModules", module.id)}
-                    className={`relative p-5 rounded-3xl border text-left transition-all duration-300 group ${
-                      isSelected
-                        ? "bg-indigo-600 border-indigo-500 shadow-xl shadow-indigo-900/50"
-                        : "bg-slate-900 border-slate-800 hover:border-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl transition-colors ${
-                          isSelected
-                            ? "bg-white/20 text-white"
-                            : `bg-slate-800 text-${module.color}-500`
-                        }`}
-                      >
-                        <i className={module.icon}></i>
-                      </div>
-                      <div className="flex-1">
-                        <h3
-                          className={`font-black text-lg ${isSelected ? "text-white" : "text-slate-200"}`}
+            {loadingModules ? (
+              <div className="flex justify-center items-center py-10">
+                <i className="fas fa-spinner fa-spin text-indigo-500 text-3xl"></i>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {availableModules.map((module) => {
+                  const isSelected = formData.selectedModules.includes(
+                    module.id,
+                  );
+                  const isDisabled = !module.isEnabled;
+
+                  return (
+                    <button
+                      key={module.id}
+                      disabled={isDisabled}
+                      onClick={() =>
+                        !isDisabled &&
+                        toggleArrayItem("selectedModules", module.id)
+                      }
+                      className={`relative p-5 rounded-3xl border text-left transition-all duration-300 group
+                        ${
+                          isDisabled
+                            ? "bg-slate-900/40 border-slate-800/50 cursor-not-allowed opacity-60 grayscale-[0.5]"
+                            : isSelected
+                              ? "bg-indigo-600 border-indigo-500 shadow-xl shadow-indigo-900/50 scale-[1.02]"
+                              : "bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-800"
+                        }
+                      `}
+                    >
+                      {/* Badge de "Em Breve" para módulos desativados */}
+                      {isDisabled && (
+                        <span className="absolute top-4 right-4 bg-slate-950 border border-slate-800 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-widest z-10">
+                          Em breve
+                        </span>
+                      )}
+
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl transition-colors ${
+                            isDisabled
+                              ? "bg-slate-800/50 text-slate-600" // Estilo do ícone desativado
+                              : isSelected
+                                ? "bg-white/20 text-white"
+                                : `bg-slate-800 text-${module.color}-500`
+                          }`}
                         >
-                          {module.title}
-                        </h3>
-                        <p
-                          className={`text-xs font-medium mt-1 ${isSelected ? "text-indigo-200" : "text-slate-500"}`}
-                        >
-                          {module.description}
-                        </p>
-                      </div>
-                      <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isSelected
-                            ? "bg-white border-white"
-                            : "border-slate-700"
-                        }`}
-                      >
-                        {isSelected && (
-                          <i className="fas fa-check text-indigo-600 text-[10px]"></i>
+                          <i className={module.icon}></i>
+                        </div>
+                        <div className="flex-1">
+                          <h3
+                            className={`font-black text-lg ${
+                              isDisabled
+                                ? "text-slate-500"
+                                : isSelected
+                                  ? "text-white"
+                                  : "text-slate-200"
+                            }`}
+                          >
+                            {module.title}
+                          </h3>
+                          <p
+                            className={`text-xs font-medium mt-1 ${
+                              isDisabled
+                                ? "text-slate-600"
+                                : isSelected
+                                  ? "text-indigo-200"
+                                  : "text-slate-500"
+                            }`}
+                          >
+                            {module.description || "Módulo do sistema"}
+                          </p>
+                        </div>
+
+                        {/* Checkbox só aparece se estiver ativo */}
+                        {!isDisabled && (
+                          <div
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                              isSelected
+                                ? "bg-white border-white"
+                                : "border-slate-700 group-hover:border-slate-500"
+                            }`}
+                          >
+                            {isSelected && (
+                              <i className="fas fa-check text-indigo-600 text-[10px]"></i>
+                            )}
+                          </div>
                         )}
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -228,189 +295,142 @@ const RegisterWizard: React.FC = () => {
                 Personalização
               </h2>
               <p className="text-slate-400 text-sm">
-                Vamos ajustar os detalhes finais para sua experiência.
+                Ajuste os detalhes dos módulos que você escolheu.
               </p>
             </div>
 
             <div className="space-y-8">
-              {/* Productivity Question */}
-              {formData.selectedModules.includes("productivity") && (
-                <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800 animate-in fade-in slide-in-from-bottom-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <i className="fas fa-list-check text-indigo-500"></i>
-                    <h3 className="font-bold text-white text-sm uppercase tracking-wide">
-                      Foco em Produtividade
-                    </h3>
-                  </div>
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => updateProdConfig("enableGoals")}
-                      className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all ${
-                        formData.productivityConfig.enableGoals
-                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-400"
-                          : "border-slate-800 text-slate-400 hover:bg-slate-800"
-                      }`}
-                    >
-                      <div className="text-left">
-                        <p className="font-black text-sm">Metas & Sonhos</p>
-                        <p className="text-[10px] opacity-70">
-                          Planejamento a longo prazo e objetivos de vida.
-                        </p>
-                      </div>
+              {/* LOOP DINÂMICO DOS MÓDULOS SELECIONADOS */}
+              {availableModules.map((module) => {
+                // 1. Só mostra se o usuário selecionou este módulo no Passo 2
+                if (!formData.selectedModules.includes(module.id)) return null;
+
+                // 2. Só mostra se o módulo estiver ativo e tiver funcionalidades
+                if (
+                  !module.isEnabled ||
+                  !module.features ||
+                  module.features.length === 0
+                )
+                  return null;
+
+                return (
+                  <div
+                    key={module.id}
+                    className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800 animate-in fade-in slide-in-from-bottom-4"
+                  >
+                    {/* Cabeçalho do Card do Módulo */}
+                    <div className="flex items-center gap-3 mb-4 border-b border-slate-800/50 pb-3">
                       <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formData.productivityConfig.enableGoals ? "bg-indigo-500 border-indigo-500" : "border-slate-600"}`}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 text-${module.color}-500`}
                       >
-                        {formData.productivityConfig.enableGoals && (
-                          <i className="fas fa-check text-[10px] text-white"></i>
-                        )}
+                        <i className={module.icon}></i>
                       </div>
-                    </button>
+                      <h3 className="font-bold text-white text-sm uppercase tracking-wide">
+                        {module.title}
+                      </h3>
+                    </div>
 
-                    <button
-                      onClick={() => updateProdConfig("enableShopping")}
-                      className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all ${
-                        formData.productivityConfig.enableShopping
-                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-400"
-                          : "border-slate-800 text-slate-400 hover:bg-slate-800"
-                      }`}
-                    >
-                      <div className="text-left">
-                        <p className="font-black text-sm">Compras & Listas</p>
-                        <p className="text-[10px] opacity-70">
-                          Listas rápidas, mercado e itens para adquirir.
-                        </p>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formData.productivityConfig.enableShopping ? "bg-indigo-500 border-indigo-500" : "border-slate-600"}`}
-                      >
-                        {formData.productivityConfig.enableShopping && (
-                          <i className="fas fa-check text-[10px] text-white"></i>
-                        )}
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
+                    {/* Lista de Funcionalidades (Features) */}
+                    <div className="space-y-3">
+                      {module.features.map((feature) => {
+                        // Verifica se a funcionalidade está selecionada (usamos o array 'interests' para salvar IDs de features)
+                        const isFeatureActive = formData.interests.includes(
+                          feature.id,
+                        );
+                        const isFeatureDisabled = !feature.isEnabled;
 
-              {/* Finance Question */}
-              {formData.selectedModules.includes("finance") && (
-                <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
-                  <div className="flex items-center gap-3 mb-4">
-                    <i className="fas fa-wallet text-emerald-500"></i>
-                    <h3 className="font-bold text-white text-sm uppercase tracking-wide">
-                      Estilo Financeiro
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => updateForm("financeMode", "simple")}
-                      className={`p-4 rounded-2xl border text-center transition-all ${
-                        formData.financeMode === "simple"
-                          ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
-                          : "border-slate-800 text-slate-400 hover:bg-slate-800"
-                      }`}
-                    >
-                      <p className="font-black text-sm mb-1">Simples</p>
-                      <p className="text-[10px]">
-                        Controle mais simples, apenas entradas, Saídas e Saldo Geral.
-                      </p>
-                    </button>
-                    <button
-                      onClick={() => updateForm("financeMode", "advanced")}
-                      className={`p-4 rounded-2xl border text-center transition-all ${
-                        formData.financeMode === "advanced"
-                          ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
-                          : "border-slate-800 text-slate-400 hover:bg-slate-800"
-                      }`}
-                    >
-                      <p className="font-black text-sm mb-1">Avançado</p>
-                      <p className="text-[10px]">
-                        Mais opções de personalização e controle, como: 
-                        Categorias, cartões, metas e tags.
-                      </p>
-                    </button>
-                  </div>
-                </div>
-              )}
+                        return (
+                          <button
+                            key={feature.id}
+                            disabled={isFeatureDisabled}
+                            onClick={() =>
+                              !isFeatureDisabled &&
+                              toggleArrayItem("interests", feature.id)
+                            }
+                            className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all group ${
+                              isFeatureDisabled
+                                ? "border-slate-800 opacity-50 cursor-not-allowed bg-slate-900/30"
+                                : isFeatureActive
+                                  ? `bg-${module.color}-500/10 border-${module.color}-500` // Usa a cor do módulo
+                                  : "border-slate-800 hover:bg-slate-800"
+                            }`}
+                            // Fallback de style caso a classe dinâmica do Tailwind não funcione
+                            style={
+                              isFeatureActive && !isFeatureDisabled
+                                ? {
+                                    borderColor: `var(--color-${module.color}-500)`,
+                                  }
+                                : {}
+                            }
+                          >
+                            <div className="text-left flex-1">
+                              <div className="flex items-center gap-2">
+                                <p
+                                  className={`font-black text-sm ${isFeatureActive ? "text-white" : "text-slate-300"}`}
+                                >
+                                  {feature.label}
+                                </p>
+                                {isFeatureDisabled && (
+                                  <span className="text-[9px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold">
+                                    Em breve
+                                  </span>
+                                )}
+                              </div>
+                              <p
+                                className={`text-[10px] mt-0.5 ${isFeatureActive ? `text-${module.color}-200` : "text-slate-500"}`}
+                              >
+                                {feature.description ||
+                                  "Funcionalidade do sistema"}
+                              </p>
+                            </div>
 
-              {/* Health Question */}
-              {formData.selectedModules.includes("health") && (
-                <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
-                  <div className="flex items-center gap-3 mb-4">
-                    <i className="fas fa-heartbeat text-rose-500"></i>
-                    <h3 className="font-bold text-white text-sm uppercase tracking-wide">
-                      Foco na Saúde
-                    </h3>
+                            {!isFeatureDisabled && (
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                  isFeatureActive
+                                    ? `bg-${module.color}-500 border-${module.color}-500`
+                                    : "border-slate-600 group-hover:border-slate-500"
+                                }`}
+                              >
+                                {isFeatureActive && (
+                                  <i className="fas fa-check text-[10px] text-white"></i>
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Hidratação",
-                      "Medicamentos",
-                      "Treinos",
-                      "Sono",
-                      "Calorias",
-                      "Academia",
-                    ].map((goal) => (
-                      <button
-                        key={goal}
-                        onClick={() => toggleArrayItem("healthGoals", goal)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
-                          formData.healthGoals.includes(goal)
-                            ? "bg-rose-500 text-white border-rose-500"
-                            : "bg-transparent text-slate-400 border-slate-700 hover:border-slate-500"
-                        }`}
-                      >
-                        {goal}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+                );
+              })}
 
-              {/* Module-specific Interests */}
-              {formData.selectedModules.length > 0 && (
+              {/* Manteve-se a seção genérica de interesses/hobbies caso ainda faça sentido para o perfil do usuário, 
+                  mas agora ela fica no final, separada da configuração técnica dos módulos */}
               <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
                 <h3 className="font-bold text-white text-sm uppercase tracking-wide mb-4 pl-1">
-                Funcionalidades de Interesse
+                  Seus Interesses & Hobbies
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                {getModuleInterests().map((interest) => (
-                  <button
-                  key={interest.id}
-                  onClick={() => toggleArrayItem("interests", interest.id)}
-                  className={`px-3 py-2 rounded-lg text-[11px] font-bold border transition-all whitespace-nowrap ${
-                    formData.interests.includes(interest.id)
-                    ? "bg-indigo-500/20 border-indigo-500 text-indigo-300"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
-                  }`}
-                  >
-                  {interest.label}
-                  </button>
-                ))}
+                  {getUserTraitInterests().map((interest) => {
+                    const isActive = formData.interests.includes(interest.id);
+                    return (
+                      <button
+                        key={interest.id}
+                        onClick={() =>
+                          toggleArrayItem("interests", interest.id)
+                        }
+                        className={`px-3 py-2 rounded-lg text-[11px] font-bold border transition-all whitespace-nowrap ${
+                          isActive
+                            ? "bg-white/20 border-white text-white"
+                            : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
+                        }`}
+                      >
+                        {interest.label}
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-              )}
-
-              {/* User Traits & Preferences */}
-              <div className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800">
-              <h3 className="font-bold text-white text-sm uppercase tracking-wide mb-4 pl-1">
-                Seus Interesses & Hobbies
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {getUserTraitInterests().map((interest) => (
-                <button
-                  key={interest.id}
-                  onClick={() => toggleArrayItem("interests", interest.id)}
-                  className={`px-3 py-2 rounded-lg text-[11px] font-bold border transition-all whitespace-nowrap ${
-                  formData.interests.includes(interest.id)
-                    ? "bg-white/20 border-white text-white"
-                    : "bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700"
-                  }`}
-                >
-                  {interest.label}
-                </button>
-                ))}
-              </div>
               </div>
             </div>
           </div>
@@ -422,7 +442,7 @@ const RegisterWizard: React.FC = () => {
             onClick={handleNext}
             disabled={loading || !isStepValid}
             className={`w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-900/40 transition-all active:scale-[0.98] flex items-center justify-center gap-3 ${
-                (loading || !isStepValid) ? "opacity-50 cursor-not-allowed" : ""
+              loading || !isStepValid ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {loading ? (

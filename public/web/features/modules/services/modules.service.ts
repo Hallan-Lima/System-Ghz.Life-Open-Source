@@ -1,5 +1,6 @@
 import { AppModule } from "../modules.types";
 import { defaultModules } from "../modules.data";
+import { api } from "../../../services/api";
 
 const STORAGE_KEY = "ghz_modules_config_v1";
 
@@ -12,21 +13,19 @@ export const modulesService = {
    * Recupera a configuração atual dos módulos.
    */
   getModules: async (): Promise<AppModule[]> => {
-    // Simula delay de leitura
-    await new Promise(resolve => setTimeout(resolve, 200));
-
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+      const response = await api.get('modules');
+      
+      if (response.data && response.data.success) {
+        return response.data.data;
       }
+      
+      return defaultModules;
     } catch (e) {
-      console.warn("Erro ao ler configuração de módulos", e);
+      console.error("Erro ao carregar módulos da API, usando fallback:", e);
+      // Fallback silencioso para não travar o cadastro se a API falhar
+      return defaultModules;
     }
-    
-    // Fallback para padrão se não houver salvo
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultModules));
-    return defaultModules;
   },
 
   /**
