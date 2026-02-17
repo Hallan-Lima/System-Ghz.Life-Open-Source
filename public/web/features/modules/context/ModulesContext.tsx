@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { AppModule } from '../modules.types';
 import { defaultModules } from '../modules.data';
 import { modulesService } from '../services/modules.service';
+import config from '../../../src/config';
 
 interface ModulesContextData {
   modules: AppModule[];
@@ -15,8 +16,8 @@ interface ModulesContextData {
 
 export const ModulesContext = createContext<ModulesContextData>({} as ModulesContextData);
 
-const STORAGE_KEY = "ghz_modules_config_v1";
-const ORDER_KEY = "ghz_modules_order_v1";
+const STORAGE_KEY = config.modulesStorageKey;
+const ORDER_KEY = config.modulesOrderKey;
 
 export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Inicialização dos Módulos

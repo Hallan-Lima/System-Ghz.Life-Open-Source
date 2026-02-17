@@ -1,6 +1,7 @@
 import { api } from "../../../services/api";
 import { storage } from "../../../services/storage";
 import { RegisterState } from "../auth.types";
+import config from "../../../src/config";
 
 class AuthService {
   async login(email: string, password: string): Promise<void> {
@@ -22,7 +23,7 @@ class AuthService {
 
       // 4. Salva a configuração dos módulos (Menu dinâmico)
       if (responseData.modulesConfig) {
-        storage.setJson("modulesConfig", responseData.modulesConfig);
+        storage.setJson(config.modulesStorageKey, responseData.modulesConfig);
       }
 
       return;
