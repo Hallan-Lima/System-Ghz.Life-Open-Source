@@ -18,7 +18,8 @@ export const useAuth = () => {
 
     try {
       await authService.login(email, pass);
-      navigate("/dashboard");
+      window.location.href = "#/dashboard";
+      window.location.reload();
     } catch (err) {
       setError("Falha no login. Verifique suas credenciais.");
     } finally {
