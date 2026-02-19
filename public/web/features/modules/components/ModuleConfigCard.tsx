@@ -16,11 +16,12 @@ interface ModuleConfigCardProps {
 const ModuleConfigCard: React.FC<ModuleConfigCardProps> = ({ module, onToggleModule, onToggleFeature }) => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
+  const isComingSoon = module.status?.toLowerCase() === "em breve";
 
   const handleIconClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Evita expandir o card ao clicar no ícone
     
-    if (!module.isEnabled) return;
+    if (!module.isEnabled || isComingSoon) return;
 
     // Mapeamento de rotas baseado no ID do módulo
     const routes: Record<string, string> = {
@@ -69,11 +70,15 @@ const ModuleConfigCard: React.FC<ModuleConfigCardProps> = ({ module, onToggleMod
                 <h3 className={`font-black text-lg truncate ${module.isEnabled ? 'text-slate-800 dark:text-white' : 'text-slate-500'}`}>
                     {module.title}
                 </h3>
-                {module.isEnabled && (
-                    <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">
-                        Ativo
-                    </span>
-                )}
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${
+                    isComingSoon
+                        ? "bg-slate-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400"
+                        : module.isEnabled
+                            ? "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                }`}>
+                    {isComingSoon ? "em breve" : module.isEnabled ? "Ativo" : "Inativo"}
+                </span>
             </div>
             <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
                 {module.description}
@@ -83,11 +88,15 @@ const ModuleConfigCard: React.FC<ModuleConfigCardProps> = ({ module, onToggleMod
         {/* Toggle Principal */}
         <div className="flex flex-col items-center gap-2">
             <button
-                onClick={() => onToggleModule(module.id)}
+                type="button"
+                disabled={isComingSoon}
+                onClick={() => !isComingSoon && onToggleModule(module.id)}
                 className={`w-12 h-7 rounded-full relative transition-all duration-300 ${
-                module.isEnabled 
-                    ? `bg-${module.color}-600 shadow-lg shadow-${module.color}-500/30` 
-                    : "bg-slate-300 dark:bg-slate-700"
+                isComingSoon
+                    ? "bg-slate-300 dark:bg-slate-700 opacity-60 cursor-not-allowed pointer-events-none"
+                    : module.isEnabled 
+                        ? `bg-${module.color}-600 shadow-lg shadow-${module.color}-500/30 cursor-pointer` 
+                        : "bg-slate-300 dark:bg-slate-700 cursor-pointer"
                 }`}
             >
                 <div 
@@ -121,7 +130,7 @@ const ModuleConfigCard: React.FC<ModuleConfigCardProps> = ({ module, onToggleMod
                     feature={feature}
                     color={module.color}
                     onToggle={() => onToggleFeature(module.id, feature.id)}
-                    disabledParent={!module.isEnabled}
+                    disabledParent={isComingSoon ? true : !module.isEnabled}
                 />
             ))}
           </div>

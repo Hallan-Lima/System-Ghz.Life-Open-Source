@@ -7,6 +7,8 @@ export interface AppFeature {
   label: string;
   description?: string;
   isEnabled: boolean;
+  status?: string; // ex.: "Ativo" | "Inativo"
+  status_id?: number; // ex.: 1 = Ativo, 2 = Inativo
   // Campos para o Menu de Ação Rápida
   quickAccessIcon?: string;
   route?: string;
@@ -23,5 +25,7 @@ export interface AppModule {
   color: string; // Ex: 'indigo', 'emerald', 'rose'
   description: string;
   isEnabled: boolean;
+  status?: string; // ex.: "Ativo" | "Inativo"
+  status_id?: number; // ex.: 1 = Ativo, 2 = Inativo
   features: AppFeature[];
 }

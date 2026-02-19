@@ -16,6 +16,7 @@ INSERT INTO sys_status (id, name) VALUES
 (4, 'Bloqueado'),
 (5, 'Concluído'),  -- Útil para Tarefas
 (6, 'Arquivado');  -- Útil para Tarefas
+(7, 'Em breve');   -- Modulos e Funcionalidades que ainda serão lançados
 
 -- ------------------------------------------------------------------------------
 -- 2. POPULANDO GÊNEROS (sys_gender)
@@ -41,10 +42,10 @@ INSERT INTO sys_subscription_plan (id, name, description, price, expires_at) VAL
 -- ==============================================================================
 INSERT INTO sys_module (id, title, sys_status_id, icon, color, description) VALUES 
 (1, 'Produtividade', 1, 'fas fa-list-check', 'indigo', 'Gestão de tarefas, metas e organização pessoal.'),
-(2, 'Financeiro', 2, 'fas fa-wallet', 'emerald', 'Controle de gastos, entradas e planejamento.'),
-(3, 'Saúde & Bem-estar', 2, 'fas fa-heartbeat', 'rose', 'Monitoramento corporal e hábitos saudáveis.'),
-(4, 'Inteligência Artificial', 2, 'fas fa-brain', 'purple', 'Assistente virtual e insights inteligentes.'),
-(5, 'Social', 2, 'fas fa-users', 'amber', 'Interações, eventos e comunidades.');
+(2, 'Financeiro', 7, 'fas fa-wallet', 'emerald', 'Controle de gastos, entradas e planejamento.'),
+(3, 'Saúde & Bem-estar', 7, 'fas fa-heartbeat', 'rose', 'Monitoramento corporal e hábitos saudáveis.'),
+(4, 'Inteligência Artificial', 7, 'fas fa-brain', 'purple', 'Assistente virtual e insights inteligentes.'),
+(5, 'Social', 7, 'fas fa-users', 'amber', 'Interações, eventos e comunidades.');
 
 -- ==============================================================================
 -- 7. POPULANDO FUNCIONALIDADES DO MÓDULO (sys_module_functionality)
@@ -58,25 +59,25 @@ INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, route
 (1, 'Listas de Compras', 1, '/tasks?type=SHOPPING', 'fas fa-cart-shopping', 'Controle de itens e valores'),
 (1, 'Anotações', 1, '/tasks?type=NOTE', 'fas fa-sticky-note', 'Bloco de notas rápido');
 
--- --- MÓDULO 2: FINANCEIRO (Inativo - Status 2) ---
+-- --- MÓDULO 2: FINANCEIRO (Inativo - Status 7) ---
 INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, router_link, icon, description) VALUES 
-(2, 'Movimentações', 2, '/finance', 'fas fa-money-bill-wave', 'Registro de entradas/saídas'),
-(2, 'Categorias', 2, NULL, NULL, 'Agrupamento de gastos'),
-(2, 'Cartões de Crédito', 2, NULL, NULL, 'Gestão de faturas'),
-(2, 'Relatórios', 2, NULL, NULL, 'Gráficos mensais');
+(2, 'Movimentações', 7, '/finance', 'fas fa-money-bill-wave', 'Registro de entradas/saídas'),
+(2, 'Categorias', 7, NULL, NULL, 'Agrupamento de gastos'),
+(2, 'Cartões de Crédito', 7, NULL, NULL, 'Gestão de faturas'),
+(2, 'Relatórios', 7, NULL, NULL, 'Gráficos mensais');
 
--- --- MÓDULO 3: SAÚDE (Inativo - Status 2) ---
+-- --- MÓDULO 3: SAÚDE (Inativo - Status 7) ---
 INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, router_link, icon, description) VALUES 
-(3, 'Hidratação', 2, '/health', 'fas fa-glass-water', 'Meta de água diária'),
-(3, 'Medicamentos', 2, '/health', 'fas fa-pills', 'Lembretes de hora em hora'),
-(3, 'Consultas', 2, '/health', 'fas fa-user-doctor', 'Agenda médica'),
-(3, 'Treinos', 2, NULL, NULL, 'Ficha de academia');
+(3, 'Hidratação', 7, '/health', 'fas fa-glass-water', 'Meta de água diária'),
+(3, 'Medicamentos', 7, '/health', 'fas fa-pills', 'Lembretes de hora em hora'),
+(3, 'Consultas', 7, '/health', 'fas fa-user-doctor', 'Agenda médica'),
+(3, 'Treinos', 7, NULL, NULL, 'Ficha de academia');
 
--- --- MÓDULO 4: IA (Inativo - Status 2) ---
+-- --- MÓDULO 4: IA (Inativo - Status 7) ---
 INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, router_link, icon, description) VALUES 
-(4, 'Sugestões IA', 2, '/ia', 'fas fa-heart-pulse', 'Conversa e Dicas');
+(4, 'Sugestões IA', 7, '/ia', 'fas fa-heart-pulse', 'Conversa e Dicas');
 
--- --- MÓDULO 5: SOCIAL (Inativo - Status 2) ---
+-- --- MÓDULO 5: SOCIAL (Inativo - Status 7) ---
 INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, router_link, icon, description) VALUES 
-(5, 'Agenda Social', 2, '/social', 'far fa-calendar-alt', 'Calendário social'),
-(5, 'Explorar', 2, '/social', 'far fa-compass', 'Descobrir novidades');
+(5, 'Agenda Social', 7, '/social', 'far fa-calendar-alt', 'Calendário social'),
+(5, 'Explorar', 7, '/social', 'far fa-compass', 'Descobrir novidades');
