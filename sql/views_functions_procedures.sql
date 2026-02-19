@@ -75,17 +75,20 @@ USE ghz_life_AMBIENTE;
             sm.icon AS module_icon,
             sm.color AS module_color,
             IF(sm.sys_status_id = 1, TRUE, FALSE) AS module_enabled,
-            
+            sm.description AS module_desc,
+            stm.name as module_status,
             smf.id AS feature_id,
             smf.title AS feature_label,
             smf.description AS feature_desc,
             smf.icon AS feature_icon,
             smf.router_link AS feature_route,
-            IF(smf.sys_status_id = 1, TRUE, FALSE) AS feature_enabled
+            IF(smf.sys_status_id = 1, TRUE, FALSE) AS feature_enabled,
+            stf.name AS feature_status
         FROM sys_module sm
         LEFT JOIN sys_module_functionality smf ON sm.id = smf.sys_module_id
+        LEFT JOIN sys_status stm ON stm.id = sm.sys_status_id
+        LEFT JOIN sys_status stf ON stf.id = smf.sys_status_id
         ORDER BY sm.id, smf.id;
-
 
 -- ==============================================================================
 -- 2. PROCEDURES (AÇÕES E ESCRITA)

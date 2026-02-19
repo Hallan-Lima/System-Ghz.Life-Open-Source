@@ -37,8 +37,9 @@ class ModuleService
                     'title'       => $row['module_title'],
                     'icon'        => $row['module_icon'],
                     'color'       => $row['module_color'],
-                    'description' => '', 
+                    'description' => $row['module_desc'],
                     'isEnabled'   => (bool) $row['module_enabled'],
+                    'status'      => $row['module_status'],
                     'features'    => []
                 ];
             }
@@ -50,6 +51,7 @@ class ModuleService
                     'description'     => $row['feature_desc'],
                     'isEnabled'       => (bool) $row['feature_enabled'],
                     'quickAccessIcon' => $row['feature_icon'],
+                    'status'          => $row['feature_status'],
                     'route'           => $row['feature_route']
                 ];
             }

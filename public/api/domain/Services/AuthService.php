@@ -83,6 +83,16 @@ class AuthService
 
     public function login(array $payload): array
     {
+        /**
+         * TODO: Refatorar toda a função,
+         *  ela está muito grande e com responsabilidades misturadas. O ideal seria dividir em métodos privados para cada etapa (ex: validarCredenciais, gerarToken, buscarConfigModulos, montarResposta).
+         *  A parte de busca de módulos e funcionalidades pode ser extraída para um método separado ou até mesmo para um Service específico (ex: ModuleService) para evitar duplicação de código e garantir consistência.
+         *  O tratamento de erros também pode ser melhorado, criando uma estrutura mais robusta para lidar com diferentes tipos de erros (ex: erros de validação, erros de banco, etc.) e retornando mensagens mais amigáveis.
+         *  Remover o tratamento especifico de parameters de módulo e funcionalidade (ex: o mapeamento rígido de IDs para strings) e buscar uma solução mais dinâmica.
+         *  Muito comentário e lógica de negócio misturada, o ideal seria ter uma camada de serviço mais limpa e delegar responsabilidades para métodos ou classes auxiliares.
+         */
+
+        
         // 1. Busca o usuário pelo E-mail para verificar senha
         $sqlUser = "
             SELECT 
@@ -153,21 +163,24 @@ class AuthService
         $sqlModules = "
             SELECT 
                 sm.id AS module_id, sm.title AS mod_title, sm.icon AS mod_icon, 
-                sm.color AS mod_color, sm.description AS mod_desc, sm.sys_status_id AS mod_status,
+                sm.color AS mod_color, sm.description AS mod_desc, sm.sys_status_id AS mod_status_id,
                 smf.id AS feat_id, smf.title AS feat_title, smf.description AS feat_desc,
-                smf.icon AS feat_icon, smf.router_link AS feat_route, smf.sys_status_id AS feat_status,
+                smf.icon AS feat_icon, smf.router_link AS feat_route, smf.sys_status_id AS feat_status_id,
+                ssm.name as  mod_status, ssf.name as feat_status,
                 CASE 
-                    WHEN smf.sys_status_id = 1 THEN 1 
-                    WHEN smfu.id IS NOT NULL THEN 1 
-                    ELSE 0 
+                WHEN smf.sys_status_id = 1 THEN 1 
+                WHEN smfu.id IS NOT NULL THEN 1 
+                ELSE 0 
                 END AS has_access
-            FROM sys_module sm
-            JOIN sys_module_functionality smf ON sm.id = smf.sys_module_id
-            LEFT JOIN sys_module_functionality_user smfu 
+                FROM sys_module sm
+                JOIN sys_module_functionality smf ON sm.id = smf.sys_module_id
+                JOIN sys_status ssm ON ssm.id = smf.sys_status_id
+                JOIN sys_status ssf ON ssf.id = smf.sys_status_id
+                LEFT JOIN sys_module_functionality_user smfu 
                 ON smfu.sys_module_functionality_id = smf.id 
                 AND smfu.user_id = :uid
-            WHERE sm.deleted_at IS NULL AND smf.deleted_at IS NULL
-            ORDER BY sm.id ASC, smf.id ASC
+                WHERE sm.deleted_at IS NULL AND smf.deleted_at IS NULL
+                ORDER BY sm.id ASC, smf.id ASC
         ";
 
         $stmtMod = $this->db->prepare($sqlModules);
@@ -187,7 +200,7 @@ class AuthService
 
             // Cria o módulo se não existir ainda no array
             if (!isset($modulesConfig[$strId])) {
-                $isEnabled = ($row['mod_status'] == 1);
+                $isEnabled = ($row['mod_status_id'] == 1);
                 if ($isEnabled) $selectedModules[] = $strId;
 
                 $modulesConfig[$strId] = [
@@ -197,6 +210,8 @@ class AuthService
                     'color' => $row['mod_color'],
                     'description' => $row['mod_desc'],
                     'isEnabled' => $isEnabled,
+                    'status_id' => $row['mod_status_id'],
+                    'status' => $row['mod_status'],
                     'features' => []
                 ];
             }
@@ -218,7 +233,9 @@ class AuthService
                 'description' => $row['feat_desc'],
                 'isEnabled' => (bool)$row['has_access'],
                 'quickAccessIcon' => $row['feat_icon'],
-                'route' => $row['feat_route']
+                'route' => $row['feat_route'],
+                'status_id' => $row['feat_status_id'],
+                'status' => $row['feat_status']
             ];
         }
 
