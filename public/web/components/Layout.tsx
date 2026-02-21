@@ -39,28 +39,31 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   // --- Helper de Verificação de Módulo ---
   const isModuleEnabled = (moduleId: string) => {
-    const mod = modules.find(m => m.id === moduleId);
-    return mod ? mod.isEnabled : true; 
+    // Garante que a comparação seja feita por string (ex: '1' === '1')
+    const mod = modules.find(m => String(m.id) === String(moduleId));
+    // CORREÇÃO: Mudei de 'true' para 'false'. Se não achar, esconde o menu!
+    return mod ? mod.isEnabled : false; 
   };
 
   // --- Configuration ---
 
   const allSidebarItems = [
     { to: '/dashboard', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
-    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: 'finance' },
-    { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: 'health' },
-    { to: '/tasks', icon: 'fas fa-list-check', label: 'Tarefas', moduleId: 'productivity' },
-    { to: '/ia', icon: 'fas fa-brain', label: 'Ghz IA', moduleId: 'ai_assistant' },
+    { to: '/tasks', icon: 'fas fa-list-check', label: 'Tarefas', moduleId: '1' }, // ID 1 = Produtividade
+    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: '2' },  // ID 2 = Financeiro
+    { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: '3' },   // ID 3 = Saúde
+    { to: '/ia', icon: 'fas fa-brain', label: 'Ghz IA', moduleId: '4' },          // ID 4 = IA
+    { to: '/social', icon: 'fas fa-users', label: 'Social', moduleId: '5' },      // ID 5 = Social
     { to: '/modules', icon: 'fas fa-boxes-stacked', label: 'Módulos', moduleId: 'core' },
     { to: '/settings', icon: 'fas fa-gear', label: 'Ajustes', moduleId: 'core' },
   ];
 
   const allMobileItems = [
     { to: '/dashboard', icon: 'fas fa-home', label: 'Home', moduleId: 'core' },
-    { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas', moduleId: 'productivity' }, 
-    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: 'finance' },
-    { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: 'health' },
-    { to: '/ia', icon: 'fas fa-brain', label: 'IA', moduleId: 'ai_assistant' },
+    { to: '/tasks', icon: 'fas fa-bars-staggered', label: 'Tarefas', moduleId: '1' },
+    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças', moduleId: '2' },
+    { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde', moduleId: '3' },
+    { to: '/ia', icon: 'fas fa-brain', label: 'IA', moduleId: '4' },
     { to: '/modules', icon: 'fas fa-boxes-stacked', label: 'Módulos', moduleId: 'core' },
   ];
 
