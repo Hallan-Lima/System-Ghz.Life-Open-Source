@@ -18,7 +18,7 @@ class AuthService {
       }
 
       if (responseData.refresh_token) {
-        storage.setJson("refresh_token", responseData.refresh_token);
+        storage.setJson(config.tokenStorageKey, responseData.refresh_token);
       }
 
       // 4. Salva a configuração dos módulos (Menu dinâmico)
@@ -43,7 +43,7 @@ class AuthService {
    */
   isAuthenticated(): boolean {
     return (
-      !!storage.getItem("refresh_token")
+      !!storage.getItem(config.tokenStorageKey)
     );
   }
   /**

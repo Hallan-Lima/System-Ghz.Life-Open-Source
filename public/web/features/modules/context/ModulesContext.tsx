@@ -63,7 +63,8 @@ export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({ child
           
           // Limpa chaves de sessão e configuração (Ajuste as chaves conforme o seu auth.service)
           localStorage.removeItem(config.configStorageKey);
-          localStorage.removeItem('token'); 
+          localStorage.removeItem(config.tokenStorageKey);
+          localStorage.removeItem('token');
           localStorage.removeItem(STORAGE_KEY);
           
           // Redirecionamento imperativo para a rota de login

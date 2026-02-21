@@ -10,6 +10,7 @@ interface Config {
   modulesStorageKey: string;
   modulesOrderKey: string;
   configStorageKey: string;
+  tokenStorageKey: string;
 }
 
 const config: Config = {
