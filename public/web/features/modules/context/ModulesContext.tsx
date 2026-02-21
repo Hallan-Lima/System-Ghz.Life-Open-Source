@@ -62,7 +62,7 @@ export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({ child
           console.warn("🛡️ Segurança: Nenhum módulo autorizado encontrado. Forçando logout.");
           
           // Limpa chaves de sessão e configuração (Ajuste as chaves conforme o seu auth.service)
-          localStorage.removeItem('userConfig');
+          localStorage.removeItem(config.configStorageKey);
           localStorage.removeItem('token'); 
           localStorage.removeItem(STORAGE_KEY);
           

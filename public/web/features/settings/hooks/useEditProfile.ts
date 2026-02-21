@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { RegisterState } from "../../auth/auth.types";
+import config from "../../../src/config";
 
 /**
  * @author HallTech AI
@@ -37,7 +38,7 @@ export const useEditProfile = () => {
   useEffect(() => {
     const loadUserData = () => {
       try {
-        const storedConfig = localStorage.getItem("userConfig");
+        const storedConfig = localStorage.getItem(config.configStorageKey);
         if (storedConfig) {
           const parsed = JSON.parse(storedConfig);
           // Mescla com o estado inicial para garantir que todos os campos existam
@@ -102,7 +103,7 @@ export const useEditProfile = () => {
 
     try {
         // Salva no LocalStorage
-        localStorage.setItem("userConfig", JSON.stringify(formData));
+        localStorage.setItem(config.configStorageKey, JSON.stringify(formData));
         
         setSuccess(true);
         setTimeout(() => {

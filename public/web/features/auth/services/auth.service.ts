@@ -14,7 +14,7 @@ class AuthService {
 
       // 3. Salva as configurações do usuário
       if (responseData.userConfig) {
-        storage.setJson("userConfig", responseData.userConfig);
+        storage.setJson(config.configStorageKey, responseData.userConfig);
       }
 
       if (responseData.refresh_token) {
@@ -54,7 +54,7 @@ class AuthService {
   async register(data: RegisterState): Promise<void> {
     const response = await api.post("/auth/register", data);
     if (response.status === 201) {
-      storage.setJson("userConfig", data);
+      storage.setJson(config.configStorageKey, data);
       return;
     } else {
       // TODO: Implementar notificação no frontend

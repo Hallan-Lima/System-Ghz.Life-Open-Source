@@ -1,6 +1,7 @@
 import { settingsMocks } from "../settings.data";
 import { storage } from "../../../services/storage";
 import { UserProfile } from "../settings.types";
+import config from "../../../src/config";
 
 /**
  * @author HallTech AI
@@ -15,7 +16,7 @@ export const settingsService = {
   getUserProfile: async (): Promise<UserProfile> => {
     try {
       // Busca dados salvos pelo EditProfile (useEditProfile.ts)
-      const storedData = storage.getItem("userConfig");
+      const storedData = storage.getItem(config.configStorageKey);
       
       if (storedData) {
         const parsed = JSON.parse(storedData);

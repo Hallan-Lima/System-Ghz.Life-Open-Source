@@ -1,8 +1,7 @@
 import { AppModule } from "../modules.types";
 import { api } from "../../../services/api";
 import { storage } from "../../../services/storage";
-
-const STORAGE_KEY = "ghz_modules_config_v1";
+import config from "../../../src/config";
 
 /**
  * @author HallTech AI
@@ -33,7 +32,7 @@ export const modulesService = {
     isActive: boolean,
   ): Promise<AppModule[] | null> => {
     try {
-      const userConfig = storage.getJson<any>("userConfig");
+      const userConfig = storage.getJson<any>(config.configStorageKey);
       const userId = userConfig?.user_id;
 
       if (!userId) {
@@ -60,7 +59,7 @@ export const modulesService = {
 
       if (response.data && response.data.success) {
         const updatedModules = response.data.data;
-        storage.setJson(STORAGE_KEY, updatedModules);
+        storage.setJson(config.modulesStorageKey, updatedModules);
         return updatedModules;
       }
 
