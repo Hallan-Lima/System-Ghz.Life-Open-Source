@@ -20,14 +20,17 @@ const DashboardView: React.FC = () => {
   const navigate = useNavigate();
 
   // --- Verificação de Módulos ---
-  const isProductivityEnabled = modules.find(m => m.id === 'productivity')?.isEnabled ?? true;
-  const isFinanceEnabled = modules.find(m => m.id === 'finance')?.isEnabled ?? true;
-  const isHealthEnabled = modules.find(m => m.id === 'health')?.isEnabled ?? true;
+  // Substituímos os textos pelos IDs numéricos que vêm do banco
+  const isProductivityEnabled = modules.find(m => m.id === '1')?.isEnabled ?? false;
+  const isFinanceEnabled = modules.find(m => m.id === '2')?.isEnabled ?? false;
+  const isHealthEnabled = modules.find(m => m.id === '3')?.isEnabled ?? false;
 
-  // Verifica features específicas de Produtividade
-  const productivityFeatures = modules.find(m => m.id === 'productivity')?.features || [];
-  const isNotesEnabled = productivityFeatures.find(f => f.id === 'notes')?.isEnabled ?? true;
-
+  // Verifica features específicas de Produtividade (Módulo 1)
+  const productivityFeatures = modules.find(m => m.id === '1')?.features || [];
+  
+  // A feature de "Anotações" no seu banco agora tem o ID '5'
+  const isNotesEnabled = productivityFeatures.find(f => f.id === '5')?.isEnabled ?? false;
+  
   // Cálculos Dinâmicos
   const pendingTasks = tasks.filter(t => !t.completed && t.type !== TaskType.NOTE);
   const completedTasks = tasks.filter(t => t.completed && t.type !== TaskType.NOTE);

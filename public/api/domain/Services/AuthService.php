@@ -162,6 +162,7 @@ class AuthService
         // Traz tudo 'achatado' e o PHP organiza depois
         $sqlModules = "
             SELECT 
+				smfu.user_id AS user_id,
                 sm.id AS module_id, sm.title AS mod_title, sm.icon AS mod_icon, 
                 sm.color AS mod_color, sm.description AS mod_desc, sm.sys_status_id AS mod_status_id,
                 smf.id AS feat_id, smf.title AS feat_title, smf.description AS feat_desc,
@@ -242,6 +243,7 @@ class AuthService
         // 5. Monta o objeto UserConfig
         $names = explode(' ', $user['nickname']);
         $userConfig = [
+            'user_id' => $user['user_id'],
             'nickname' => $user['nickname'],
             'firstName' => $names[0],
             'lastName' => end($names),
@@ -251,11 +253,6 @@ class AuthService
             'gender' => ($user['sys_gender_id'] == 2 ? 'male' : ($user['sys_gender_id'] == 3 ? 'female' : 'other')),
             'birthDate' => $user['birthdate'],
             'selectedModules' => $selectedModules,
-            // Dados estáticos (Mockados) para não quebrar o front
-            'financeMode' => 'simple',
-            'healthGoals' => [],
-            'productivityConfig' => ['enableGoals' => true, 'enableShopping' => true, 'enableHabits' => false],
-            'interests' => []
         ];
 
         return [

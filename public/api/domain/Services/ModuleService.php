@@ -3,60 +3,87 @@
  * @author HallTech AI
  */
 
-namespace Domain\Services;
+namespace App\Controllers;
 
-use Infrastructure\Database\Connection;
-use PDO;
+use Domain\Services\ModuleService;
 
-class ModuleService
+class ModuleController
 {
-    private PDO $db;
+    private ModuleService $service;
 
     public function __construct()
     {
-        $this->db = Connection::make();
+        $this->service = new ModuleService();
+    }
+
+    public function list(): void
+    {
+        try {
+            // Se o frontend enviar o user_id na URL (ex: /api/modules?user_id=123), buscamos personalizado
+            $userUuid = $_GET['user_id'] ?? null;
+            $data = $this->service->list($userUuid);
+
+            responseJson([
+                'success' => true,
+                'data'    => $data,
+                'message' => 'Módulos carregados com sucesso.'
+            ]);
+        } catch (\Throwable $e) {
+            error_log("Erro ao listar módulos: " . $e->getMessage());
+            responseJson([
+                'success' => false,
+                'message' => 'Erro interno ao carregar módulos.'
+            ], 500);
+        }
     }
 
     /**
-     * Lista todos os módulos e suas funcionalidades agrupadas.
-     * Consome a View: vw_system_modules
+     * Endpoint para ativar/desativar módulos ou funcionalidades
+     * Recebe um Payload JSON via POST/PUT
      */
-    public function list(): array
+    public function toggleVisibility(): void
     {
-        $stmt = $this->db->query("SELECT * FROM vw_system_modules");
-        $rows = $stmt->fetchAll();
+        try {
+            // Captura o JSON enviado na requisição
+            $input = json_decode(file_get_contents('php://input'), true);
 
-        $modulesMap = [];
-
-        foreach ($rows as $row) {
-            $moduleId = $row['module_id'];
-
-            if (!isset($modulesMap[$moduleId])) {
-                $modulesMap[$moduleId] = [
-                    'id'          => (string) $moduleId,
-                    'title'       => $row['module_title'],
-                    'icon'        => $row['module_icon'],
-                    'color'       => $row['module_color'],
-                    'description' => $row['module_desc'],
-                    'isEnabled'   => (bool) $row['module_enabled'],
-                    'status'      => $row['module_status'],
-                    'features'    => []
-                ];
+            // Validação básica dos dados obrigatórios
+            if (!$input || !isset($input['user_id']) || !isset($input['is_active'])) {
+                responseJson([
+                    'success' => false,
+                    'message' => 'Parâmetros obrigatórios ausentes: user_id ou is_active.'
+                ], 400);
             }
 
-            if (!empty($row['feature_id'])) {
-                $modulesMap[$moduleId]['features'][] = [
-                    'id'              => (string) $row['feature_id'],
-                    'label'           => $row['feature_label'],
-                    'description'     => $row['feature_desc'],
-                    'isEnabled'       => (bool) $row['feature_enabled'],
-                    'quickAccessIcon' => $row['feature_icon'],
-                    'status'          => $row['feature_status'],
-                    'route'           => $row['feature_route']
-                ];
+            $userUuid = $input['user_id'];
+            $isActive = (bool) $input['is_active'];
+            
+            // Opcionais (um dos dois deve existir)
+            $moduleId = isset($input['module_id']) ? (int) $input['module_id'] : null;
+            $functionalityId = isset($input['functionality_id']) ? (int) $input['functionality_id'] : null;
+
+            if (empty($moduleId) && empty($functionalityId)) {
+                responseJson([
+                    'success' => false,
+                    'message' => 'É necessário informar o module_id ou o functionality_id.'
+                ], 400);
             }
+
+            // Chama o Service, executa a procedure e já recebe os dados 100% atualizados
+            $data = $this->service->toggleVisibility($userUuid, $moduleId, $functionalityId, $isActive);
+
+            responseJson([
+                'success' => true,
+                'data'    => $data, // Enviando os dados de volta para o frontend!
+                'message' => 'Visibilidade atualizada com sucesso.'
+            ]);
+
+        } catch (\Throwable $e) {
+            error_log("Erro ao atualizar visibilidade: " . $e->getMessage());
+            responseJson([
+                'success' => false,
+                'message' => 'Erro interno ao atualizar a configuração do módulo/funcionalidade.'
+            ], 500);
         }
-
-        return array_values($modulesMap);
     }
 }

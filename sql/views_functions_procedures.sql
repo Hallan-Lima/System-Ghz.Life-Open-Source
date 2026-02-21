@@ -262,7 +262,138 @@ USE ghz_life_AMBIENTE;
             END IF;
         END$$
 
+    -- ------------------------------------------------------------------------------
+    -- 2.4. ATIVAR/DESATIVAR MÓDULO OU FUNCIONALIDADE PARA O USUÁRIO
+    -- Permite que o usuário ative (1) ou desative (0) permissões na sua conta
+    -- ------------------------------------------------------------------------------
+        DROP PROCEDURE IF EXISTS sp_toggle_user_module_functionality$$
 
+        CREATE PROCEDURE sp_toggle_user_module_functionality(
+            IN p_user_uuid VARCHAR(36),      
+            IN p_module_id INT,              
+            IN p_functionality_id INT,       
+            IN p_is_active BOOLEAN           
+        )
+        BEGIN
+            DECLARE v_user_bin BINARY(16);
+
+            -- Tratamento de Erro e Rollback automático em caso de falha
+            DECLARE EXIT HANDLER FOR SQLEXCEPTION
+            BEGIN
+                ROLLBACK;
+                RESIGNAL; 
+            END;
+
+            SET v_user_bin = UNHEX(REPLACE(p_user_uuid, '-', ''));
+
+            START TRANSACTION;
+
+            IF p_is_active = TRUE THEN
+                -- LÓGICA DE ATIVAÇÃO
+                IF p_functionality_id IS NOT NULL AND p_functionality_id > 0 THEN
+                    INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id, deleted_at)
+                    VALUES (v_user_bin, p_functionality_id, NULL)
+                    ON DUPLICATE KEY UPDATE deleted_at = NULL;
+                    
+                ELSEIF p_module_id IS NOT NULL AND p_module_id > 0 THEN
+                    INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id, deleted_at)
+                    SELECT v_user_bin, id, NULL
+                    FROM sys_module_functionality
+                    WHERE sys_module_id = p_module_id
+                    ON DUPLICATE KEY UPDATE deleted_at = NULL;
+                END IF;
+
+            ELSE
+                -- LÓGICA DE DESATIVAÇÃO (Soft Delete)
+                IF p_functionality_id IS NOT NULL AND p_functionality_id > 0 THEN
+                    UPDATE sys_module_functionality_user
+                    SET deleted_at = CURRENT_TIMESTAMP
+                    WHERE user_id = v_user_bin 
+                    AND sys_module_functionality_id = p_functionality_id
+                    AND deleted_at IS NULL;
+                    
+                ELSEIF p_module_id IS NOT NULL AND p_module_id > 0 THEN
+                    UPDATE sys_module_functionality_user smfu
+                    JOIN sys_module_functionality smf ON smfu.sys_module_functionality_id = smf.id
+                    SET smfu.deleted_at = CURRENT_TIMESTAMP
+                    WHERE smfu.user_id = v_user_bin 
+                    AND smf.sys_module_id = p_module_id
+                    AND smfu.deleted_at IS NULL;
+                END IF;
+
+            END IF;
+
+            COMMIT;
+
+            -- =========================================================================
+            -- RETORNO: Chama a procedure de listagem para devolver o estado atualizado
+            -- =========================================================================
+            CALL sp_get_user_modules(p_user_uuid);
+
+        END$$
+    
+    -- ------------------------------------------------------------------------------
+    -- 2.5: BUSCAR MÓDULOS E FUNCIONALIDADES DO USUÁRIO
+    -- Retorna a lista completa baseada na View, mas com as flags 
+    -- 'module_enabled' e 'feature_enabled' fiéis ao que o usuário ativou/desativou.
+    -- ------------------------------------------------------------------------------
+        DROP PROCEDURE IF EXISTS sp_get_user_modules$$
+
+        CREATE PROCEDURE sp_get_user_modules(
+            IN p_user_uuid VARCHAR(36)
+        )
+        BEGIN
+            DECLARE v_user_bin BINARY(16);
+            
+            -- Se o UUID for passado vazio ou nulo, apenas retorna vazio
+            IF p_user_uuid IS NULL OR p_user_uuid = '' THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'O UUID do usuário é obrigatório.';
+            END IF;
+
+            SET v_user_bin = UNHEX(REPLACE(p_user_uuid, '-', ''));
+
+            SELECT 
+                sm.id AS module_id,
+                sm.title AS module_title,
+                sm.icon AS module_icon,
+                sm.color AS module_color,
+                
+                -- O módulo é considerado ATIVO se o usuário tiver PELO MENOS UMA feature dele ativa
+                IF((
+                    SELECT COUNT(1) 
+                    FROM sys_module_functionality_user smfu2
+                    JOIN sys_module_functionality smf2 ON smfu2.sys_module_functionality_id = smf2.id
+                    WHERE smf2.sys_module_id = sm.id 
+                    AND smfu2.user_id = v_user_bin 
+                    AND smfu2.deleted_at IS NULL
+                ) > 0, 1, 0) AS module_enabled,
+                
+                sm.description AS module_desc,
+                stm.name AS module_status,
+                smf.id AS feature_id,
+                smf.title AS feature_label,
+                smf.description AS feature_desc,
+                smf.icon AS feature_icon,
+                smf.router_link AS feature_route,
+                
+                -- A feature é considerada ATIVA se existir vínculo na tabela e o deleted_at for NULL
+                IF(smfu.id IS NOT NULL, 1, 0) AS feature_enabled,
+                stf.name AS feature_status
+                
+            FROM sys_module sm
+            LEFT JOIN sys_module_functionality smf ON sm.id = smf.sys_module_id
+            LEFT JOIN sys_status stm ON stm.id = sm.sys_status_id
+            LEFT JOIN sys_status stf ON stf.id = smf.sys_status_id
+            
+            -- Fazemos o LEFT JOIN com a tabela do usuário para pegar apenas o que ele tem ativo
+            LEFT JOIN sys_module_functionality_user smfu 
+                ON smfu.sys_module_functionality_id = smf.id 
+                AND smfu.user_id = v_user_bin 
+                AND smfu.deleted_at IS NULL
+                
+            ORDER BY sm.id, smf.id;
+        END$$
+    
     DELIMITER ;
 
 -- ==============================================================================

@@ -5,6 +5,7 @@ import { ModulesContext } from "../context/ModulesContext";
  * @author HallTech AI
  * Hook para acessar o contexto de Módulos.
  * Garante acesso ao estado global de configuração (Feature Flags).
+ * TODO: Entender a necessidade de separar em um hook customizado, ou se o contexto já é suficiente.
  */
 export const useModules = () => {
   const context = useContext(ModulesContext);

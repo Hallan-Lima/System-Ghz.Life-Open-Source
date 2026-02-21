@@ -1,17 +1,27 @@
+/**
+ * @file ModulesContext.tsx
+ * @description Gerenciamento de estado global dos Módulos e Funcionalidades (Feature Flags).
+ * * @architecture Diretrizes do Guia de Arquitetura (System Ghz.Life):
+ * - Feature-Based: Pertence ao domínio 'modules', isolando regras de negócio de UI.
+ * - Single Source of Truth: Dependência estrita da API (Banco de Dados).
+ * - Security: Não utiliza cache local (localStorage) para inicializar permissões. 
+ * Se o backend falhar ao retornar os módulos ativos, a sessão é encerrada (Logout).
+ * * @author HallTech AI
+ */
+
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { AppModule } from '../modules.types';
-import { defaultModules } from '../modules.data';
 import { modulesService } from '../services/modules.service';
 import config from '../../../src/config';
 
 interface ModulesContextData {
   modules: AppModule[];
-  moduleOrder: string[]; // Lista de IDs na ordem definida pelo usuário
+  moduleOrder: string[]; 
   loading: boolean;
   toggleModule: (moduleId: string) => void;
   toggleFeature: (moduleId: string, featureId: string) => void;
   updateModuleOrder: (newOrder: string[]) => void;
-  swapModuleFeatures: (moduleId: string, indexA: number, indexB: number) => void; // Nova função
+  swapModuleFeatures: (moduleId: string, indexA: number, indexB: number) => void; 
 }
 
 export const ModulesContext = createContext<ModulesContextData>({} as ModulesContextData);
@@ -20,81 +30,123 @@ const STORAGE_KEY = config.modulesStorageKey;
 const ORDER_KEY = config.modulesOrderKey;
 
 export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Inicialização dos Módulos
-  const [modules, setModules] = useState<AppModule[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (e) {
-      console.warn("ModulesContext: Erro ao ler localStorage na inicialização.", e);
-    }
-    return defaultModules;
-  });
+  // Inicialização LIMPA: Cache antigo estritamente proibido por segurança.
+  // A interface aguardará a resposta oficial da API.
+  const [modules, setModules] = useState<AppModule[]>([]);
 
-  // Inicialização da Ordem
+  // Ordem de exibição pode ser mantida em cache, pois trata-se apenas de preferência visual de UI
   const [moduleOrder, setModuleOrder] = useState<string[]>(() => {
     try {
         const storedOrder = localStorage.getItem(ORDER_KEY);
-        if (storedOrder) {
-            return JSON.parse(storedOrder);
-        }
-    } catch (e) {}
-    // Default: Ordem original do array defaultModules
-    return defaultModules.map(m => m.id);
+        if (storedOrder) return JSON.parse(storedOrder);
+    } catch (e) {
+        console.warn("ModulesContext: Falha ao ler ordem dos módulos.", e);
+    }
+    return []; 
   });
 
-  const [loading, setLoading] = useState(false);
+  // Inicia como TRUE para bloquear a renderização da tela com dados vazios ou não autorizados
+  const [loading, setLoading] = useState(true);
 
-  // Persistência: Sempre que 'modules' mudar, salva no storage
+  // Busca sincronizada com o Backend ao carregar a página e validação de sessão
   useEffect(() => {
-    modulesService.saveModules(modules);
-  }, [modules]);
+    let isMounted = true;
+    
+    const carregarModulosDoBanco = async () => {
+      setLoading(true);
+      const modulosDoBanco = await modulesService.getModules();
+      
+      if (isMounted) {
+        // Regra de Negócio: Se não retornar módulos ou ocorrer falha, força o LOGOUT
+        if (!modulosDoBanco || modulosDoBanco.length === 0) {
+          console.warn("🛡️ Segurança: Nenhum módulo autorizado encontrado. Forçando logout.");
+          
+          // Limpa chaves de sessão e configuração (Ajuste as chaves conforme o seu auth.service)
+          localStorage.removeItem('userConfig');
+          localStorage.removeItem('token'); 
+          localStorage.removeItem(STORAGE_KEY);
+          
+          // Redirecionamento imperativo para a rota de login
+          window.location.href = '/login';
+          return;
+        }
 
-  // Persistência: Sempre que 'moduleOrder' mudar
+        // Caminho de Sucesso: Atualiza o estado com a fonte da verdade
+        setModules(modulosDoBanco);
+        
+        // Mantém uma cópia limpa no storage apenas para consultas rápidas de UI (se necessário em outros cantos)
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modulosDoBanco));
+        
+        // Define a ordem padrão na primeira vez que o usuário carrega o sistema
+        if (moduleOrder.length === 0) {
+            const newOrder = modulosDoBanco.map(m => m.id.toString());
+            setModuleOrder(newOrder);
+            localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder));
+        }
+        
+        setLoading(false);
+      }
+    };
+
+    carregarModulosDoBanco();
+
+    return () => { isMounted = false; };
+  }, []); 
+
+  // Persistência isolada apenas para a Ordem de exibição da Interface
   useEffect(() => {
-      localStorage.setItem(ORDER_KEY, JSON.stringify(moduleOrder));
+      if (moduleOrder.length > 0) {
+         localStorage.setItem(ORDER_KEY, JSON.stringify(moduleOrder));
+      }
   }, [moduleOrder]);
 
   const toggleModule = useCallback((moduleId: string) => {
+    const targetModule = modules.find(m => m.id === moduleId);
+    if (!targetModule) return;
+    const newStatus = !targetModule.isEnabled;
+
     setModules(prev => prev.map(mod => 
-      mod.id === moduleId ? { ...mod, isEnabled: !mod.isEnabled } : mod
+      mod.id === moduleId ? { ...mod, isEnabled: newStatus } : mod
     ));
-  }, []);
+
+    modulesService.saveModules(moduleId, null, newStatus).then(freshModules => {
+      if (freshModules) setModules(freshModules);
+    });
+  }, [modules]); 
 
   const toggleFeature = useCallback((moduleId: string, featureId: string) => {
+    const targetModule = modules.find(m => m.id === moduleId);
+    const targetFeature = targetModule?.features.find(f => f.id === featureId);
+    if (!targetFeature) return;
+    const newStatus = !targetFeature.isEnabled;
+
     setModules(prev => prev.map(mod => {
       if (mod.id === moduleId) {
         return {
           ...mod,
           features: mod.features.map(feat => 
-            feat.id === featureId ? { ...feat, isEnabled: !feat.isEnabled } : feat
+            feat.id === featureId ? { ...feat, isEnabled: newStatus } : feat
           )
         };
       }
       return mod;
     }));
-  }, []);
+
+    modulesService.saveModules(null, featureId, newStatus).then(freshModules => {
+      if (freshModules) setModules(freshModules);
+    });
+  }, [modules]);
 
   const updateModuleOrder = useCallback((newOrder: string[]) => {
       setModuleOrder(newOrder);
   }, []);
 
-  // Nova função para reordenar features dentro de um módulo
   const swapModuleFeatures = useCallback((moduleId: string, indexA: number, indexB: number) => {
     setModules(prev => prev.map(mod => {
       if (mod.id !== moduleId) return mod;
-
       const newFeatures = [...mod.features];
-      // Validação básica de índices
-      if (indexA < 0 || indexB < 0 || indexA >= newFeatures.length || indexB >= newFeatures.length) {
-          return mod;
-      }
-
-      // Swap
+      if (indexA < 0 || indexB < 0 || indexA >= newFeatures.length || indexB >= newFeatures.length) return mod;
       [newFeatures[indexA], newFeatures[indexB]] = [newFeatures[indexB], newFeatures[indexA]];
-
       return { ...mod, features: newFeatures };
     }));
   }, []);

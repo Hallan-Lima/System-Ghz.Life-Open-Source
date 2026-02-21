@@ -1,6 +1,6 @@
 import { AppModule } from "../modules.types";
-import { defaultModules } from "../modules.data";
 import { api } from "../../../services/api";
+import { storage } from "../../../services/storage";
 
 const STORAGE_KEY = "ghz_modules_config_v1";
 
@@ -12,30 +12,62 @@ export const modulesService = {
   /**
    * Recupera a configuração atual dos módulos.
    */
-  getModules: async (): Promise<AppModule[]> => {
+    getModules: async (): Promise<AppModule[]> => {
     try {
-      const response = await api.get('modules');
-      
+      const response = await api.get("modules");
+
       if (response.data && response.data.success) {
         return response.data.data;
       }
-      
-      return defaultModules;
+
+      return []; // Sem fallback falso. Retorna vazio se der erro.
     } catch (e) {
-      console.error("Erro ao carregar módulos da API, usando fallback:", e);
-      // Fallback silencioso para não travar o cadastro se a API falhar
-      return defaultModules;
+      console.error("Erro ao carregar módulos da API:", e);
+      return [];
     }
   },
 
-  /**
-   * Salva a configuração completa.
-   */
-  saveModules: async (modules: AppModule[]): Promise<void> => {
+  saveModules: async (
+    moduleId: string | null,
+    featureId: string | null,
+    isActive: boolean,
+  ): Promise<AppModule[] | null> => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(modules));
+      const userConfig = storage.getJson<any>("userConfig");
+      const userId = userConfig?.user_id;
+
+      if (!userId) {
+        console.error("Usuário não encontrado na sessão local.");
+        return null;
+      }
+
+      const modIdInt = moduleId ? parseInt(moduleId, 10) : null;
+      const featIdInt = featureId ? parseInt(featureId, 10) : null;
+
+      if ((moduleId && isNaN(modIdInt as number)) || (featureId && isNaN(featIdInt as number))) {
+          console.error(`ERRO: O ID do Módulo (${moduleId}) ou Feature (${featureId}) não é um número. Eles devem bater com o ID da tabela do Banco de Dados!`);
+          return null; 
+      }
+
+      const payload = {
+        user_id: userId,
+        module_id: modIdInt,
+        functionality_id: featIdInt,
+        is_active: isActive,
+      };
+      
+      const response = await api.post("modules/toggle", payload);
+
+      if (response.data && response.data.success) {
+        const updatedModules = response.data.data;
+        storage.setJson(STORAGE_KEY, updatedModules);
+        return updatedModules;
+      }
+
+      return null;
     } catch (e) {
-      console.error("Erro ao salvar configuração de módulos", e);
+      console.error("Erro ao salvar configuração de módulos no backend", e);
+      return null;
     }
-  }
+  },
 };

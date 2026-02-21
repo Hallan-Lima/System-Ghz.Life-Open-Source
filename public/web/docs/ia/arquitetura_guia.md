@@ -58,15 +58,19 @@ Faca comentarios apenas no head da funcao ou componente, exemplo:
 ```typescript
 /**
  * @author HallTech AI
- * 
- * @description Esse e um caso de exemplo 
+ * @file ModuleConfigCard.tsx
+ * @description Componente visual para gerenciamento individual de um Módulo e suas Funcionalidades.
+ * @architecture Diretrizes do Guia de Arquitetura (System Ghz.Life):
+ * - Feature-Based: Pertence ao domínio 'modules', focando apenas na renderização (Presentational).
+ * - Dumb Component: Recebe dados e callbacks via props (onToggleModule, onToggleFeature).
+ * - Performance: Constantes e dicionários de domínio são declarados fora do ciclo de renderização.
  */
 ```
 
 Explicando brevemente o que esta abaixo, considerando que ate um leigo consiga olhar e entender.
-Paragrafos curtos, caso veja que esta ficando muito grande a descricao quebre em outra funcao.
-
-
+Parágrafos curtos, caso veja que esta ficando muito grande a descrição quebre em outra função.
+NÁO FAÇA O COMENTÁRIO DENTRO DA FUNCIONALIDADE, EXEMPLO:
+// ESTA PEGANDO UM VALOR X.....
 
 ### Nomenclatura
 - **Componentes:** PascalCase (ex: `MobileHeader.tsx`).
