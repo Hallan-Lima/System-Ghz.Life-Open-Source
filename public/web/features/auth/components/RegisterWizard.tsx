@@ -200,7 +200,9 @@ const RegisterWizard: React.FC = () => {
                   const isSelected = formData.selectedModules.includes(
                     module.id,
                   );
-                  const isDisabled = !module.isEnabled;
+
+                  // TODO: Refletir o status real do módulo vindo da API, e não tratar no código
+                  const isDisabled = (module.status != "Ativo");
 
                   return (
                     <button
@@ -306,8 +308,9 @@ const RegisterWizard: React.FC = () => {
                 if (!formData.selectedModules.includes(module.id)) return null;
 
                 // 2. Só mostra se o módulo estiver ativo e tiver funcionalidades
+                //TODO: Refletir o status real do módulo vindo da API, e não tratar no código
                 if (
-                  !module.isEnabled ||
+                  module.status !== "Ativo" ||
                   !module.features ||
                   module.features.length === 0
                 )
@@ -337,7 +340,7 @@ const RegisterWizard: React.FC = () => {
                         const isFeatureActive = formData.interests.includes(
                           feature.id,
                         );
-                        const isFeatureDisabled = !feature.isEnabled;
+                        const isFeatureDisabled = feature.status !== "Ativo"; // TODO: Refletir o status real da feature vinda da API, e não tratar no código
 
                         return (
                           <button
