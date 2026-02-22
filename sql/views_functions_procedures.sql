@@ -68,12 +68,14 @@ USE ghz_life_AMBIENTE;
     -- 1.3. VIEW: MÓDULOS E FEATURES
     -- Ajuda a montar o menu lateral dinamicamente
     -- ------------------------------------------------------------------------------
+        DROP VIEW IF EXISTS vw_system_modules;
         CREATE OR REPLACE VIEW vw_system_modules AS
         SELECT 
             `sm`.`id` AS `module_id`,
             `sm`.`title` AS `module_title`,
             `sm`.`icon` AS `module_icon`,
             `sm`.`color` AS `module_color`,
+            `sm`.`router_link` AS `module_router_link`,
             0 AS `module_enabled`,
             `sm`.`description` AS `module_desc`,
             `stm`.`name` AS `module_status`,

@@ -40,12 +40,12 @@ INSERT INTO sys_subscription_plan (id, name, description, price, expires_at) VAL
 -- 6. POPULANDO MÓDULOS (sys_module)
 -- Apenas o ID 1 (Produtividade) está ATIVO (1). Os demais estão INATIVOS (2).
 -- ==============================================================================
-INSERT INTO sys_module (id, title, sys_status_id, icon, color, description) VALUES 
-(1, 'Produtividade', 1, 'fas fa-list-check', 'indigo', 'Gestão de tarefas, metas e organização pessoal.'),
-(2, 'Financeiro', 7, 'fas fa-wallet', 'emerald', 'Controle de gastos, entradas e planejamento.'),
-(3, 'Saúde & Bem-estar', 7, 'fas fa-heartbeat', 'rose', 'Monitoramento corporal e hábitos saudáveis.'),
-(4, 'Inteligência Artificial', 7, 'fas fa-brain', 'purple', 'Assistente virtual e insights inteligentes.'),
-(5, 'Social', 7, 'fas fa-users', 'amber', 'Interações, eventos e comunidades.');
+INSERT INTO sys_module (id, title, sys_status_id, icon, color, description, router_link) VALUES 
+(1, 'Produtividade', 1, 'fas fa-list-check', 'indigo', 'Gestão de tarefas, metas e organização pessoal.', '/productivity'),
+(2, 'Financeiro', 7, 'fas fa-wallet', 'emerald', 'Controle de gastos, entradas e planejamento.', '/finance'),
+(3, 'Saúde & Bem-estar', 7, 'fas fa-heartbeat', 'rose', 'Monitoramento corporal e hábitos saudáveis.', '/health'),
+(4, 'Inteligência Artificial', 7, 'fas fa-brain', 'purple', 'Assistente virtual e insights inteligentes.', '/ai_assistant'),
+(5, 'Social', 7, 'fas fa-users', 'amber', 'Interações, eventos e comunidades.', '/social');
 
 -- ==============================================================================
 -- 7. POPULANDO FUNCIONALIDADES DO MÓDULO (sys_module_functionality)
