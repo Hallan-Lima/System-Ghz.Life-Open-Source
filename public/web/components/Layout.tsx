@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useModules } from '../features/modules/hooks/useModules';
+import { getModuleRouteForPath } from '../features/modules/moduleRoutes';
 import { authService } from '../features/auth/services/auth.service';
 
 // Sub-components
@@ -25,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const navigate = useNavigate();
   const { modules, moduleOrder } = useModules(); // Adicionado moduleOrder
   
-  const hideNav = location.pathname === '/login' || location.pathname === '/register';
+  const hideNav = location.pathname === '/login' || location.pathname === '/auth' || location.pathname === '/register' || location.pathname === '/';
   const [showQuickMenu, setShowQuickMenu] = useState(false);
 
   // Verifica rotas para comportamento do FAB
@@ -37,12 +38,20 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   ? (storage.getItem("user_profile_name") || "Convidado")
   : "Convidado";
 
-  // --- Helper de Verificação de Módulo ---
-  const isModuleEnabled = (moduleId: string) => {
-    // Garante que a comparação seja feita por string (ex: '1' === '1')
-    const mod = modules.find(m => String(m.id) === String(moduleId));
-    // CORREÇÃO: Mudei de 'true' para 'false'. Se não achar, esconde o menu!
-    return mod ? mod.isEnabled : false; 
+  // --- Helper: permissão por rota (usa module.route = module_router_link da API) ---
+  const hasAccessToRoute = (path: string) => {
+    const moduleRoute = getModuleRouteForPath(path);
+    if (moduleRoute === null) return true;
+    const mod = modules.find((m) => m.route === moduleRoute);
+    return mod ? mod.isEnabled : false;
+  };
+
+  const getModuleWeightByPath = (path: string) => {
+    if (getModuleRouteForPath(path) === null) return -1;
+    const mod = modules.find((m) => m.route === getModuleRouteForPath(path));
+    if (!mod) return 999;
+    const index = moduleOrder.indexOf(mod.id);
+    return index === -1 ? 999 : index;
   };
 
   // --- Configuration ---
@@ -69,25 +78,12 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   // --- Sorting & Filtering Logic ---
   
-  // Função para pegar o peso (índice) do módulo na ordem definida pelo usuário
-  const getModuleWeight = (moduleId: string) => {
-      if (moduleId === 'core') return -1; // Core itens (Home) geralmente ficam primeiro ou por último, aqui forçamos prioridade se não estiverem na lista
-      const index = moduleOrder.indexOf(moduleId);
-      return index === -1 ? 999 : index; // Se não achou, joga pro fim
-  };
-
   const processItems = (items: any[]) => {
-    // 1. Filtra desabilitados
-    const active = items.filter(item => {
-        if (item.moduleId === 'core') return true;
-        return isModuleEnabled(item.moduleId);
-    });
-
-    // 2. Ordena baseado no moduleOrder
+    const active = items.filter((item) => hasAccessToRoute(item.to));
     return active.sort((a, b) => {
-        const weightA = getModuleWeight(a.moduleId);
-        const weightB = getModuleWeight(b.moduleId);
-        return weightA - weightB;
+      const weightA = getModuleWeightByPath(a.to);
+      const weightB = getModuleWeightByPath(b.to);
+      return weightA - weightB;
     });
   };
 
@@ -170,7 +166,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         isOpen={showQuickMenu} 
         onClose={() => setShowQuickMenu(false)}
         onAction={handleQuickAction}
-        enableAi={isModuleEnabled('ai_assistant')}
+        enableAi={hasAccessToRoute('/ia')}
       />
 
       {/* Mobile Bottom Navigation & FAB */}

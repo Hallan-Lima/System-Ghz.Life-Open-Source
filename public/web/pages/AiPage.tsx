@@ -8,7 +8,7 @@ import ModuleGuard from "../components/layout/ModuleGuard";
  */
 const AiPage: React.FC = () => {
   return (
-    <ModuleGuard moduleId="ai_assistant">
+    <ModuleGuard routePath="/ia">
       <AiView />
     </ModuleGuard>
   );

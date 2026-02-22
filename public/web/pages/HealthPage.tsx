@@ -9,7 +9,7 @@ import ModuleGuard from "../components/layout/ModuleGuard";
  */
 const HealthPage: React.FC = () => {
   return (
-    <ModuleGuard moduleId="health">
+    <ModuleGuard routePath="/health">
       <HealthView />
     </ModuleGuard>
   );

@@ -9,7 +9,7 @@ import ModuleGuard from "../components/layout/ModuleGuard";
  */
 const FinancePage: React.FC = () => {
   return (
-    <ModuleGuard moduleId="finance">
+    <ModuleGuard routePath="/finance">
       <FinanceView />
     </ModuleGuard>
   );

@@ -9,7 +9,7 @@ import ModuleGuard from "../components/layout/ModuleGuard";
  */
 const TasksPage: React.FC = () => {
   return (
-    <ModuleGuard moduleId="productivity">
+    <ModuleGuard routePath="/tasks">
       <TasksView />
     </ModuleGuard>
   );

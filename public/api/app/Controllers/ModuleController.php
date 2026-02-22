@@ -83,6 +83,7 @@ class ModuleService
                     'icon'        => $row['module_icon'],
                     'color'       => $row['module_color'],
                     'description' => $row['module_desc'],
+                    'route'       => $row['module_router_link'] ?? '',
                     'isEnabled'   => (bool) $row['module_enabled'],
                     'status'      => $row['module_status'],
                     'features'    => []

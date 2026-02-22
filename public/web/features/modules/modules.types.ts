@@ -24,6 +24,8 @@ export interface AppModule {
   icon: string;
   color: string; // Ex: 'indigo', 'emerald', 'rose'
   description: string;
+  /** Rota do módulo (module_router_link do backend), ex: /productivity, /finance, /ia */
+  route?: string;
   isEnabled: boolean;
   status?: string; // ex.: "Ativo" | "Inativo"
   status_id?: number; // ex.: 1 = Ativo, 2 = Inativo

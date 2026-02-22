@@ -1,44 +1,63 @@
+/**
+ * @file ModuleGuard.tsx
+ * @description Protege rotas baseadas nos módulos: verifica permissão pelo route do módulo (module_router_link).
+ * @author HallTech AI
+ */
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useModules } from '../../features/modules/hooks/useModules';
+import { getModuleRouteForPath } from '../../features/modules/moduleRoutes';
+import config from '../../src/config';
 
 interface ModuleGuardProps {
-  moduleId: string;
+  /** Path da rota da página (ex: /finance, /tasks, /ia). Usado para encontrar o módulo pelo route retornado pela API. */
+  routePath: string;
   children: React.ReactNode;
 }
 
-/**
- * @author HallTech AI
- * HOC/Componente Wrapper que protege rotas.
- * Se o módulo especificado estiver desativado, redireciona o usuário para a Home.
- */
-const ModuleGuard: React.FC<ModuleGuardProps> = ({ moduleId, children }) => {
+const ModuleGuard: React.FC<ModuleGuardProps> = ({ routePath, children }) => {
   const { modules, loading } = useModules();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Só verifica quando terminar de carregar as configurações
-    if (!loading) {
-      const module = modules.find(m => m.id === moduleId);
-      
-      // Se não encontrar o módulo ou ele estiver desativado
-      if (!module || !module.isEnabled) {
-        console.warn(`[ModuleGuard] Acesso negado ao módulo: ${moduleId}. Redirecionando...`);
-        navigate('/', { replace: true });
-      }
+    if (loading) return;
+
+    const moduleRoute = getModuleRouteForPath(routePath);
+    if (moduleRoute === null) {
+      return;
     }
-  }, [modules, loading, moduleId, navigate]);
+
+    const module = modules.find((m) => m.route === moduleRoute);
+    if (!module || !module.isEnabled) {
+      console.warn(`🛡️ [ModuleGuard] Acesso negado à rota: ${routePath} (módulo route: ${moduleRoute}). Redirecionando para login.`);
+
+      localStorage.removeItem(config.configStorageKey);
+      localStorage.removeItem(config.tokenStorageKey);
+      localStorage.removeItem(config.modulesStorageKey);
+      localStorage.removeItem(config.modulesOrderKey);
+
+      navigate('/auth', { replace: true });
+    }
+  }, [modules, loading, routePath, navigate]);
 
   if (loading) {
-    // Estado de carregamento minimalista enquanto verifica permissão
-    return <div className="min-h-screen bg-slate-50 dark:bg-slate-950"></div>;
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <i className="fas fa-spinner animate-spin text-indigo-600 text-3xl"></i>
+      </div>
+    );
   }
 
-  // Se passou na verificação (ou ainda está renderizando antes do useEffect disparar), renderiza o filho.
-  // O useEffect cuidará do redirecionamento se necessário.
-  const isEnabled = modules.find(m => m.id === moduleId)?.isEnabled;
-  
-  if (!isEnabled) return null;
+  const moduleRoute = getModuleRouteForPath(routePath);
+  if (moduleRoute === null) {
+    return <>{children}</>;
+  }
+
+  const module = modules.find((m) => m.route === moduleRoute);
+  if (!module?.isEnabled) {
+    return null;
+  }
 
   return <>{children}</>;
 };

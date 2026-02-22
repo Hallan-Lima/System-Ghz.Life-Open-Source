@@ -360,6 +360,7 @@ USE ghz_life_AMBIENTE;
                 sm.title AS module_title,
                 sm.icon AS module_icon,
                 sm.color AS module_color,
+                sm.router_link AS module_router_link,
                 
                 -- O módulo é considerado ATIVO se o usuário tiver PELO MENOS UMA feature dele ativa
                 IF((
