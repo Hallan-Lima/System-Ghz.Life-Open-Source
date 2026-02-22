@@ -106,14 +106,21 @@ export const ModulesProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!targetModule) return;
     const newStatus = !targetModule.isEnabled;
 
-    setModules(prev => prev.map(mod => 
-      mod.id === moduleId ? { ...mod, isEnabled: newStatus } : mod
-    ));
+    setModules(prev => prev.map(mod => {
+      if (mod.id === moduleId) {
+        return {
+          ...mod,
+          isEnabled: newStatus,
+          features: mod.features.map(feat => ({ ...feat, isEnabled: newStatus }))
+        };
+      }
+      return mod;
+    }));
 
     modulesService.saveModules(moduleId, null, newStatus).then(freshModules => {
       if (freshModules) setModules(freshModules);
     });
-  }, [modules]); 
+  }, [modules]);
 
   const toggleFeature = useCallback((moduleId: string, featureId: string) => {
     const targetModule = modules.find(m => m.id === moduleId);

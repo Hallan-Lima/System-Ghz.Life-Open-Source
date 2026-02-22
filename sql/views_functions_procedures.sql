@@ -70,25 +70,26 @@ USE ghz_life_AMBIENTE;
     -- ------------------------------------------------------------------------------
         CREATE OR REPLACE VIEW vw_system_modules AS
         SELECT 
-            sm.id AS module_id,
-            sm.title AS module_title,
-            sm.icon AS module_icon,
-            sm.color AS module_color,
-            IF(sm.sys_status_id = 1, TRUE, FALSE) AS module_enabled,
-            sm.description AS module_desc,
-            stm.name as module_status,
-            smf.id AS feature_id,
-            smf.title AS feature_label,
-            smf.description AS feature_desc,
-            smf.icon AS feature_icon,
-            smf.router_link AS feature_route,
-            IF(smf.sys_status_id = 1, TRUE, FALSE) AS feature_enabled,
-            stf.name AS feature_status
-        FROM sys_module sm
-        LEFT JOIN sys_module_functionality smf ON sm.id = smf.sys_module_id
-        LEFT JOIN sys_status stm ON stm.id = sm.sys_status_id
-        LEFT JOIN sys_status stf ON stf.id = smf.sys_status_id
-        ORDER BY sm.id, smf.id;
+            `sm`.`id` AS `module_id`,
+            `sm`.`title` AS `module_title`,
+            `sm`.`icon` AS `module_icon`,
+            `sm`.`color` AS `module_color`,
+            0 AS `module_enabled`,
+            `sm`.`description` AS `module_desc`,
+            `stm`.`name` AS `module_status`,
+            `smf`.`id` AS `feature_id`,
+            `smf`.`title` AS `feature_label`,
+            `smf`.`description` AS `feature_desc`,
+            `smf`.`icon` AS `feature_icon`,
+            `smf`.`router_link` AS `feature_route`,
+            0 AS `feature_enabled`,
+            `stf`.`name` AS `feature_status`
+        FROM
+            (((`ghz_life_ambiente`.`sys_module` `sm`
+            LEFT JOIN `ghz_life_ambiente`.`sys_module_functionality` `smf` ON (`sm`.`id` = `smf`.`sys_module_id`))
+            LEFT JOIN `ghz_life_ambiente`.`sys_status` `stm` ON (`stm`.`id` = `sm`.`sys_status_id`))
+            LEFT JOIN `ghz_life_ambiente`.`sys_status` `stf` ON (`stf`.`id` = `smf`.`sys_status_id`))
+        ORDER BY `sm`.`id` , `smf`.`id`;
 
 -- ==============================================================================
 -- 2. PROCEDURES (AÇÕES E ESCRITA)
@@ -403,6 +404,8 @@ USE ghz_life_AMBIENTE;
     DELIMITER $$
 
     -- 3.1. Ao Concluir Tarefa -> Progresso = 100%
+
+	DROP TRIGGER IF EXISTS trg_task_auto_complete$$
     CREATE TRIGGER trg_task_auto_complete
     BEFORE UPDATE ON app_tasks
     FOR EACH ROW

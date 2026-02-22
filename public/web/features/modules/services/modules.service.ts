@@ -1,3 +1,8 @@
+/**
+ * @file modules.service.ts
+ * @description Serviço de comunicação com a API para Módulos e Feature Flags.
+ * @author HallTech AI
+ */
 import { AppModule } from "../modules.types";
 import { api } from "../../../services/api";
 import { storage } from "../../../services/storage";
@@ -11,15 +16,21 @@ export const modulesService = {
   /**
    * Recupera a configuração atual dos módulos.
    */
-    getModules: async (): Promise<AppModule[]> => {
+  getModules: async (): Promise<AppModule[]> => {
     try {
-      const response = await api.get("modules");
+      // 1. Resgata o usuário ativo da sessão usando a chave correta
+      const userConfig = storage.getJson<any>(config.configStorageKey);
+      const userId = userConfig?.user_id;
+
+      // 2. Envia o ID na Query String para o Backend invocar a Procedure
+      const endpoint = userId ? `modules?user_id=${userId}` : "modules";
+      const response = await api.get(endpoint);
 
       if (response.data && response.data.success) {
         return response.data.data;
       }
 
-      return []; // Sem fallback falso. Retorna vazio se der erro.
+      return [];
     } catch (e) {
       console.error("Erro ao carregar módulos da API:", e);
       return [];
@@ -43,9 +54,14 @@ export const modulesService = {
       const modIdInt = moduleId ? parseInt(moduleId, 10) : null;
       const featIdInt = featureId ? parseInt(featureId, 10) : null;
 
-      if ((moduleId && isNaN(modIdInt as number)) || (featureId && isNaN(featIdInt as number))) {
-          console.error(`ERRO: O ID do Módulo (${moduleId}) ou Feature (${featureId}) não é um número. Eles devem bater com o ID da tabela do Banco de Dados!`);
-          return null; 
+      if (
+        (moduleId && isNaN(modIdInt as number)) ||
+        (featureId && isNaN(featIdInt as number))
+      ) {
+        console.error(
+          `ERRO: O ID do Módulo (${moduleId}) ou Feature (${featureId}) não é um número. Eles devem bater com o ID da tabela do Banco de Dados!`,
+        );
+        return null;
       }
 
       const payload = {
@@ -54,7 +70,7 @@ export const modulesService = {
         functionality_id: featIdInt,
         is_active: isActive,
       };
-      
+
       const response = await api.post("modules/toggle", payload);
 
       if (response.data && response.data.success) {
