@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS ghz_life_AMBIENTE;
+
 -- ==============================================================================
 -- SCRIPT DE CRIAÇÃO DO BANCO DE DADOS
 -- Versão: 1.0
@@ -59,6 +61,7 @@ SET FOREIGN_KEY_CHECKS = 0;
         icon VARCHAR(100) DEFAULT NULL,
         color VARCHAR(20) DEFAULT NULL,
         description TEXT DEFAULT NULL,
+        router_link VARCHAR(255) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         deleted_at TIMESTAMP NULL,

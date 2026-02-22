@@ -15,7 +15,7 @@ INSERT INTO sys_status (id, name) VALUES
 (3, 'Pendente'),
 (4, 'Bloqueado'),
 (5, 'Concluído'),  -- Útil para Tarefas
-(6, 'Arquivado');  -- Útil para Tarefas
+(6, 'Arquivado'),  -- Útil para Tarefas
 (7, 'Em breve');   -- Modulos e Funcionalidades que ainda serão lançados
 
 -- ------------------------------------------------------------------------------
