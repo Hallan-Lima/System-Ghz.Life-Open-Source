@@ -37,15 +37,17 @@ export const useTasks = () => {
 
   // Deriva a configuração a partir dos módulos globais
   const config: TasksConfig = useMemo(() => {
-    const prodModule = modules.find(m => m.id === 'productivity');
+    const prodModule = modules.find((m) => m.id === "productivity");
     const features = prodModule?.features || [];
 
     return {
-        enableDaily: features.find(f => f.id === 'daily_tasks')?.isEnabled ?? true,
-        enableGoals: features.find(f => f.id === 'goals')?.isEnabled ?? true,
-        enableDreams: features.find(f => f.id === 'dreams')?.isEnabled ?? true,
-        enableShopping: features.find(f => f.id === 'shopping')?.isEnabled ?? true,
-        enableNotes: features.find(f => f.id === 'notes')?.isEnabled ?? true,
+      enableDaily:
+        features.find((f) => f.id === "daily_tasks")?.isEnabled ?? true,
+      enableGoals: features.find((f) => f.id === "goals")?.isEnabled ?? true,
+      enableDreams: features.find((f) => f.id === "dreams")?.isEnabled ?? true,
+      enableShopping:
+        features.find((f) => f.id === "shopping")?.isEnabled ?? true,
+      enableNotes: features.find((f) => f.id === "notes")?.isEnabled ?? true,
     };
   }, [modules]);
 
@@ -81,29 +83,37 @@ export const useTasks = () => {
 
   // Validação: Se a aba ativa for desativada nos módulos, redireciona para uma aba válida
   useEffect(() => {
-      if (!loadingModules) {
-          // Lógica de fallback hierárquico
-          if (activeTab === TaskType.DAILY && !config.enableDaily) {
-             if (config.enableGoals) setActiveTab(TaskType.GOAL);
-             else if (config.enableDreams) setActiveTab(TaskType.DREAM);
-             else if (config.enableShopping) setActiveTab(TaskType.SHOPPING);
-             else if (config.enableNotes) setActiveTab(TaskType.NOTE);
-          }
-          else if (activeTab === TaskType.GOAL && !config.enableGoals) setActiveTab(TaskType.DAILY);
-          else if (activeTab === TaskType.DREAM && !config.enableDreams) setActiveTab(TaskType.DAILY);
-          else if (activeTab === TaskType.SHOPPING && !config.enableShopping) setActiveTab(TaskType.DAILY);
-          else if (activeTab === TaskType.NOTE && !config.enableNotes) setActiveTab(TaskType.DAILY);
-      }
+    if (!loadingModules) {
+      // Lógica de fallback hierárquico
+      if (activeTab === TaskType.DAILY && !config.enableDaily) {
+        if (config.enableGoals) setActiveTab(TaskType.GOAL);
+        else if (config.enableDreams) setActiveTab(TaskType.DREAM);
+        else if (config.enableShopping) setActiveTab(TaskType.SHOPPING);
+        else if (config.enableNotes) setActiveTab(TaskType.NOTE);
+      } else if (activeTab === TaskType.GOAL && !config.enableGoals)
+        setActiveTab(TaskType.DAILY);
+      else if (activeTab === TaskType.DREAM && !config.enableDreams)
+        setActiveTab(TaskType.DAILY);
+      else if (activeTab === TaskType.SHOPPING && !config.enableShopping)
+        setActiveTab(TaskType.DAILY);
+      else if (activeTab === TaskType.NOTE && !config.enableNotes)
+        setActiveTab(TaskType.DAILY);
+    }
   }, [config, activeTab, loadingModules]);
 
   const filteredTasks = useMemo(() => {
     const list = taskList
       .filter((t) => {
-        if (activeTab === TaskType.DAILY && t.type === TaskType.DAILY) return true;
-        if (activeTab === TaskType.GOAL && t.type === TaskType.GOAL) return true;
-        if (activeTab === TaskType.DREAM && t.type === TaskType.DREAM) return true;
-        if (activeTab === TaskType.SHOPPING && t.type === TaskType.SHOPPING) return true;
-        if (activeTab === TaskType.NOTE && t.type === TaskType.NOTE) return true;
+        if (activeTab === TaskType.DAILY && t.type === TaskType.DAILY)
+          return true;
+        if (activeTab === TaskType.GOAL && t.type === TaskType.GOAL)
+          return true;
+        if (activeTab === TaskType.DREAM && t.type === TaskType.DREAM)
+          return true;
+        if (activeTab === TaskType.SHOPPING && t.type === TaskType.SHOPPING)
+          return true;
+        if (activeTab === TaskType.NOTE && t.type === TaskType.NOTE)
+          return true;
         return false;
       })
       .filter((t) => {
@@ -125,7 +135,7 @@ export const useTasks = () => {
   // --- ACTIONS ---
 
   const toggleTask = async (id: string) => {
-    const task = taskList.find(t => t.id === id);
+    const task = taskList.find((t) => t.id === id);
     if (!task) return;
 
     const newStatus = !task.completed;
@@ -136,16 +146,19 @@ export const useTasks = () => {
         if (t.id === id) {
           const updates: Partial<Task> = { completed: newStatus };
           // Lógica otimista para metas
-          if ((t.type === TaskType.GOAL || t.type === TaskType.DREAM) && newStatus) {
+          if (
+            (t.type === TaskType.GOAL || t.type === TaskType.DREAM) &&
+            newStatus
+          ) {
             updates.progress = 100;
             if (t.targetValue) updates.currentValue = t.targetValue;
           }
           return { ...t, ...updates };
         }
         return t;
-      })
+      }),
     );
-    
+
     // 2. Chamada ao Serviço
     try {
       await tasksService.toggleTaskCompletion(id);
@@ -158,7 +171,7 @@ export const useTasks = () => {
   const togglePin = async (id: string) => {
     // 1. Atualização Otimista
     setTaskList((prev) =>
-      prev.map((t) => t.id === id ? { ...t, isPinned: !t.isPinned } : t)
+      prev.map((t) => (t.id === id ? { ...t, isPinned: !t.isPinned } : t)),
     );
 
     // 2. Chamada ao Serviço
@@ -176,22 +189,27 @@ export const useTasks = () => {
   const updateProgressValue = async (id: string, newValue: number) => {
     // 1. Otimista
     setTaskList((prev) =>
-        prev.map((t) => {
-            if (t.id === id) {
-                const target = t.targetValue || 1;
-                const newProgress = Math.round((newValue / target) * 100);
-                return { ...t, currentValue: newValue, progress: newProgress, completed: newValue >= target };
-            }
-            return t;
-        })
+      prev.map((t) => {
+        if (t.id === id) {
+          const target = t.targetValue || 1;
+          const newProgress = Math.round((newValue / target) * 100);
+          return {
+            ...t,
+            currentValue: newValue,
+            progress: newProgress,
+            completed: newValue >= target,
+          };
+        }
+        return t;
+      }),
     );
 
     // 2. Serviço
     try {
-        await tasksService.updateTaskValue(id, newValue);
+      await tasksService.updateTaskValue(id, newValue);
     } catch (error) {
-        console.error("Erro ao atualizar valor", error);
-        loadTasks(); // Rollback
+      console.error("Erro ao atualizar valor", error);
+      loadTasks(); // Rollback
     }
   };
 
@@ -210,7 +228,7 @@ export const useTasks = () => {
     } catch (error) {
       console.error("Erro ao deletar tarefa", error);
       // Em caso de erro, reverte a lista
-      setTaskList(previousList); 
+      setTaskList(previousList);
     }
   };
 
@@ -219,7 +237,7 @@ export const useTasks = () => {
   };
 
   return {
-    taskList, 
+    taskList,
     filteredTasks,
     activeTab,
     setActiveTab,
@@ -232,6 +250,6 @@ export const useTasks = () => {
     deleteTask,
     editTask,
     loading,
-    refresh: loadTasks
+    refresh: loadTasks,
   };
 };
