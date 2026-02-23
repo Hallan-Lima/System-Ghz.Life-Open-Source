@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Layout from "../../../components/Layout";
 import { useTasks } from "../hooks/useTasks";
 import { TaskType } from "../../../domain/tasks.types";
@@ -10,7 +10,6 @@ import TaskItemDaily from "./list-items/TaskItemDaily";
 import TaskItemGoal from "./list-items/TaskItemGoal";
 import TaskItemShopping from "./list-items/TaskItemShopping";
 import TaskItemNote from "./list-items/TaskItemNote";
-import { useLocation, useNavigate } from "react-router-dom";
 
 /**
  * @author HallTech AI
@@ -29,16 +28,8 @@ const TasksView: React.FC = () => {
     updateProgressValue,
     deleteTask,
     editTask,
-    loading,
-    refresh
+    loading
   } = useTasks();
-
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    refresh();
-  }, [location.key]);
 
   const renderContent = () => {
     if (loading) {
@@ -70,7 +61,6 @@ const TasksView: React.FC = () => {
         onEdit: () => editTask(task)
       };
 
-      // CORREÇÃO: Agora renderiza baseado no TIPO DA TAREFA, e não na Aba Ativa
       if (task.type === TaskType.DAILY) {
         return <TaskItemDaily {...commonProps} />;
       }

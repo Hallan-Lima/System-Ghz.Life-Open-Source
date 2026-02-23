@@ -1,36 +1,42 @@
 import { tasksMocks } from "../tasks.data";
 import { Task, TaskType } from "../../../domain/tasks.types";
+import { api } from "../../../services/api";
+import config from "../../../src/config";
 
 /**
  * @author HallTech AI
- * Serviço para gerenciamento de tarefas.
- * Utiliza LocalStorage para persistir os dados do Mock, garantindo que
- * exclusões e edições funcionem mesmo após recarregar a página.
+ * @description: Este serviço é responsável por toda a comunicação com a API e também pela gestão do cache local.
  */
 
-const STORAGE_KEY = "ghz_life_tasks_db";
+const STORAGE_TASK = config.tasksStorageKey;
+const STORAGE_CONFIG = config.configStorageKey;
+
+// Helper para pegar o ID do usuário logado
+const getUserId = () => {
+  const stored = localStorage.getItem(STORAGE_CONFIG);
+  const userConfig = stored ? JSON.parse(stored) : {};
+  return userConfig?.user_id;
+};
 
 // Helper para carregar o banco de dados local ou iniciar com mocks
 const getDb = (): Task[] => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_TASK);
     if (stored) {
       return JSON.parse(stored);
     }
   } catch (e) {
     console.warn("Erro ao ler dados locais, resetando para mocks.", e);
   }
-
-  // Se não houver dados salvos, inicia com os mocks padrão e salva
   const initialData = [...tasksMocks];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
+  localStorage.setItem(STORAGE_TASK, JSON.stringify(initialData));
   return initialData;
 };
 
-// Helper para salvar alterações
+// Helper para salvar alterações no Storage Local
 const saveDb = (data: Task[]) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_TASK, JSON.stringify(data));
   } catch (e) {
     console.error("Erro ao salvar dados locais.", e);
   }
@@ -38,83 +44,96 @@ const saveDb = (data: Task[]) => {
 
 export const tasksService = {
   /**
-   * Obtém a lista de tarefas do armazenamento local.
+   * Obtém a lista de tarefas reais da API e atualiza o cache local.
    */
   getTasks: async (): Promise<Task[]> => {
-    // Simulação de delay de rede para realismo
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return getDb();
+    console.log("tasksService.getTasks: Carregando tarefas da API...");
+    try {
+      const userId = getUserId();
+      // Manda o ID do usuário para a API listar apenas as tarefas dele
+      const endpoint = userId ? `tasks?user_id=${userId}` : "tasks";
+      const response = await api.get(endpoint);
+
+      if (response.data && response.data.success) {
+        const apiTasks = response.data.data;
+        // Sincroniza o banco de dados local com a verdade que veio do servidor
+        saveDb(apiTasks);
+        return apiTasks;
+      }
+
+      return getDb(); // Fallback se a API não retornar sucesso
+    } catch (error) {
+      console.error("Erro ao buscar tarefas da API, usando cache local", error);
+      return getDb(); // Se a API estiver offline, o sistema não quebra
+    }
   },
 
   /**
    * Atualiza uma tarefa completa (PUT).
    */
-  updateTask: async (task: Task): Promise<Task> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+  updateTask: async (task: any): Promise<any> => {
+    try {
+      await api.put(`tasks/${task.id}`, task);
 
-    const db = getDb();
-    const index = db.findIndex((t) => t.id === task.id);
+      const currentTasks = JSON.parse(
+        localStorage.getItem(STORAGE_TASK) || "[]",
+      );
+      const updatedTasks = currentTasks.map((t: any) =>
+        t.id === task.id ? task : t,
+      );
+      localStorage.setItem(STORAGE_TASK, JSON.stringify(updatedTasks));
 
-    if (index !== -1) {
-      db[index] = { ...task };
-      saveDb(db);
-      console.log(`[API LOCAL] Tarefa atualizada: ${task.id}`);
-      return db[index];
+      return task;
+    } catch (error) {
+      console.error("Falha ao atualizar na API", error);
+      throw error;
     }
-    throw new Error("Tarefa não encontrada.");
   },
 
   /**
    * Cria uma nova tarefa (POST).
    */
-  createTask: async (taskData: Partial<Task>): Promise<Task> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
+  createTask: async (task: any): Promise<any> => {
+    try {
+      const response = await api.post("tasks", task);
+      const finalTask = response.data?.data || task;
 
-    const db = getDb();
-    const newTask: Task = {
-      ...taskData,
-      id: Math.random().toString(36).substr(2, 9),
-      createdAt: new Date(), // Garante timestamp se necessário
-      completed: false,
-      isPinned: false,
-    } as Task;
+      const currentTasks = JSON.parse(
+        localStorage.getItem(STORAGE_TASK) || "[]",
+      );
+      currentTasks.push(finalTask);
+      localStorage.setItem(STORAGE_TASK, JSON.stringify(currentTasks));
 
-    // Adiciona no início da lista
-    db.unshift(newTask);
-    saveDb(db);
-    console.log(`[API LOCAL] Tarefa criada: ${newTask.id}`);
-    return newTask;
+      return finalTask;
+    } catch (error) {
+      console.error("Falha ao criar na API", error);
+      throw error;
+    }
   },
 
   /**
    * Remove uma tarefa (DELETE).
    */
   deleteTask: async (taskId: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    let db = getDb();
-    const initialLength = db.length;
-    db = db.filter((t) => t.id !== taskId);
-
-    if (db.length === initialLength) {
-      console.warn(
-        `[API LOCAL] Tentativa de deletar tarefa inexistente: ${taskId}`,
-      );
-      // Não lançamos erro aqui para permitir que a UI se atualize (idempotência)
+    try {
+      await api.delete(`tasks/${taskId}`);
+    } catch (error) {
+      console.error("Falha ao deletar na API", error);
+      throw error;
     }
 
+    // 2. Storage Local (Atualização Visual)
+    let db = getDb();
+    db = db.filter((t) => String(t.id) !== String(taskId));
     saveDb(db);
-    console.log(`[API LOCAL] Tarefa removida: ${taskId}`);
   },
 
   /**
    * Alterna status de conclusão e atualiza progresso se necessário (PATCH).
    */
   toggleTaskCompletion: async (taskId: string): Promise<Task> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     const db = getDb();
-    const index = db.findIndex((t) => t.id === taskId);
+    const index = db.findIndex((t) => String(t.id) === String(taskId));
 
     if (index !== -1) {
       const task = db[index];
@@ -124,78 +143,84 @@ export const tasksService = {
         completed: newStatus,
       };
 
-      // REGRA DE NEGÓCIO: Se for Meta/Sonho e estiver completando, define progresso como 100%
       if (
         (task.type === TaskType.GOAL || task.type === TaskType.DREAM) &&
         newStatus
       ) {
         updates.progress = 100;
-        if (task.targetValue) {
-          updates.currentValue = task.targetValue;
-        }
-      } else if (
-        (task.type === TaskType.GOAL || task.type === TaskType.DREAM) &&
-        !newStatus
-      ) {
-        // Se desmarcar, não necessariamente zera o valor, apenas o status de concluído
-        // Opcional: updates.progress = Math.floor((task.currentValue / task.targetValue) * 100);
+        if (task.targetValue) updates.currentValue = task.targetValue;
       }
 
       db[index] = { ...task, ...updates };
       saveDb(db);
 
-      console.log(`[API LOCAL] Status alterado: ${taskId} -> ${newStatus}`);
+      // 2. Sincroniza com a API em Background
+      try {
+        await api.patch(`tasks/${taskId}/toggle`);
+      } catch (error) {
+        console.error("Falha ao alternar status na API", error);
+      }
+
       return db[index];
     }
-
     throw new Error("Tarefa não encontrada.");
   },
 
   /**
-   * Atualiza especificamente o valor numérico de uma meta/sonho.
-   * Recalcula a porcentagem e o status de conclusão automaticamente.
+   * Atualiza especificamente o valor numérico de uma meta/sonho (PATCH).
    */
   updateTaskValue: async (taskId: string, newValue: number): Promise<Task> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
     const db = getDb();
-    const index = db.findIndex((t) => t.id === taskId);
+    const index = db.findIndex((t) => String(t.id) === String(taskId));
 
     if (index !== -1) {
       const task = db[index];
-      const target = task.targetValue || 1; // Evita divisão por zero
+      const target = task.targetValue || 1;
 
-      // Garante que não exceda visualmente limites absurdos, mas permite over-achievement
       let newProgress = Math.round((newValue / target) * 100);
 
       const updates: Partial<Task> = {
         currentValue: newValue,
         progress: newProgress,
-        // Se atingiu ou passou da meta, marca como completo. Se caiu, desmarca.
         completed: newValue >= target,
       };
 
+      // 1. Atualiza Visualmente
       db[index] = { ...task, ...updates };
       saveDb(db);
-      console.log(
-        `[API LOCAL] Valor atualizado: ${taskId} -> ${newValue} (${newProgress}%)`,
-      );
+
+      // 2. Sincroniza com a API
+      try {
+        // Envia o JSON com a chave "value" igual o seu TaskController.php espera
+        await api.patch(`tasks/${taskId}/progress`, { value: newValue });
+      } catch (error) {
+        console.error("Falha ao atualizar progresso na API", error);
+      }
+
       return db[index];
     }
     throw new Error("Tarefa não encontrada.");
   },
 
   /**
-   * Alterna o estado de fixado (Pin) de uma tarefa.
+   * Alterna o estado de fixado (Pin) de uma tarefa (PATCH).
    */
   toggleTaskPin: async (taskId: string): Promise<Task> => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
     const db = getDb();
-    const index = db.findIndex((t) => t.id === taskId);
+    const index = db.findIndex((t) => String(t.id) === String(taskId));
 
     if (index !== -1) {
-      const task = db[index];
-      db[index] = { ...task, isPinned: !task.isPinned };
+      // 1. Atualiza Visualmente
+      db[index] = { ...db[index], isPinned: !db[index].isPinned };
       saveDb(db);
+
+      // 2. Sincroniza com a API
+      try {
+        await api.patch(`tasks/${taskId}/pin`);
+      } catch (error) {
+        console.error("Falha ao fixar tarefa na API", error);
+      }
+
       return db[index];
     }
     throw new Error("Tarefa não encontrada.");

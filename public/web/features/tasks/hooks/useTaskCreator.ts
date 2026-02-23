@@ -7,6 +7,8 @@ import {
   RecurrenceInterval,
 } from "../../../domain/tasks.types";
 import { tasksService } from "../services/tasks.service";
+import config from '../../../src/config';
+const STORAGE_KEY = config.configStorageKey;
 
 /**
  * @author HallTech AI
@@ -77,42 +79,46 @@ export const useTaskCreator = () => {
   };
 
   const handleSave = async () => {
-    // Conversão de valores numéricos
-    const finalTarget = targetValue ? Number(targetValue) : undefined;
-    const finalCurrent = currentValue ? Number(currentValue) : 0;
-
-    // Calcula progresso inicial se houver meta definida
-    let initialProgress = 0;
-    if (finalTarget && finalTarget > 0) {
-      initialProgress = Math.round((finalCurrent / finalTarget) * 100);
-    }
-
-    const commonData = {
-      title,
-      type,
-      priority: type === TaskType.NOTE ? TaskPriority.LOW : priority,
-      dueDate,
-      targetValue: finalTarget,
-      currentValue: finalCurrent,
-      unit, // Salva a unidade no objeto
-      progress: initialProgress,
-      completed: finalTarget ? finalCurrent >= finalTarget : false,
-      estimatedCost: cost ? Number(cost) : undefined,
-      recurrence,
-      content: notes,
-      notes,
-      tags,
-    };
+    if (!title.trim()) return;
 
     try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const userConfig = stored ? JSON.parse(stored) : null;
+      const userId = userConfig?.user_id;
+
+      if (!userId) {
+        console.warn("useTaskCreator: Usuário não identificado no storage.");
+        return;
+      }
+
+      const finalTarget = targetValue ? Number(targetValue) : undefined;
+      const finalCurrent = currentValue ? Number(currentValue) : undefined;
+      const initialProgress = finalTarget && finalCurrent ? Math.round((finalCurrent / finalTarget) * 100) : 0;
+
+      const commonData = {
+        user_id: userId,
+        type,
+        title,
+        priority: type === TaskType.NOTE ? TaskPriority.LOW : priority,
+        dueDate,
+        targetValue: finalTarget,
+        currentValue: finalCurrent,
+        unit,
+        progress: initialProgress,
+        completed: finalTarget && finalCurrent ? finalCurrent >= finalTarget : false,
+        estimatedCost: cost ? Number(cost) : undefined,
+        recurrence: recurrence === "none" ? undefined : recurrence,
+        content: notes,
+        notes,
+        tags,
+      };
+
       if (isEditing && taskToEdit) {
-        // UPDATE
         await tasksService.updateTask({
           ...taskToEdit,
           ...commonData,
         });
       } else {
-        // CREATE
         await tasksService.createTask({
           ...commonData,
           createdAt: new Date(),
@@ -121,8 +127,7 @@ export const useTaskCreator = () => {
 
       navigate(-1);
     } catch (error) {
-      console.error("Erro ao salvar tarefa", error);
-      alert("Erro ao salvar. Tente novamente.");
+      console.error("Erro ao salvar tarefa:", error);
     }
   };
 

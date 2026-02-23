@@ -36,32 +36,18 @@ USE ghz_life_AMBIENTE;
         CREATE OR REPLACE VIEW vw_app_tasks_board AS
         SELECT 
             t.id,
-            -- Lógica manual BIN_TO_UUID
-            LOWER(CONCAT(
-                HEX(SUBSTR(t.user_id, 1, 4)), '-', 
-                HEX(SUBSTR(t.user_id, 5, 2)), '-', 
-                HEX(SUBSTR(t.user_id, 7, 2)), '-', 
-                HEX(SUBSTR(t.user_id, 9, 2)), '-', 
-                HEX(SUBSTR(t.user_id, 11, 6))
-            )) AS user_id,
+            LOWER(CONCAT(HEX(SUBSTR(t.user_id, 1, 4)), '-', HEX(SUBSTR(t.user_id, 5, 2)), '-', HEX(SUBSTR(t.user_id, 7, 2)), '-', HEX(SUBSTR(t.user_id, 9, 2)), '-', HEX(SUBSTR(t.user_id, 11, 6)))) AS user_id,
+            CASE t.sys_module_functionality_id
+                WHEN 1 THEN 'DAILY' WHEN 2 THEN 'GOAL' WHEN 3 THEN 'DREAM' WHEN 4 THEN 'SHOPPING' WHEN 5 THEN 'NOTE' ELSE 'DAILY'
+            END AS type,
             t.title,
-            IF(t.sys_status_id = 5, TRUE, FALSE) AS completed,
-            CASE 
-                WHEN t.priority >= 2 THEN 'HIGH'
-                WHEN t.priority = 1 THEN 'MEDIUM'
-                ELSE 'LOW'
-            END AS priority,
-            UPPER(SUBSTRING_INDEX(smf.router_link, '=', -1)) AS type,
-            t.content,
-            t.due_date AS dueDate,
-            t.progress,
-            t.target_value AS targetValue,
-            t.current_value AS currentValue,
-            t.estimated_cost AS estimatedCost,
-            t.tags
-        FROM app_tasks t
-        JOIN sys_module_functionality smf ON t.sys_module_functionality_id = smf.id
-        WHERE t.deleted_at IS NULL;
+            CASE t.priority WHEN 1 THEN 'LOW' WHEN 2 THEN 'MEDIUM' WHEN 3 THEN 'HIGH' ELSE 'MEDIUM' END AS priority,
+            IF(t.sys_status_id = 5, 1, 0) AS completed,
+            t.isPinned AS isPinned,
+            t.due_date AS dueDate, t.target_value AS targetValue, t.current_value AS currentValue,
+            t.progress, t.estimated_cost AS estimatedCost, t.unit, t.recurrence, t.content, t.notes, t.tags,
+            t.created_at AS createdAt, t.updated_at AS updatedAt
+        FROM app_tasks t;
 
     -- ------------------------------------------------------------------------------
     -- 1.3. VIEW: MÓDULOS E FEATURES
@@ -91,6 +77,8 @@ USE ghz_life_AMBIENTE;
             LEFT JOIN `ghz_life_ambiente`.`sys_status` `stm` ON (`stm`.`id` = `sm`.`sys_status_id`))
             LEFT JOIN `ghz_life_ambiente`.`sys_status` `stf` ON (`stf`.`id` = `smf`.`sys_status_id`))
         ORDER BY `sm`.`id` , `smf`.`id`;
+
+    
 
 -- ==============================================================================
 -- 2. PROCEDURES (AÇÕES E ESCRITA)
@@ -219,52 +207,131 @@ USE ghz_life_AMBIENTE;
         END$$
 
     -- ------------------------------------------------------------------------------
-    -- 2.3. CRIAR TAREFA (Simplificado)
+    -- 2.3. CRIAR TAREFA (Completo)
+    -- Insere um novo registro com todos os atributos suportados pelo Frontend
     -- ------------------------------------------------------------------------------
-        DROP PROCEDURE IF EXISTS sp_task_create$$
+        DROP PROCEDURE IF EXISTS sp_app_task_create$$
 
-        CREATE PROCEDURE sp_task_create(
-            IN p_user_uuid VARCHAR(36),
-            IN p_type_code VARCHAR(50), -- Ex: 'DAILY', 'GOAL', 'NOTE'
+        CREATE PROCEDURE sp_app_task_create(
+            IN p_user_id VARCHAR(36),
+            IN p_type VARCHAR(50),
             IN p_title VARCHAR(255),
-            IN p_priority INT           -- 0=Low, 1=Medium, 2=High
+            IN p_priority VARCHAR(20),
+            IN p_content TEXT,
+            IN p_notes TEXT,
+            IN p_tags JSON,
+            IN p_due_date DATETIME,
+            IN p_recurrence VARCHAR(50),
+            IN p_target_value DECIMAL(18,2),
+            IN p_current_value DECIMAL(18,2),
+            IN p_estimated_cost DECIMAL(18,2),
+            IN p_unit VARCHAR(20),
+            IN p_progress DECIMAL(5,2),
+            IN p_completed TINYINT
         )
         BEGIN
             DECLARE v_user_bin BINARY(16);
             DECLARE v_func_id INT;
-            
-            -- 1. Conversão Manual de UUID (Compatível MariaDB)
-            SET v_user_bin = UNHEX(REPLACE(p_user_uuid, '-', ''));
-            
-            -- 2. Descobre o ID da funcionalidade
-            -- Ele busca onde o link contém "type=DAILY" (ou o código passado)
-            SELECT id INTO v_func_id 
-            FROM sys_module_functionality 
-            WHERE router_link LIKE CONCAT('%type=', p_type_code) 
-            LIMIT 1;
-            
-            -- 3. Inserção
-            IF v_func_id IS NOT NULL THEN
-                INSERT INTO app_tasks (
-                    sys_module_functionality_id, 
-                    user_id, 
-                    title, 
-                    sys_status_id, 
-                    priority
-                ) VALUES (
-                    v_func_id, 
-                    v_user_bin, 
-                    p_title, 
-                    3, -- 3 = Pendente (Padrão)
-                    p_priority
-                );
-            ELSE
-                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Tipo de tarefa inválido (Código não encontrado no router_link).';
-            END IF;
+            DECLARE v_status_id INT;
+            DECLARE v_priority_int INT;
+
+            -- 1. Converte UUID do Front para BINARY(16) do Banco
+            SET v_user_bin = UNHEX(REPLACE(p_user_id, '-', ''));
+
+            -- 2. Converte a String (DAILY, GOAL...) para o ID da Funcionalidade
+            SET v_func_id = CASE p_type
+                WHEN 'DAILY' THEN 1
+                WHEN 'GOAL' THEN 2
+                WHEN 'DREAM' THEN 3
+                WHEN 'SHOPPING' THEN 4
+                WHEN 'NOTE' THEN 5
+                ELSE 1
+            END;
+
+            -- 3. Status: 1 = Pendente, 5 = Concluído
+            SET v_status_id = IF(p_completed = 1, 5, 1);
+
+            -- 4. Tratamento de Prioridade
+            SET v_priority_int = CASE p_priority
+                WHEN 'LOW' THEN 1
+                WHEN 'MEDIUM' THEN 2
+                WHEN 'HIGH' THEN 3
+                ELSE 2
+            END;
+
+            -- 5. Inserção
+            INSERT INTO app_tasks (
+                sys_module_functionality_id, user_id, title, sys_status_id, priority,
+                content, notes, tags, due_date, recurrence, target_value, current_value,
+                estimated_cost, unit, progress, isPinned
+            ) VALUES (
+                v_func_id, v_user_bin, p_title, v_status_id, v_priority_int,
+                p_content, p_notes, p_tags, p_due_date, p_recurrence, p_target_value, p_current_value,
+                p_estimated_cost, p_unit, p_progress, 0
+            );
+
+            -- 6. Devolve o ID real recém-criado para o Frontend!
+            SELECT LAST_INSERT_ID() AS new_id;
         END$$
 
     -- ------------------------------------------------------------------------------
-    -- 2.4. ATIVAR/DESATIVAR MÓDULO OU FUNCIONALIDADE PARA O USUÁRIO
+    -- 2.4. ATUALIZAR TAREFA
+    -- Atualiza um registro existente mantendo as regras de negócio
+    -- ------------------------------------------------------------------------------
+        DROP PROCEDURE IF EXISTS sp_app_task_update$$
+
+        CREATE PROCEDURE sp_app_task_update(
+            IN p_id INT,
+            IN p_title VARCHAR(255),
+            IN p_priority VARCHAR(20),
+            IN p_content TEXT,
+            IN p_notes TEXT,
+            IN p_tags JSON,
+            IN p_due_date DATETIME,
+            IN p_recurrence VARCHAR(50),
+            IN p_target_value DECIMAL(18,2),
+            IN p_current_value DECIMAL(18,2),
+            IN p_estimated_cost DECIMAL(18,2),
+            IN p_unit VARCHAR(20),
+            IN p_progress DECIMAL(5,2),
+            IN p_completed TINYINT
+        )
+        BEGIN
+            DECLARE v_status_id INT;
+            DECLARE v_priority_int INT;
+
+            -- 1. Definição de Status
+            SET v_status_id = IF(p_completed = 1, 5, 1);
+
+            -- 2. Tratamento de Prioridade
+            SET v_priority_int = CASE p_priority
+                WHEN 'LOW' THEN 1  
+                WHEN 'MEDIUM' THEN 2  
+                WHEN 'HIGH' THEN 3 
+                ELSE 2
+            END;
+
+            -- 3. Atualização
+            UPDATE app_tasks SET
+                title = p_title, 
+                sys_status_id = v_status_id, 
+                priority = v_priority_int,
+                content = p_content, 
+                notes = p_notes, 
+                tags = p_tags, 
+                due_date = p_due_date,
+                recurrence = p_recurrence, 
+                target_value = p_target_value, 
+                current_value = p_current_value,
+                estimated_cost = p_estimated_cost, 
+                unit = p_unit, 
+                progress = p_progress, 
+                updated_at = NOW()
+            WHERE id = p_id;
+        END$$
+
+    -- ------------------------------------------------------------------------------
+    -- 2.5. ATIVAR/DESATIVAR MÓDULO OU FUNCIONALIDADE PARA O USUÁRIO
     -- Permite que o usuário ative (1) ou desative (0) permissões na sua conta
     -- ------------------------------------------------------------------------------
         DROP PROCEDURE IF EXISTS sp_toggle_user_module_functionality$$
@@ -334,7 +401,7 @@ USE ghz_life_AMBIENTE;
         END$$
     
     -- ------------------------------------------------------------------------------
-    -- 2.5: BUSCAR MÓDULOS E FUNCIONALIDADES DO USUÁRIO
+    -- 2.6: BUSCAR MÓDULOS E FUNCIONALIDADES DO USUÁRIO
     -- Retorna a lista completa baseada na View, mas com as flags 
     -- 'module_enabled' e 'feature_enabled' fiéis ao que o usuário ativou/desativou.
     -- ------------------------------------------------------------------------------

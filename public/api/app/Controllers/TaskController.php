@@ -17,9 +17,17 @@ class TaskController
         $this->service = new TaskService();
     }
 
+    private function getJsonBody(): array
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        return is_array($data) ? $data : [];
+    }
+
     public function list(): void
     {
         $filters = [
+            'user_id' => $_GET['user_id'] ?? null,
             'type' => $_GET['type'] ?? null,
             'status' => $_GET['status'] ?? null
         ];
@@ -33,16 +41,18 @@ class TaskController
             'errors' => []
         ]);
     }
+    
     public function create(): void
     {
         $payload = TaskPayload::fromRequest($this->getJsonBody());
 
-        if (empty($payload['title']) || empty($payload['type'])) {
+        // Segurança: O Frontend DEVE enviar o user_id e os campos básicos
+        if (empty($payload['title']) || empty($payload['type']) || empty($payload['user_id'])) {
             responseJson([
                 'success' => false,
                 'data' => null,
                 'message' => 'Falha na validação.',
-                'errors' => ['Os campos title e type são obrigatórios.']
+                'errors' => ['Os campos user_id, title e type são obrigatórios.']
             ], 400);
         }
 
@@ -55,9 +65,20 @@ class TaskController
             'errors' => []
         ], 201);
     }
+
     public function update(string $id): void
     {
         $payload = TaskPayload::fromRequest($this->getJsonBody());
+
+        if (empty($payload['title']) || empty($payload['type'])) {
+            responseJson([
+                'success' => false,
+                'data' => null,
+                'message' => 'Falha na validação.',
+                'errors' => ['Os campos title e type são obrigatórios.']
+            ], 400);
+        }
+
         $data = $this->service->update($id, $payload);
 
         responseJson([
@@ -67,6 +88,7 @@ class TaskController
             'errors' => []
         ]);
     }
+
     public function toggle(string $id): void
     {
         $data = $this->service->toggle($id);
@@ -78,6 +100,7 @@ class TaskController
             'errors' => []
         ]);
     }
+
     public function updateProgress(string $id): void
     {
         $body = $this->getJsonBody();
@@ -101,6 +124,7 @@ class TaskController
             'errors' => []
         ]);
     }
+
     public function delete(string $id): void
     {
         $this->service->delete($id);
@@ -112,13 +136,16 @@ class TaskController
             'errors' => []
         ]);
     }
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input');
-        if (!$raw) {
-            return [];
-        }
 
-        return json_decode($raw, true) ?? [];
+    public function pin(string $id): void
+    {
+        $data = $this->service->togglePin($id);
+
+        responseJson([
+            'success' => true,
+            'data' => $data,
+            'message' => 'Pin atualizado com sucesso.',
+            'errors' => []
+        ]);
     }
 }

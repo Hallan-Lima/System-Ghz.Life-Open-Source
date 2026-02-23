@@ -11,6 +11,7 @@ interface Config {
   modulesOrderKey: string;
   configStorageKey: string;
   tokenStorageKey: string;
+  tasksStorageKey: string;
 }
 
 const config: Config = {
@@ -22,6 +23,7 @@ const config: Config = {
   modulesOrderKey: import.meta.env.VITE_STORAGE_MODULES_ORDER_KEY || 'ghz_modules_order_v1',
   configStorageKey: import.meta.env.VITE_STORAGE_CONFIG_USER || 'ghz_user_config_v1',
   tokenStorageKey: import.meta.env.VITE_STORAGE_TOKEN || 'ghz_user_token_v1',
+  tasksStorageKey: import.meta.env.VITE_STORAGE_TASKS || 'ghz_tasks_db',
 };
 
 export default config;
