@@ -20,7 +20,7 @@ const getDb = (): Task[] => {
   } catch (e) {
     console.warn("Erro ao ler dados locais, resetando para mocks.", e);
   }
-  
+
   // Se não houver dados salvos, inicia com os mocks padrão e salva
   const initialData = [...tasksMocks];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
@@ -42,7 +42,7 @@ export const tasksService = {
    */
   getTasks: async (): Promise<Task[]> => {
     // Simulação de delay de rede para realismo
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return getDb();
   },
 
@@ -50,11 +50,11 @@ export const tasksService = {
    * Atualiza uma tarefa completa (PUT).
    */
   updateTask: async (task: Task): Promise<Task> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     const db = getDb();
-    const index = db.findIndex(t => t.id === task.id);
-    
+    const index = db.findIndex((t) => t.id === task.id);
+
     if (index !== -1) {
       db[index] = { ...task };
       saveDb(db);
@@ -68,8 +68,8 @@ export const tasksService = {
    * Cria uma nova tarefa (POST).
    */
   createTask: async (taskData: Partial<Task>): Promise<Task> => {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
     const db = getDb();
     const newTask: Task = {
       ...taskData,
@@ -90,15 +90,17 @@ export const tasksService = {
    * Remove uma tarefa (DELETE).
    */
   deleteTask: async (taskId: string): Promise<void> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     let db = getDb();
     const initialLength = db.length;
-    db = db.filter(t => t.id !== taskId);
-    
+    db = db.filter((t) => t.id !== taskId);
+
     if (db.length === initialLength) {
-        console.warn(`[API LOCAL] Tentativa de deletar tarefa inexistente: ${taskId}`);
-        // Não lançamos erro aqui para permitir que a UI se atualize (idempotência)
+      console.warn(
+        `[API LOCAL] Tentativa de deletar tarefa inexistente: ${taskId}`,
+      );
+      // Não lançamos erro aqui para permitir que a UI se atualize (idempotência)
     }
 
     saveDb(db);
@@ -109,37 +111,43 @@ export const tasksService = {
    * Alterna status de conclusão e atualiza progresso se necessário (PATCH).
    */
   toggleTaskCompletion: async (taskId: string): Promise<Task> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     const db = getDb();
-    const index = db.findIndex(t => t.id === taskId);
-    
+    const index = db.findIndex((t) => t.id === taskId);
+
     if (index !== -1) {
       const task = db[index];
       const newStatus = !task.completed;
-      
+
       const updates: Partial<Task> = {
-          completed: newStatus
+        completed: newStatus,
       };
 
       // REGRA DE NEGÓCIO: Se for Meta/Sonho e estiver completando, define progresso como 100%
-      if ((task.type === TaskType.GOAL || task.type === TaskType.DREAM) && newStatus) {
+      if (
+        (task.type === TaskType.GOAL || task.type === TaskType.DREAM) &&
+        newStatus
+      ) {
         updates.progress = 100;
         if (task.targetValue) {
-            updates.currentValue = task.targetValue;
+          updates.currentValue = task.targetValue;
         }
-      } else if ((task.type === TaskType.GOAL || task.type === TaskType.DREAM) && !newStatus) {
-         // Se desmarcar, não necessariamente zera o valor, apenas o status de concluído
-         // Opcional: updates.progress = Math.floor((task.currentValue / task.targetValue) * 100);
+      } else if (
+        (task.type === TaskType.GOAL || task.type === TaskType.DREAM) &&
+        !newStatus
+      ) {
+        // Se desmarcar, não necessariamente zera o valor, apenas o status de concluído
+        // Opcional: updates.progress = Math.floor((task.currentValue / task.targetValue) * 100);
       }
 
       db[index] = { ...task, ...updates };
       saveDb(db);
-      
+
       console.log(`[API LOCAL] Status alterado: ${taskId} -> ${newStatus}`);
       return db[index];
     }
-    
+
     throw new Error("Tarefa não encontrada.");
   },
 
@@ -148,28 +156,30 @@ export const tasksService = {
    * Recalcula a porcentagem e o status de conclusão automaticamente.
    */
   updateTaskValue: async (taskId: string, newValue: number): Promise<Task> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
     const db = getDb();
-    const index = db.findIndex(t => t.id === taskId);
+    const index = db.findIndex((t) => t.id === taskId);
 
     if (index !== -1) {
-        const task = db[index];
-        const target = task.targetValue || 1; // Evita divisão por zero
-        
-        // Garante que não exceda visualmente limites absurdos, mas permite over-achievement
-        let newProgress = Math.round((newValue / target) * 100);
-        
-        const updates: Partial<Task> = {
-            currentValue: newValue,
-            progress: newProgress,
-            // Se atingiu ou passou da meta, marca como completo. Se caiu, desmarca.
-            completed: newValue >= target
-        };
+      const task = db[index];
+      const target = task.targetValue || 1; // Evita divisão por zero
 
-        db[index] = { ...task, ...updates };
-        saveDb(db);
-        console.log(`[API LOCAL] Valor atualizado: ${taskId} -> ${newValue} (${newProgress}%)`);
-        return db[index];
+      // Garante que não exceda visualmente limites absurdos, mas permite over-achievement
+      let newProgress = Math.round((newValue / target) * 100);
+
+      const updates: Partial<Task> = {
+        currentValue: newValue,
+        progress: newProgress,
+        // Se atingiu ou passou da meta, marca como completo. Se caiu, desmarca.
+        completed: newValue >= target,
+      };
+
+      db[index] = { ...task, ...updates };
+      saveDb(db);
+      console.log(
+        `[API LOCAL] Valor atualizado: ${taskId} -> ${newValue} (${newProgress}%)`,
+      );
+      return db[index];
     }
     throw new Error("Tarefa não encontrada.");
   },
@@ -178,10 +188,10 @@ export const tasksService = {
    * Alterna o estado de fixado (Pin) de uma tarefa.
    */
   toggleTaskPin: async (taskId: string): Promise<Task> => {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const db = getDb();
-    const index = db.findIndex(t => t.id === taskId);
-    
+    const index = db.findIndex((t) => t.id === taskId);
+
     if (index !== -1) {
       const task = db[index];
       db[index] = { ...task, isPinned: !task.isPinned };
@@ -189,5 +199,5 @@ export const tasksService = {
       return db[index];
     }
     throw new Error("Tarefa não encontrada.");
-  }
+  },
 };

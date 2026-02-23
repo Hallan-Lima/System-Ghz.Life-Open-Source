@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Task, TaskType, TaskPriority, RecurrenceInterval } from "../../../domain/tasks.types";
+import {
+  Task,
+  TaskType,
+  TaskPriority,
+  RecurrenceInterval,
+} from "../../../domain/tasks.types";
 import { tasksService } from "../services/tasks.service";
 
 /**
@@ -10,7 +15,7 @@ import { tasksService } from "../services/tasks.service";
 export const useTaskCreator = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Verifica se estamos em modo de edição via location state
   const taskToEdit = location.state?.taskToEdit as Task | undefined;
   const isEditing = !!taskToEdit;
@@ -21,7 +26,7 @@ export const useTaskCreator = () => {
   const [type, setType] = useState<TaskType>(defaultType);
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
-  
+
   // Estados de Detalhes
   const [dueDate, setDueDate] = useState("");
   const [targetValue, setTargetValue] = useState("");
@@ -30,7 +35,7 @@ export const useTaskCreator = () => {
   const [unit, setUnit] = useState("un"); // Padrão 'un'
   const [recurrence, setRecurrence] = useState<RecurrenceInterval>("none");
   const [notes, setNotes] = useState("");
-  
+
   // Tags
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
@@ -75,11 +80,11 @@ export const useTaskCreator = () => {
     // Conversão de valores numéricos
     const finalTarget = targetValue ? Number(targetValue) : undefined;
     const finalCurrent = currentValue ? Number(currentValue) : 0;
-    
+
     // Calcula progresso inicial se houver meta definida
     let initialProgress = 0;
     if (finalTarget && finalTarget > 0) {
-        initialProgress = Math.round((finalCurrent / finalTarget) * 100);
+      initialProgress = Math.round((finalCurrent / finalTarget) * 100);
     }
 
     const commonData = {
@@ -113,7 +118,7 @@ export const useTaskCreator = () => {
           createdAt: new Date(),
         } as any);
       }
-      
+
       navigate(-1);
     } catch (error) {
       console.error("Erro ao salvar tarefa", error);
@@ -126,27 +131,43 @@ export const useTaskCreator = () => {
   return {
     isEditing,
     form: {
-      type, setType,
-      title, setTitle,
-      priority, setPriority,
-      dueDate, setDueDate,
-      targetValue, setTargetValue,
-      currentValue, setCurrentValue,
-      cost, setCost,
-      unit, setUnit,
-      recurrence, setRecurrence,
-      notes, setNotes,
-      tags, tagInput, setTagInput,
-      necessity, setNecessity,
-      satisfaction, setSatisfaction,
-      frequency, setFrequency,
-      priorityMode, setPriorityMode
+      type,
+      setType,
+      title,
+      setTitle,
+      priority,
+      setPriority,
+      dueDate,
+      setDueDate,
+      targetValue,
+      setTargetValue,
+      currentValue,
+      setCurrentValue,
+      cost,
+      setCost,
+      unit,
+      setUnit,
+      recurrence,
+      setRecurrence,
+      notes,
+      setNotes,
+      tags,
+      tagInput,
+      setTagInput,
+      necessity,
+      setNecessity,
+      satisfaction,
+      setSatisfaction,
+      frequency,
+      setFrequency,
+      priorityMode,
+      setPriorityMode,
     },
     actions: {
       handleAddTag,
       removeTag,
       handleSave,
-      handleBack
-    }
+      handleBack,
+    },
   };
 };
