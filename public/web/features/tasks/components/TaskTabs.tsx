@@ -1,77 +1,70 @@
-import React from "react";
-import { TaskType } from "../../../domain/tasks.types";
+/**
+ * @file TaskTabs.tsx
+ * @description Abas de navegação para filtrar os diferentes tipos de tarefas baseadas nas permissões do usuário.
+ * @author HallTech AI
+ */
+
+import React, { useEffect, useMemo } from 'react';
+import { useModules } from '../../modules/hooks/useModules';
+import { TaskFilterType } from '../hooks/useTasks';
 
 interface TaskTabsProps {
-  activeTab: TaskType;
-  onTabChange: (tab: TaskType) => void;
-  config: {
-    enableDaily: boolean;
-    enableGoals: boolean;
-    enableDreams: boolean;
-    enableShopping: boolean;
-    enableNotes: boolean;
-  };
+  activeTab: TaskFilterType;
+  onTabChange: (tab: TaskFilterType) => void;
 }
 
-/**
- * @author HallTech AI
- * Abas de navegação para alternar entre contextos de tarefas.
- * Renderiza apenas as abas habilitadas nas configurações do módulo.
- */
-const TaskTabs: React.FC<TaskTabsProps> = ({ activeTab, onTabChange, config }) => {
-  const getButtonClass = (isActive: boolean) =>
-    `flex-shrink-0 px-6 py-3 rounded-[2rem] font-black text-xs uppercase tracking-wider transition-all border ${
-      isActive
-        ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none"
-        : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800"
-    }`;
+const TaskTabs: React.FC<TaskTabsProps> = ({ activeTab, onTabChange }) => {
+  const { modules } = useModules();
+
+  const productivityModule = modules.find(m => String(m.id) === '1');
+  const features = productivityModule?.features || [];
+
+  const isFeatureEnabled = (id: string) => {
+    return features.find(f => String(f.id) === id)?.isEnabled ?? false;
+  };
+
+  const availableTabs = useMemo(() => {
+    const featureTabs = [
+      { id: 'DAILY', label: 'Rotina', icon: 'fas fa-check-double', show: isFeatureEnabled('1') },
+      { id: 'GOAL', label: 'Metas', icon: 'fas fa-bullseye', show: isFeatureEnabled('2') },
+      { id: 'DREAM', label: 'Sonhos', icon: 'fas fa-plane', show: isFeatureEnabled('3') },
+      { id: 'SHOPPING', label: 'Compras', icon: 'fas fa-cart-shopping', show: isFeatureEnabled('4') },
+      { id: 'NOTE', label: 'Notas', icon: 'fas fa-sticky-note', show: isFeatureEnabled('5') }
+    ];
+    
+    const activeTabs = featureTabs.filter(tab => tab.show);
+
+    if (activeTabs.length > 1) {
+      activeTabs.unshift({ id: 'ALL', label: 'Tudo', icon: 'fas fa-layer-group', show: true });
+    }
+
+    return activeTabs;
+  }, [features]);
+
+  useEffect(() => {
+    if (availableTabs.length > 0 && !availableTabs.find(tab => tab.id === activeTab)) {
+      onTabChange(availableTabs[0].id as TaskFilterType);
+    }
+  }, [activeTab, availableTabs, onTabChange]);
+
+  if (availableTabs.length <= 1) return null; // Não mostra menu se tiver apenas a aba Tudo
 
   return (
-    <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-      {config.enableDaily && (
+    <div className="flex gap-3 overflow-x-auto pb-4 hide-scrollbar">
+      {availableTabs.map((tab) => (
         <button
-            onClick={() => onTabChange(TaskType.DAILY)}
-            className={getButtonClass(activeTab === TaskType.DAILY)}
+          key={tab.id}
+          onClick={() => onTabChange(tab.id as TaskFilterType)}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl whitespace-nowrap font-bold text-sm transition-all duration-300 ${
+            activeTab === tab.id
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105'
+              : 'bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800'
+          }`}
         >
-            <i className="fas fa-check-double mr-2"></i> Dia a Dia
+          <i className={tab.icon}></i>
+          {tab.label}
         </button>
-      )}
-
-      {config.enableGoals && (
-        <button
-          onClick={() => onTabChange(TaskType.GOAL)}
-          className={getButtonClass(activeTab === TaskType.GOAL)}
-        >
-          <i className="fas fa-bullseye mr-2"></i> Metas
-        </button>
-      )}
-
-      {config.enableDreams && (
-        <button
-          onClick={() => onTabChange(TaskType.DREAM)}
-          className={getButtonClass(activeTab === TaskType.DREAM)}
-        >
-          <i className="fas fa-plane mr-2"></i> Sonhos
-        </button>
-      )}
-
-      {config.enableShopping && (
-        <button
-          onClick={() => onTabChange(TaskType.SHOPPING)}
-          className={getButtonClass(activeTab === TaskType.SHOPPING)}
-        >
-          <i className="fas fa-cart-shopping mr-2"></i> Listas
-        </button>
-      )}
-
-      {config.enableNotes && (
-        <button
-          onClick={() => onTabChange(TaskType.NOTE)}
-          className={getButtonClass(activeTab === TaskType.NOTE)}
-        >
-          <i className="fas fa-sticky-note mr-2"></i> Notas
-        </button>
-      )}
+      ))}
     </div>
   );
 };

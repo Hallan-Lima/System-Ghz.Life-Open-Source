@@ -1,30 +1,75 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTaskCreator } from "../hooks/useTaskCreator";
 import { getTaskTypeConfig } from "../tasks.utils";
 import TaskTypeSelector from "./creator/TaskTypeSelector";
 import TaskFormFields from "./creator/TaskFormFields";
 import { TaskType } from "../../../domain/tasks.types";
+import { useModules } from "../../modules/hooks/useModules";
 
 /**
  * @author HallTech AI
  * View container para o formulário de criação/edição.
  */
 const TaskCreatorView: React.FC = () => {
+  const navigate = useNavigate();
+  const { modules } = useModules();
+
   const { form, actions, isEditing } = useTaskCreator();
   const { type, title, setTitle } = form;
   const currentConfig = getTaskTypeConfig(type);
+  const hasActiveFeatures = useMemo(() => {
+    const prodModule = modules.find((m) => String(m.id) === "1");
+    const features = prodModule?.features || [];
+    // Verifica se existe pelo menos uma feature da área de Produtividade ativa
+    return features.some(
+      (f) => ["1", "2", "3", "4", "5"].includes(String(f.id)) && f.isEnabled,
+    );
+  }, [modules]);
+
+  if (!hasActiveFeatures) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+        <div className="text-center bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 max-w-sm w-full animate-in zoom-in-95 duration-500">
+          <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-3xl text-slate-300 dark:text-slate-500 rotate-12">
+            <i className="fas fa-lock"></i>
+          </div>
+          <h2 className="text-xl font-black text-slate-800 dark:text-white mb-2">
+            Acesso Restrito
+          </h2>
+          <p className="text-slate-500 text-xs mb-8 leading-relaxed">
+            Você precisa habilitar pelo menos uma funcionalidade no módulo de{" "}
+            <strong className="text-indigo-600 dark:text-indigo-400">
+              Produtividade
+            </strong>{" "}
+            para criar novos registros.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="w-full py-4 rounded-2xl bg-slate-800 dark:bg-slate-700 text-white font-bold hover:bg-slate-700 active:scale-[0.98] transition-all"
+          >
+            Voltar para o Início
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const isNote = type === TaskType.NOTE;
   const isShopping = type === TaskType.SHOPPING;
   const isGoal = type === TaskType.GOAL;
 
   const actionVerb = isEditing ? "Editando" : "Criando";
-  const confirmText = isEditing ? "SALVAR ALTERAÇÕES" : `CONFIRMAR ${currentConfig.label.toUpperCase()}`;
+  const confirmText = isEditing
+    ? "SALVAR ALTERAÇÕES"
+    : `CONFIRMAR ${currentConfig.label.toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans relative overflow-hidden transition-colors duration-500">
       {/* Background Lights */}
-      <div className={`absolute top-0 right-0 w-[500px] h-[500px] bg-${currentConfig.color}-500/10 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none transition-colors duration-500`}></div>
+      <div
+        className={`absolute top-0 right-0 w-[500px] h-[500px] bg-${currentConfig.color}-500/10 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none transition-colors duration-500`}
+      ></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-500/10 rounded-full blur-[80px] -ml-20 -mb-20 pointer-events-none"></div>
 
       {/* Header */}
@@ -44,19 +89,22 @@ const TaskCreatorView: React.FC = () => {
       </div>
 
       <div className="flex-1 px-6 pb-40 overflow-y-auto no-scrollbar relative z-20">
-        
         {/* 1. Type Selector (Desabilitar se editando para simplificar) */}
         {!isEditing && (
-             <TaskTypeSelector currentType={type} onSelect={form.setType} />
+          <TaskTypeSelector currentType={type} onSelect={form.setType} />
         )}
-        
+
         {isEditing && (
-            <div className="mb-6 flex justify-center">
-                <div className={`bg-${currentConfig.color}-100 dark:bg-${currentConfig.color}-900/30 text-${currentConfig.color}-600 dark:text-${currentConfig.color}-400 px-4 py-2 rounded-2xl flex items-center gap-2`}>
-                    <i className={currentConfig.icon}></i>
-                    <span className="font-bold text-xs uppercase tracking-wider">{currentConfig.label}</span>
-                </div>
+          <div className="mb-6 flex justify-center">
+            <div
+              className={`bg-${currentConfig.color}-100 dark:bg-${currentConfig.color}-900/30 text-${currentConfig.color}-600 dark:text-${currentConfig.color}-400 px-4 py-2 rounded-2xl flex items-center gap-2`}
+            >
+              <i className={currentConfig.icon}></i>
+              <span className="font-bold text-xs uppercase tracking-wider">
+                {currentConfig.label}
+              </span>
             </div>
+          </div>
         )}
 
         {/* 2. Main Input */}
@@ -68,14 +116,24 @@ const TaskCreatorView: React.FC = () => {
           </div>
           <div className="relative">
             <textarea
-              placeholder={isNote ? "Sobre o que é essa nota?" : isShopping ? "O que você quer comprar?" : isGoal ? "O que você quer alcançar?" : "O que você precisa fazer?"}
+              placeholder={
+                isNote
+                  ? "Sobre o que é essa nota?"
+                  : isShopping
+                    ? "O que você quer comprar?"
+                    : isGoal
+                      ? "O que você quer alcançar?"
+                      : "O que você precisa fazer?"
+              }
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               rows={2}
               className="w-full bg-transparent text-3xl sm:text-4xl font-black text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700 outline-none resize-none leading-tight tracking-tight"
               autoFocus
             />
-            <div className={`h-1 w-20 bg-${currentConfig.color}-500 rounded-full mt-4 opacity-50`}></div>
+            <div
+              className={`h-1 w-20 bg-${currentConfig.color}-500 rounded-full mt-4 opacity-50`}
+            ></div>
           </div>
         </div>
 
@@ -99,7 +157,9 @@ const TaskCreatorView: React.FC = () => {
             {confirmText}
           </span>
           <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center relative z-10">
-            <i className={`fas ${isEditing ? 'fa-save' : 'fa-arrow-right'} text-[10px]`}></i>
+            <i
+              className={`fas ${isEditing ? "fa-save" : "fa-arrow-right"} text-[10px]`}
+            ></i>
           </div>
         </button>
       </div>

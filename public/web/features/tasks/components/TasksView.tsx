@@ -15,7 +15,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 /**
  * @author HallTech AI
  * View principal do módulo de Produtividade (Tarefas).
- * Responsável pela composição visual.
  */
 const TasksView: React.FC = () => {
   const {
@@ -37,7 +36,6 @@ const TasksView: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Recarrega a lista se voltar da tela de criação/edição
   useEffect(() => {
     refresh();
   }, [location.key]);
@@ -53,17 +51,12 @@ const TasksView: React.FC = () => {
 
     if (filteredTasks.length === 0) {
       return (
-        <div className="text-center py-10">
-          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-            <i className="fas fa-clipboard-list text-2xl"></i>
+        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+          <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i className="fas fa-clipboard-list text-2xl text-slate-400"></i>
           </div>
-          <p className="text-slate-400 font-bold text-sm">Nenhum item encontrado.</p>
-          <button 
-            onClick={() => navigate('/tasks/new', { state: { defaultType: activeTab } })}
-            className="mt-4 text-indigo-500 font-bold text-xs uppercase tracking-widest hover:underline"
-          >
-            Criar novo item
-          </button>
+          <h3 className="text-slate-800 dark:text-white font-bold mb-1">Nenhum registro encontrado</h3>
+          <p className="text-slate-500 text-sm">Que tal criar algo novo hoje?</p>
         </div>
       );
     }
@@ -72,17 +65,17 @@ const TasksView: React.FC = () => {
       const commonProps = {
         key: task.id,
         task,
-        onToggle: toggleTask,
-        onDelete: deleteTask,
-        onEdit: editTask
+        onToggle: () => toggleTask(task.id),
+        onDelete: () => deleteTask(task.id),
+        onEdit: () => editTask(task)
       };
 
-      if (activeTab === TaskType.DAILY) {
+      // CORREÇÃO: Agora renderiza baseado no TIPO DA TAREFA, e não na Aba Ativa
+      if (task.type === TaskType.DAILY) {
         return <TaskItemDaily {...commonProps} />;
       }
       
-      // Goals e Dreams usam o mesmo componente visual, mas são filtrados separadamente
-      if (activeTab === TaskType.GOAL || activeTab === TaskType.DREAM) {
+      if (task.type === TaskType.GOAL || task.type === TaskType.DREAM) {
         return (
             <TaskItemGoal 
                 {...commonProps} 
@@ -91,18 +84,18 @@ const TasksView: React.FC = () => {
         );
       }
       
-      if (activeTab === TaskType.SHOPPING) {
+      if (task.type === TaskType.SHOPPING) {
         return <TaskItemShopping {...commonProps} />;
       }
       
-      if (activeTab === TaskType.NOTE) {
+      if (task.type === TaskType.NOTE) {
         return (
           <TaskItemNote 
             key={task.id} 
             task={task} 
             onEdit={() => editTask(task)} 
             onDelete={() => deleteTask(task.id)}
-            onArchive={() => toggleTask(task.id)} // Arquivar usa a lógica de toggle completion
+            onArchive={() => toggleTask(task.id)}
             onPin={() => togglePin(task.id)}
           />
         );
@@ -114,12 +107,12 @@ const TasksView: React.FC = () => {
   return (
     <Layout title="Produtividade">
       <div className="space-y-6">
-        <TaskTabs activeTab={activeTab} onTabChange={setActiveTab} config={config} />
+        <TaskTabs activeTab={activeTab} onTabChange={setActiveTab} />
         
         <TaskFilters 
             currentFilter={filter} 
             onFilterChange={setFilter} 
-            activeTab={activeTab} // Passado para alterar o label de Concluído para Arquivado
+            activeTab={activeTab as TaskType}
         />
         
         <div className="space-y-4 pb-20">

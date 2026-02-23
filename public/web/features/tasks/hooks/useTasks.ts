@@ -8,6 +8,7 @@ import { useModules } from "../../modules/hooks/useModules";
  * @author HallTech AI
  * Configuração de visibilidade dos módulos de tarefas.
  */
+export type TaskFilterType = TaskType | "ALL";
 interface TasksConfig {
   enableDaily: boolean;
   enableGoals: boolean;
@@ -27,9 +28,9 @@ export const useTasks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { modules, loading: loadingModules } = useModules();
 
-  // Inicializa a aba ativa baseada na URL ou padrão DAILY
-  const initialTab = (searchParams.get("type") as TaskType) || TaskType.DAILY;
-  const [activeTab, setActiveTabState] = useState<TaskType>(initialTab);
+  // Inicializa a aba ativa baseada na URL ou padrão ALL (Tudo)
+  const initialTab = (searchParams.get("type") as TaskFilterType) || "ALL";
+  const [activeTab, setActiveTabState] = useState<TaskFilterType>(initialTab);
 
   const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
   const [taskList, setTaskList] = useState<Task[]>([]);
@@ -52,10 +53,20 @@ export const useTasks = () => {
   }, [modules]);
 
   // Wrapper para atualizar o estado e a URL ao mesmo tempo
-  const setActiveTab = (tab: TaskType) => {
-    setActiveTabState(tab);
-    setSearchParams({ type: tab });
-  };
+  const setActiveTab = useCallback(
+    (tab: TaskFilterType) => {
+      setActiveTabState(tab);
+      setFilter("all");
+
+      if (tab === "ALL") {
+        searchParams.delete("type");
+      } else {
+        searchParams.set("type", tab);
+      }
+      setSearchParams(searchParams);
+    },
+    [searchParams, setSearchParams],
+  );
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -104,17 +115,16 @@ export const useTasks = () => {
   const filteredTasks = useMemo(() => {
     const list = taskList
       .filter((t) => {
-        if (activeTab === TaskType.DAILY && t.type === TaskType.DAILY)
-          return true;
-        if (activeTab === TaskType.GOAL && t.type === TaskType.GOAL)
-          return true;
-        if (activeTab === TaskType.DREAM && t.type === TaskType.DREAM)
-          return true;
-        if (activeTab === TaskType.SHOPPING && t.type === TaskType.SHOPPING)
-          return true;
-        if (activeTab === TaskType.NOTE && t.type === TaskType.NOTE)
-          return true;
-        return false;
+        // NOVA LÓGICA: Se a aba for "Tudo", verifica se o módulo daquela tarefa está ativo
+        if (activeTab === "ALL") {
+          if (t.type === TaskType.DAILY) return config.enableDaily;
+          if (t.type === TaskType.GOAL) return config.enableGoals;
+          if (t.type === TaskType.DREAM) return config.enableDreams;
+          if (t.type === TaskType.SHOPPING) return config.enableShopping;
+          if (t.type === TaskType.NOTE) return config.enableNotes;
+          return false;
+        }
+        return t.type === activeTab;
       })
       .filter((t) => {
         if (filter === "all") return true;
@@ -130,8 +140,7 @@ export const useTasks = () => {
       if (!a.isPinned && b.isPinned) return 1;
       return 0; // Mantém a ordem original (geralmente por data de criação)
     });
-  }, [taskList, activeTab, filter]);
-
+  }, [taskList, activeTab, filter, config]);
   // --- ACTIONS ---
 
   const toggleTask = async (id: string) => {

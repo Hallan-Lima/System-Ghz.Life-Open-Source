@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { TaskType } from "../../../../domain/tasks.types";
 import { getTaskTypeConfig } from "../../tasks.utils";
+import { useModules } from "../../../modules/hooks/useModules";
 
 interface TaskTypeSelectorProps {
   currentType: TaskType;
@@ -11,17 +12,45 @@ interface TaskTypeSelectorProps {
  * @author HallTech AI
  * Seletor de tipo de tarefa em formato de carrossel.
  */
-const TaskTypeSelector: React.FC<TaskTypeSelectorProps> = ({ currentType, onSelect }) => {
+const TaskTypeSelector: React.FC<TaskTypeSelectorProps> = ({
+  currentType,
+  onSelect,
+}) => {
+  const { modules } = useModules();
+  const features = modules.find((m) => String(m.id) === "1")?.features || [];
+
+  /**
+   * Mapeia os tipos para os IDs das features no banco e filtra os ativos
+   * TODO: Alterar para utilizar o parametro que vem do feature_route do backend, evitando hardcode e garantindo consistência
+   */
+  const availableTypes = useMemo(() => {
+    const allTypes = [
+      { type: TaskType.DAILY, featureId: "1" },
+      { type: TaskType.GOAL, featureId: "2" },
+      { type: TaskType.DREAM, featureId: "3" },
+      { type: TaskType.SHOPPING, featureId: "4" },
+      { type: TaskType.NOTE, featureId: "5" },
+    ];
+
+    return allTypes
+      .filter((item) => features.find((f) => String(f.id) === item.featureId)?.isEnabled)
+      .map((item) => item.type);
+  }, [features]);
+
+  // Segurança: Se a página abrir num tipo que está desativado, força a seleção para o primeiro disponível
+  useEffect(() => {
+    if (availableTypes.length > 0 && !availableTypes.includes(currentType)) {
+      onSelect(availableTypes[0]);
+    }
+  }, [availableTypes, currentType, onSelect]);
+
+  // Prevenção de quebra: Se não houver nada ativo, oculta o carrossel
+  if (availableTypes.length === 0) return null;
+  
   return (
     <div className="mb-10">
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-6 -mx-6 px-6 snap-x">
-        {[
-          TaskType.DAILY,
-          TaskType.NOTE,
-          TaskType.GOAL,
-          TaskType.DREAM,
-          TaskType.SHOPPING,
-        ].map((t) => {
+        {availableTypes.map((t) => {
           const config = getTaskTypeConfig(t);
           const isActive = currentType === t;
           return (
