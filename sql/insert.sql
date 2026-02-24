@@ -53,7 +53,7 @@ INSERT INTO sys_module (id, title, sys_status_id, icon, color, description, rout
 
 -- --- MÓDULO 1: PRODUTIVIDADE (Ativo) ---
 INSERT INTO sys_module_functionality (sys_module_id, title, sys_status_id, router_link, icon, description) VALUES 
-(1, 'Tarefas Diárias', 1, '/tasks?type=DAILY', 'fas fa-check-double', 'Checklists de rotina'),
+(1, 'Tarefas', 1, '/tasks?type=DAILY', 'fas fa-check-double', 'Checklists de rotina'),
 (1, 'Metas & Objetivos', 1, '/tasks?type=GOAL', 'fas fa-bullseye', 'Metas quantitativas'),
 (1, 'Sonhos', 1, '/tasks?type=DREAM', 'fas fa-plane', 'Visão de longo prazo'),
 (1, 'Listas de Compras', 1, '/tasks?type=SHOPPING', 'fas fa-cart-shopping', 'Controle de itens e valores'),

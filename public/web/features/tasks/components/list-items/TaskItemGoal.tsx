@@ -134,10 +134,10 @@ const TaskItemGoal: React.FC<TaskItemGoalProps> = ({ task, onToggle, onDelete, o
           {/* Header do Progresso */}
           <div className="flex justify-between items-end mb-1">
              <span className={`text-3xl font-black ${iconColor}`}>
-                 {Math.round(task.progress || 0)}%
+           {Math.round(task.progress || 0)}%
              </span>
              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                 Concluído
+           {Math.round(task.progress || 0) >= 100 ? "Concluído" : "Em Progresso"}
              </span>
           </div>
 
@@ -150,61 +150,61 @@ const TaskItemGoal: React.FC<TaskItemGoalProps> = ({ task, onToggle, onDelete, o
           <div className="mt-3 flex items-center justify-between">
               
               {!isUpdating ? (
-                  // VISUALIZAÇÃO PADRÃO
-                  <>
-                    <div className="flex flex-col">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Atual</span>
-                        <span className="font-bold text-slate-700 dark:text-slate-200 text-sm sm:text-base">
-                            {formatValue(task.currentValue)}
-                        </span>
-                    </div>
+            // VISUALIZAÇÃO PADRÃO
+            <>
+              <div className="flex flex-col">
+            <span className="text-[10px] text-slate-400 font-bold uppercase">Atual</span>
+            <span className="font-bold text-slate-700 dark:text-slate-200 text-sm sm:text-base">
+                {formatValue(task.currentValue)}
+            </span>
+              </div>
 
-                    <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+              <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
 
-                    <div className="flex flex-col text-right">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Meta</span>
-                        <span className="font-bold text-slate-700 dark:text-slate-200 text-sm sm:text-base">
-                             {formatValue(task.targetValue)}
-                        </span>
-                    </div>
-                    
-                    {/* Botão de Atualizar Rápido */}
-                    <button 
-                        onClick={handleToggleMode}
-                        className={`ml-3 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-all text-white ${progressColor}`}
-                        title="Atualizar valor"
-                    >
-                        <i className="fas fa-plus text-sm"></i>
-                    </button>
-                  </>
+              <div className="flex flex-col text-right">
+            <span className="text-[10px] text-slate-400 font-bold uppercase">Meta</span>
+            <span className="font-bold text-slate-700 dark:text-slate-200 text-sm sm:text-base">
+                 {formatValue(task.targetValue)}
+            </span>
+              </div>
+              
+              {/* Botão de Atualizar Rápido */}
+              <button 
+            onClick={handleToggleMode}
+            className={`ml-3 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-all text-white ${progressColor}`}
+            title="Atualizar valor"
+              >
+            <i className="fas fa-plus text-sm"></i>
+              </button>
+            </>
               ) : (
-                  // MODO DE EDIÇÃO
-                  <div className="flex w-full items-center gap-2 animate-in fade-in zoom-in duration-200">
-                      <div className="flex-1 relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">
-                             {getEditPrefix()}
-                          </span>
-                          <input 
-                            type="number"
-                            autoFocus
-                            value={tempValue}
-                            onChange={(e) => setTempValue(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-800 border-2 border-indigo-500 rounded-xl py-2 pl-8 pr-2 text-sm font-bold text-slate-800 dark:text-white outline-none"
-                          />
-                      </div>
-                      <button 
-                        onClick={handleSaveValue}
-                        className="bg-emerald-500 text-white p-2.5 rounded-xl shadow-lg active:scale-95"
-                      >
-                          <i className="fas fa-check"></i>
-                      </button>
-                      <button 
-                        onClick={handleToggleMode}
-                        className="bg-slate-200 dark:bg-slate-700 text-slate-500 p-2.5 rounded-xl active:scale-95"
-                      >
-                          <i className="fas fa-times"></i>
-                      </button>
-                  </div>
+            // MODO DE EDIÇÃO
+            <div className="flex w-full items-center gap-2 animate-in fade-in zoom-in duration-200">
+                <div className="flex-1 relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">
+                 {getEditPrefix()}
+              </span>
+              <input 
+                type="number"
+                autoFocus
+                value={tempValue}
+                onChange={(e) => setTempValue(e.target.value)}
+                className="w-full bg-white dark:bg-slate-800 border-2 border-indigo-500 rounded-xl py-2 pl-8 pr-2 text-sm font-bold text-slate-800 dark:text-white outline-none"
+              />
+                </div>
+                <button 
+            onClick={handleSaveValue}
+            className="bg-emerald-500 text-white p-2.5 rounded-xl shadow-lg active:scale-95"
+                >
+              <i className="fas fa-check"></i>
+                </button>
+                <button 
+            onClick={handleToggleMode}
+            className="bg-slate-200 dark:bg-slate-700 text-slate-500 p-2.5 rounded-xl active:scale-95"
+                >
+              <i className="fas fa-times"></i>
+                </button>
+            </div>
               )}
           </div>
         </div>

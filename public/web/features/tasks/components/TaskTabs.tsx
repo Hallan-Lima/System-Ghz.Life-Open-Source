@@ -25,7 +25,7 @@ const TaskTabs: React.FC<TaskTabsProps> = ({ activeTab, onTabChange }) => {
 
   const availableTabs = useMemo(() => {
     const featureTabs = [
-      { id: 'DAILY', label: 'Rotina', icon: 'fas fa-check-double', show: isFeatureEnabled('1') },
+      { id: 'DAILY', label: 'Tarefas', icon: 'fas fa-check-double', show: isFeatureEnabled('1') },
       { id: 'GOAL', label: 'Metas', icon: 'fas fa-bullseye', show: isFeatureEnabled('2') },
       { id: 'DREAM', label: 'Sonhos', icon: 'fas fa-plane', show: isFeatureEnabled('3') },
       { id: 'SHOPPING', label: 'Compras', icon: 'fas fa-cart-shopping', show: isFeatureEnabled('4') },
