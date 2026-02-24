@@ -72,12 +72,28 @@ const TaskItemGoal: React.FC<TaskItemGoalProps> = ({
     setIsUpdating(!isUpdating);
   };
 
-  const handleSaveValue = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const numVal = parseFloat(tempValue);
+  const handleSaveValue = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.stopPropagation();
+
+    const normalizedValue = tempValue.trim().replace(",", ".");
+    const numVal = parseFloat(normalizedValue);
+
     if (!isNaN(numVal) && onUpdateValue) {
       onUpdateValue(task.id, numVal);
       setIsUpdating(false);
+    } else {
+      setIsUpdating(false);
+      setTempValue(task.currentValue?.toString() || "0");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (e.key === "Enter") {
+      handleSaveValue(e);
+    } else if (e.key === "Escape") {
+      setIsUpdating(false);
+      setTempValue(task.currentValue?.toString() || "0");
     }
   };
 
@@ -210,20 +226,27 @@ const TaskItemGoal: React.FC<TaskItemGoalProps> = ({
                   </span>
                   <input
                     type="number"
+                    step="any" /* MÁGICA: Permite números decimais sem bugar o navegador */
                     autoFocus
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
+                    onKeyDown={handleKeyDown} /* Adicionado evento de teclado */
                     className="w-full bg-white dark:bg-slate-800 border-2 border-indigo-500 rounded-xl py-2 pl-8 pr-2 text-sm font-bold text-slate-800 dark:text-white outline-none"
                   />
                 </div>
                 <button
+                  type="button" /* Proteção contra reload acidental */
                   onClick={handleSaveValue}
                   className="bg-emerald-500 text-white p-2.5 rounded-xl shadow-lg active:scale-95"
                 >
                   <i className="fas fa-check"></i>
                 </button>
                 <button
-                  onClick={handleToggleMode}
+                  type="button" /* Proteção contra reload acidental */
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsUpdating(false);
+                  }}
                   className="bg-slate-200 dark:bg-slate-700 text-slate-500 p-2.5 rounded-xl active:scale-95"
                 >
                   <i className="fas fa-times"></i>

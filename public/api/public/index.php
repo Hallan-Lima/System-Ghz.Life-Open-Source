@@ -37,9 +37,11 @@ $routes = [
     ['POST',   '#^/api/tasks$#',                        TaskController::class, 'create'],
     ['PUT',    '#^/api/tasks/([a-zA-Z0-9-]+)$#',        TaskController::class, 'update'],
     ['DELETE', '#^/api/tasks/([a-zA-Z0-9-]+)$#',        TaskController::class, 'delete'],
-    
-    // rota customizada (Toggle Status)
-    ['PATCH',  '#^/api/tasks/([a-zA-Z0-9-]+)/toggle$#', TaskController::class, 'toggle'],
+
+    // rotas customizadas (Ações Específicas)
+    ['PATCH',  '#^/api/tasks/([a-zA-Z0-9-]+)/toggle$#',   TaskController::class, 'toggle'],
+    ['PATCH',  '#^/api/tasks/([a-zA-Z0-9-]+)/progress$#', TaskController::class, 'updateProgress'],
+    ['PATCH',  '#^/api/tasks/([a-zA-Z0-9-]+)/pin$#',      TaskController::class, 'pin'],
 
     // --- Módulo: Auth ---
     ['POST', '#^/api/auth/register$#', AuthController::class, 'register'],
