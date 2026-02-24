@@ -58,25 +58,25 @@ class TaskService
         $tagsJson = !empty($payload['tags']) ? json_encode($payload['tags']) : null;
         
         $stmt->execute([
-            'user_id' => $payload['user_id'],
-            'type' => $payload['type'],
-            'title' => $payload['title'],
-            'priority' => $payload['priority'],
-            'content' => $payload['content'],
-            'notes' => $payload['notes'],
+            'user_id' => $payload['user_id'] ?? null,
+            'type' => $payload['type'] ?? 'task',
+            'title' => $payload['title'] ?? '',
+            'priority' => $payload['priority'] ?? 'medium',
+            'content' => $payload['content'] ?? '',
+            'notes' => $payload['notes'] ?? '',
             'tags' => $tagsJson,
-            'due_date' => $payload['dueDate'],
-            'recurrence' => $payload['recurrence'],
-            'target_value' => $payload['targetValue'],
-            'current_value' => $payload['currentValue'],
-            'estimated_cost' => $payload['estimatedCost'],
-            'unit' => $payload['unit'],
+            'due_date' => $payload['dueDate'] ?? null,
+            'recurrence' => $payload['recurrence'] ?? 'none',
+            'target_value' => $payload['targetValue'] ?? 0,
+            'current_value' => $payload['currentValue'] ?? 0,
+            'estimated_cost' => $payload['estimatedCost'] ?? 0,
+            'unit' => $payload['unit'] ?? 'un',
             'progress' => $payload['progress'] ?? 0,
             'completed' => ($payload['completed'] ?? false) ? 1 : 0
         ]);
         
         $result = $stmt->fetch();
-        $payload['id'] = (string) $result['new_id'];
+        $payload['id'] = isset($result['new_id']) ? (string) $result['new_id'] : null;
         return $payload;
     }
 
