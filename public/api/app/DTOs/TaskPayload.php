@@ -24,7 +24,12 @@ class TaskPayload
             'completed' => $data['completed'] ?? false,  // Status de conclusão
             'estimatedCost' => $data['estimatedCost'] ?? null,
             'unit' => $data['unit'] ?? 'un',
-            'recurrence' => $data['recurrence'] ?? null
+            'recurrence' => $data['recurrence'] ?? null,
+            'priorityMode' => $data['priorityMode'] ?? 'manual',
+            'priorityScore' => $data['priorityScore'] ?? 0,
+            'necessity' => $data['necessity'] ?? 0,
+            'satisfaction' => $data['satisfaction'] ?? 0,
+            'frequency' => $data['frequency'] ?? 0,
         ];
     }
 }

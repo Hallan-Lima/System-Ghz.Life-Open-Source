@@ -33,6 +33,11 @@ class TaskService
                 'type' => $row['type'],
                 'title' => $row['title'],
                 'priority' => $row['priority'],
+                'priorityMode' => $row['priorityMode'] ?? 'manual',
+                'priorityScore' => (int) ($row['priorityScore'] ?? 0),
+                'necessity' => (int) ($row['necessity'] ?? 0),
+                'satisfaction' => (int) ($row['satisfaction'] ?? 0),
+                'frequency' => (int) ($row['frequency'] ?? 0),
                 'completed' => (bool) $row['completed'],
                 'isPinned' => (bool) $row['isPinned'],
                 'dueDate' => $row['dueDate'],
@@ -53,23 +58,33 @@ class TaskService
 
     public function create(array $payload): array
     {
-        $stmt = $this->db->prepare("CALL sp_app_task_create(:user_id, :type, :title, :priority, :content, :notes, :tags, :due_date, :recurrence, :target_value, :current_value, :estimated_cost, :unit, :progress, :completed)");
+        $stmt = $this->db->prepare("CALL sp_app_task_create(
+            :user_id, :type, :title, :priority, 
+            :priority_mode, :priority_score, :priority_necessity, :priority_satisfaction, :priority_frequency, 
+            :content, :notes, :tags, :due_date, :recurrence, :target_value, :current_value, 
+            :estimated_cost, :unit, :progress, :completed
+        )");
         
         $tagsJson = !empty($payload['tags']) ? json_encode($payload['tags']) : null;
         
         $stmt->execute([
             'user_id' => $payload['user_id'] ?? null,
-            'type' => $payload['type'] ?? 'task',
+            'type' => $payload['type'] ?? 'DAILY',
             'title' => $payload['title'] ?? '',
-            'priority' => $payload['priority'] ?? 'medium',
-            'content' => $payload['content'] ?? '',
-            'notes' => $payload['notes'] ?? '',
+            'priority' => $payload['priority'] ?? 'MEDIUM',
+            'priority_mode' => $payload['priorityMode'] ?? 'manual',
+            'priority_score' => $payload['priorityScore'] ?? 0,
+            'priority_necessity' => $payload['necessity'] ?? 0,
+            'priority_satisfaction' => $payload['satisfaction'] ?? 0,
+            'priority_frequency' => $payload['frequency'] ?? 0,
+            'content' => $payload['content'] ?? null,
+            'notes' => $payload['notes'] ?? null,
             'tags' => $tagsJson,
             'due_date' => $payload['dueDate'] ?? null,
-            'recurrence' => $payload['recurrence'] ?? 'none',
-            'target_value' => $payload['targetValue'] ?? 0,
-            'current_value' => $payload['currentValue'] ?? 0,
-            'estimated_cost' => $payload['estimatedCost'] ?? 0,
+            'recurrence' => $payload['recurrence'] ?? null,
+            'target_value' => $payload['targetValue'] ?? null,
+            'current_value' => $payload['currentValue'] ?? null,
+            'estimated_cost' => $payload['estimatedCost'] ?? null,
             'unit' => $payload['unit'] ?? 'un',
             'progress' => $payload['progress'] ?? 0,
             'completed' => ($payload['completed'] ?? false) ? 1 : 0
@@ -77,12 +92,18 @@ class TaskService
         
         $result = $stmt->fetch();
         $payload['id'] = isset($result['new_id']) ? (string) $result['new_id'] : null;
+        
         return $payload;
     }
 
     public function update(string $id, array $payload): array
     {
-        $stmt = $this->db->prepare("CALL sp_app_task_update(:id, :title, :priority, :content, :notes, :tags, :due_date, :recurrence, :target_value, :current_value, :estimated_cost, :unit, :progress, :completed)");
+        $stmt = $this->db->prepare("CALL sp_app_task_update(
+            :id, :title, :priority, 
+            :priority_mode, :priority_score, :priority_necessity, :priority_satisfaction, :priority_frequency, 
+            :content, :notes, :tags, :due_date, :recurrence, :target_value, :current_value, 
+            :estimated_cost, :unit, :progress, :completed
+        )");
         
         $tagsJson = !empty($payload['tags']) ? json_encode($payload['tags']) : null;
         
@@ -90,6 +111,11 @@ class TaskService
             'id' => $id,
             'title' => $payload['title'],
             'priority' => $payload['priority'],
+            'priority_mode' => $payload['priorityMode'],
+            'priority_score' => $payload['priorityScore'],
+            'priority_necessity' => $payload['necessity'],
+            'priority_satisfaction' => $payload['satisfaction'],
+            'priority_frequency' => $payload['frequency'],
             'content' => $payload['content'],
             'notes' => $payload['notes'],
             'tags' => $tagsJson,

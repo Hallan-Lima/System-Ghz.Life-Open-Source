@@ -62,6 +62,10 @@ export const useTaskCreator = () => {
       setRecurrence(taskToEdit.recurrence || "none");
       setNotes(taskToEdit.content || taskToEdit.notes || "");
       setTags(taskToEdit.tags || []);
+      setPriorityMode(taskToEdit.priorityMode || "manual");
+      setNecessity(taskToEdit.necessity ?? 50);
+      setSatisfaction(taskToEdit.satisfaction ?? 50);
+      setFrequency(taskToEdit.frequency ?? 50);
     }
   }, [taskToEdit]);
 
@@ -95,11 +99,25 @@ export const useTaskCreator = () => {
       const finalCurrent = currentValue ? Number(currentValue) : undefined;
       const initialProgress = finalTarget && finalCurrent ? Math.round((finalCurrent / finalTarget) * 100) : 0;
 
+      let finalPriorityScore = 50;
+      if (priorityMode === "auto") {
+        finalPriorityScore = Math.round((necessity + satisfaction + frequency) / 3);
+      } else {
+        if (priority === TaskPriority.HIGH) finalPriorityScore = 100;
+        else if (priority === TaskPriority.MEDIUM) finalPriorityScore = 50;
+        else if (priority === TaskPriority.LOW) finalPriorityScore = 10;
+      }
+
       const commonData = {
         user_id: userId,
         type,
         title,
-        priority: type === TaskType.NOTE ? TaskPriority.LOW : priority,
+        priority,
+        priorityMode,               // 'manual' ou 'auto'
+        priorityScore: finalPriorityScore, // De 0 a 100
+        necessity,                  // Valor original do Slider
+        satisfaction,               // Valor original do Slider
+        frequency,                  // Valor original do Slider
         dueDate,
         targetValue: finalTarget,
         currentValue: finalCurrent,

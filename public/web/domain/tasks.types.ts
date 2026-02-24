@@ -48,6 +48,12 @@ export interface Task {
   // Agendamento
   dueDate?: string;
   recurrence?: RecurrenceInterval;
+
+  priorityMode?: "manual" | "auto";
+  priorityScore?: number;
+  necessity?: number;
+  satisfaction?: number;
+  frequency?: number;
   
   // Específico para GOAL/DREAM
   progress?: number;

@@ -133,14 +133,13 @@ export const useTasks = () => {
         return true;
       });
 
-    // Ordenação: 1º Fixados, 2º Prioridade, 3º Data, 4º Título Alfabético
+    // Ordenação (Cascata de 5 Regras)
     return list.sort((a, b) => {
-      // 1. Itens fixados (Pinned) vêm primeiro, independente de qualquer coisa
+      // REGRA 1: Itens fixados (Pinned) vêm primeiro, ignorando todas as outras regras
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
 
-      // 2. Prioridade (HIGH > MEDIUM > LOW)
-      // Mapeamos os valores de texto para peso numérico para o JS conseguir comparar
+      // REGRA 2: Grupo de Prioridade (Todas as HIGH juntas, depois MEDIUM, depois LOW)
       const priorityWeight: Record<string, number> = {
         HIGH: 3,
         MEDIUM: 2,
@@ -149,20 +148,36 @@ export const useTasks = () => {
       const pA = priorityWeight[a.priority as string] || 2; // Padrão: 2 (Medium)
       const pB = priorityWeight[b.priority as string] || 2;
 
-      if (pA !== pB) return pB - pA; // Maior peso vem antes
+      if (pA !== pB) return pB - pA; // Maior peso de grupo vem antes
 
-      // 3. Data (dueDate) - Mais antigas / mais próximas do vencimento primeiro
+      // REGRA 3: Score de Prioridade (Calculado internamente no grupo - Maior pro menor)
+      const getScore = (task: typeof a) => {
+        if (task.priorityScore !== undefined && task.priorityScore !== null) {
+          return task.priorityScore;
+        }
+        // Fallback caso a tarefa seja antiga e não tenha score salvo no banco
+        if (task.priority === "HIGH") return 100;
+        if (task.priority === "LOW") return 10;
+        return 50;
+      };
+
+      const scoreA = getScore(a);
+      const scoreB = getScore(b);
+
+      if (scoreA !== scoreB) return scoreB - scoreA; // Desempata pelo Score
+
+      // REGRA 4: Data de Vencimento (dueDate) - Vencem primeiro ficam no topo
       if (a.dueDate && b.dueDate) {
         const dateA = new Date(a.dueDate).getTime();
         const dateB = new Date(b.dueDate).getTime();
-        if (dateA !== dateB) return dateA - dateB;
+        if (dateA !== dateB) return dateA - dateB; // Desempata pela data
       } else if (a.dueDate && !b.dueDate) {
-        return -1; // Se A tem data e B não tem, A vem primeiro
+        return -1; // Tarefa com prazo vence a que não tem prazo
       } else if (!a.dueDate && b.dueDate) {
-        return 1; // Se B tem data e A não tem, B vem primeiro
+        return 1;
       }
 
-      // 4. Ordem Alfabética do Título (Como critério de desempate final)
+      // REGRA 5: Ordem Alfabética (Critério final se data e score forem idênticos)
       const titleA = a.title || "";
       const titleB = b.title || "";
       return titleA.localeCompare(titleB);

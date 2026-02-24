@@ -47,7 +47,7 @@ const TaskTabs: React.FC<TaskTabsProps> = ({ activeTab, onTabChange }) => {
     }
   }, [activeTab, availableTabs, onTabChange]);
 
-  if (availableTabs.length <= 1) return null; // Não mostra menu se tiver apenas a aba Tudo
+  if (availableTabs.length <= 1) return null;
 
   return (
     <div className="flex gap-3 overflow-x-auto pb-4 hide-scrollbar">
