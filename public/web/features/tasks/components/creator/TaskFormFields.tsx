@@ -1,6 +1,14 @@
 import React from "react";
-import { TaskType, TaskPriority, RecurrenceInterval } from "../../../../domain/tasks.types";
-import { getNecessityLabel, getSatisfactionLabel, getFrequencyLabel } from "../../tasks.utils";
+import {
+  TaskType,
+  TaskPriority,
+  RecurrenceInterval,
+} from "../../../../domain/tasks.types";
+import {
+  getNecessityLabel,
+  getSatisfactionLabel,
+  getFrequencyLabel,
+} from "../../tasks.utils";
 
 interface TaskFormFieldsProps {
   form: any;
@@ -13,36 +21,57 @@ interface TaskFormFieldsProps {
  */
 const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
   const {
-    type, cost, setCost, targetValue, setTargetValue, unit, setUnit,
-    currentValue, setCurrentValue, // Novo campo desestruturado
-    recurrence, setRecurrence, dueDate, setDueDate,
-    priorityMode, setPriorityMode, priority, setPriority,
-    necessity, setNecessity, satisfaction, setSatisfaction, frequency, setFrequency,
-    tags, tagInput, setTagInput, notes, setNotes
+    type,
+    cost,
+    setCost,
+    targetValue,
+    setTargetValue,
+    unit,
+    setUnit,
+    currentValue,
+    setCurrentValue, // Novo campo desestruturado
+    recurrence,
+    setRecurrence,
+    dueDate,
+    setDueDate,
+    priorityMode,
+    setPriorityMode,
+    priority,
+    setPriority,
+    necessity,
+    setNecessity,
+    satisfaction,
+    setSatisfaction,
+    frequency,
+    setFrequency,
+    tags,
+    tagInput,
+    setTagInput,
+    notes,
+    setNotes,
   } = form;
 
   const { handleAddTag, removeTag } = actions;
-  
+
   const isShopping = type === TaskType.SHOPPING;
   const isNote = type === TaskType.NOTE;
   const isGoalOrDream = type === TaskType.GOAL || type === TaskType.DREAM;
 
   // Verifica se a unidade atual é uma moeda conhecida
-  const isFinancial = ['BRL', 'USD', 'EUR'].includes(unit);
+  const isFinancial = ["BRL", "USD", "EUR"].includes(unit);
 
   // Função para alternar entre modo Financeiro e Personalizado
   const toggleUnitMode = () => {
-      if (isFinancial) {
-          setUnit('un'); // Volta para genérico
-      } else {
-          setUnit('BRL'); // Vai para moeda padrão
-      }
+    if (isFinancial) {
+      setUnit("un"); // Volta para genérico
+    } else {
+      setUnit("BRL"); // Vai para moeda padrão
+    }
   };
 
   return (
     <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/50 dark:border-slate-800 rounded-[2.5rem] p-1 shadow-xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
       <div className="p-6 space-y-8">
-        
         {/* SHOPPING: Valor Estimado */}
         {isShopping && (
           <div className="space-y-3">
@@ -67,83 +96,90 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
         {/* GOALS/DREAMS: Meta, Valor Atual e Unidade */}
         {isGoalOrDream && (
           <div className="space-y-6">
-            
             {/* Linha 1: Saldo Atual (Opcional, mas destacado) */}
             <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                  Já tenho (Saldo Atual)
-                </label>
-                <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-transparent focus-within:ring-2 focus-within:ring-indigo-500 transition-all overflow-hidden">
-                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
-                        {isFinancial ? 'R$' : '#'}
-                     </span>
-                     <input
-                        type="number"
-                        placeholder="0"
-                        value={currentValue}
-                        onChange={(e) => setCurrentValue(e.target.value)}
-                        className="w-full bg-transparent text-slate-800 dark:text-white text-lg font-bold p-4 pl-10 outline-none"
-                    />
-                </div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                Já tenho (Saldo Atual)
+              </label>
+              <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-transparent focus-within:ring-2 focus-within:ring-indigo-500 transition-all overflow-hidden">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                  {isFinancial ? "R$" : "#"}
+                </span>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={currentValue}
+                  onChange={(e) => setCurrentValue(e.target.value)}
+                  className="w-full bg-transparent text-slate-800 dark:text-white text-lg font-bold p-4 pl-10 outline-none"
+                />
+              </div>
             </div>
 
             {/* Linha 2: Meta e Unidade */}
             <div className="grid grid-cols-5 gap-4">
-                <div className="col-span-3 space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                        Meta Alvo
-                    </label>
-                    <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm pointer-events-none z-10">
-                            {isFinancial ? 'R$' : '#'}
-                        </span>
-                        <input
-                            type="number"
-                            placeholder="100"
-                            min="1"
-                            value={targetValue}
-                            onChange={(e) => setTargetValue(e.target.value)}
-                            className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 pl-10 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                        />
-                    </div>
+              <div className="col-span-3 space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                  Meta Alvo
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm pointer-events-none z-10">
+                    {isFinancial ? "R$" : "#"}
+                  </span>
+                  <input
+                    type="number"
+                    placeholder="100"
+                    min="1"
+                    value={targetValue}
+                    onChange={(e) => setTargetValue(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 pl-10 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
                 </div>
-                
-                <div className="col-span-2 space-y-3">
-                    <div className="flex justify-between items-center px-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            Unidade
-                        </label>
-                        {/* Botão Toggle Tipo de Unidade */}
-                        <button 
-                            type="button"
-                            onClick={toggleUnitMode}
-                            className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-md"
-                            title={isFinancial ? "Mudar para Texto Livre" : "Mudar para Moeda"}
-                        >
-                            {isFinancial ? <i className="fas fa-font"></i> : <i className="fas fa-dollar-sign"></i>}
-                        </button>
-                    </div>
+              </div>
 
+              <div className="col-span-2 space-y-3">
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Unidade
+                  </label>
+                  {/* Botão Toggle Tipo de Unidade */}
+                  <button
+                    type="button"
+                    onClick={toggleUnitMode}
+                    className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-md"
+                    title={
+                      isFinancial
+                        ? "Mudar para Texto Livre"
+                        : "Mudar para Moeda"
+                    }
+                  >
                     {isFinancial ? (
-                        <select
-                        value={unit}
-                        onChange={(e) => setUnit(e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-amber-500 outline-none transition-all appearance-none cursor-pointer"
-                        >
-                        <option value="BRL">R$ (BRL)</option>
-                        <option value="USD">$ (USD)</option>
-                        <option value="EUR">€ (EUR)</option>
-                        </select>
+                      <i className="fas fa-font"></i>
                     ) : (
-                        <input
-                        type="text"
-                        placeholder="Kg, un..."
-                        value={unit}
-                        onChange={(e) => setUnit(e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-center"
-                        />
+                      <i className="fas fa-dollar-sign"></i>
                     )}
+                  </button>
                 </div>
+
+                {isFinancial ? (
+                  <select
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-amber-500 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="BRL">R$ (BRL)</option>
+                    <option value="USD">$ (USD)</option>
+                    <option value="EUR">€ (EUR)</option>
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="Kg, un..."
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white text-xl font-bold p-4 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-center"
+                  />
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -157,9 +193,21 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
               {[
                 { val: "none", label: "Não repetir", icon: "fas fa-ban" },
-                { val: "daily", label: "Diariamente", icon: "fas fa-calendar-day" },
-                { val: "weekly", label: "Semanalmente", icon: "fas fa-calendar-week" },
-                { val: "monthly", label: "Mensalmente", icon: "fas fa-calendar" },
+                {
+                  val: "daily",
+                  label: "Diariamente",
+                  icon: "fas fa-calendar-day",
+                },
+                {
+                  val: "weekly",
+                  label: "Semanalmente",
+                  icon: "fas fa-calendar-week",
+                },
+                {
+                  val: "monthly",
+                  label: "Mensalmente",
+                  icon: "fas fa-calendar",
+                },
               ].map((opt) => (
                 <button
                   key={opt.val}
@@ -192,7 +240,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
               </div>
               <input
                 type="date"
-                value={dueDate}
+                value={dueDate ? String(dueDate).substring(0, 10) : ""}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-bold p-4 pl-16 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all appearance-none"
               />
@@ -236,23 +284,29 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
             {/* SELEÇÃO MANUAL */}
             {priorityMode === "manual" && (
               <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-950/50 p-1.5 rounded-2xl animate-fade-in">
-                {[TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH].map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPriority(p)}
-                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${
-                      priority === p
-                        ? p === TaskPriority.HIGH
-                          ? "bg-rose-500 text-white shadow-rose-500/30 transform scale-[1.02]"
-                          : p === TaskPriority.MEDIUM
-                            ? "bg-amber-500 text-white shadow-amber-500/30 transform scale-[1.02]"
-                            : "bg-slate-500 text-white shadow-slate-500/30 transform scale-[1.02]"
-                        : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-transparent opacity-60 hover:opacity-100"
-                    }`}
-                  >
-                    {p === TaskPriority.LOW ? "Baixa" : p === TaskPriority.MEDIUM ? "Média" : "Alta"}
-                  </button>
-                ))}
+                {[TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH].map(
+                  (p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPriority(p)}
+                      className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${
+                        priority === p
+                          ? p === TaskPriority.HIGH
+                            ? "bg-rose-500 text-white shadow-rose-500/30 transform scale-[1.02]"
+                            : p === TaskPriority.MEDIUM
+                              ? "bg-amber-500 text-white shadow-amber-500/30 transform scale-[1.02]"
+                              : "bg-slate-500 text-white shadow-slate-500/30 transform scale-[1.02]"
+                          : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-transparent opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      {p === TaskPriority.LOW
+                        ? "Baixa"
+                        : p === TaskPriority.MEDIUM
+                          ? "Média"
+                          : "Alta"}
+                    </button>
+                  ),
+                )}
               </div>
             )}
 
@@ -260,31 +314,56 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
             {priorityMode === "auto" && (
               <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8 animate-fade-in mt-2">
                 {[
-                  { label: "Necessidade", icon: "fas fa-bolt", color: "indigo", val: necessity, set: setNecessity, labelFn: getNecessityLabel },
-                  { label: "Satisfação", icon: "fas fa-heart", color: "purple", val: satisfaction, set: setSatisfaction, labelFn: getSatisfactionLabel },
-                  { label: "Frequência", icon: "fas fa-calendar-alt", color: "cyan", val: frequency, set: setFrequency, labelFn: getFrequencyLabel },
+                  {
+                    label: "Necessidade",
+                    icon: "fas fa-bolt",
+                    color: "indigo",
+                    val: necessity,
+                    set: setNecessity,
+                    labelFn: getNecessityLabel,
+                  },
+                  {
+                    label: "Satisfação",
+                    icon: "fas fa-heart",
+                    color: "purple",
+                    val: satisfaction,
+                    set: setSatisfaction,
+                    labelFn: getSatisfactionLabel,
+                  },
+                  {
+                    label: "Frequência",
+                    icon: "fas fa-calendar-alt",
+                    color: "cyan",
+                    val: frequency,
+                    set: setFrequency,
+                    labelFn: getFrequencyLabel,
+                  },
                 ].map((item) => (
-                    <div key={item.label} className="space-y-4">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                                    <i className={`${item.icon} text-${item.color}-400`}></i>
-                                    {item.label}
-                                </label>
-                            </div>
-                            <span className={`text-xs font-bold text-${item.color}-600 bg-${item.color}-50 dark:bg-${item.color}-900/30 px-3 py-1.5 rounded-xl border border-${item.color}-100 dark:border-${item.color}-800 min-w-[80px] text-center`}>
-                                {item.labelFn(item.val)}
-                            </span>
-                        </div>
-                        <input
-                            type="range"
-                            min="1"
-                            max="100"
-                            value={item.val}
-                            onChange={(e) => item.set(Number(e.target.value))}
-                            className={`w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-${item.color}-600 hover:accent-${item.color}-500 transition-all focus:outline-none`}
-                        />
+                  <div key={item.label} className="space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <label className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                          <i
+                            className={`${item.icon} text-${item.color}-400`}
+                          ></i>
+                          {item.label}
+                        </label>
+                      </div>
+                      <span
+                        className={`text-xs font-bold text-${item.color}-600 bg-${item.color}-50 dark:bg-${item.color}-900/30 px-3 py-1.5 rounded-xl border border-${item.color}-100 dark:border-${item.color}-800 min-w-[80px] text-center`}
+                      >
+                        {item.labelFn(item.val)}
+                      </span>
                     </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="100"
+                      value={item.val}
+                      onChange={(e) => item.set(Number(e.target.value))}
+                      className={`w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-${item.color}-600 hover:accent-${item.color}-500 transition-all focus:outline-none`}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -293,64 +372,81 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
 
         {/* Shopping Link */}
         {isShopping && (
-            <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
+          <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                Link do Produto
+              Link do Produto
             </label>
             <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:text-white transition-all">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:text-white transition-all">
                 <i className="fas fa-link text-sm"></i>
-                </div>
-                <input
+              </div>
+              <input
                 type="url"
                 placeholder="https://exemplo.com/produto"
                 className="w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 pl-16 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all text-sm"
-                />
+              />
             </div>
-            </div>
+          </div>
         )}
 
         {/* Notes & Tags */}
-        <div className={`pt-4 ${isNote ? "" : "border-t border-slate-200 dark:border-slate-700"} space-y-6`}>
-            {/* Tags Input */}
-            <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Tags</label>
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500 transition-all flex flex-wrap gap-2 items-center">
-                    {tags.map((tag: string) => (
-                    <span key={tag} className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1">
-                        #{tag}
-                        <button onClick={() => removeTag(tag)} className="hover:text-indigo-800 dark:hover:text-indigo-200">
-                        <i className="fas fa-times"></i>
-                        </button>
-                    </span>
-                    ))}
-                    <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleAddTag}
-                    placeholder={tags.length > 0 ? "" : "Adicionar tag..."}
-                    className="bg-transparent text-sm font-bold text-slate-700 dark:text-white outline-none flex-1 min-w-[80px] p-2"
-                    />
-                    <button onClick={() => handleAddTag()} className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-colors">
-                    <i className="fas fa-plus text-xs"></i>
-                    </button>
-                </div>
+        <div
+          className={`pt-4 ${isNote ? "" : "border-t border-slate-200 dark:border-slate-700"} space-y-6`}
+        >
+          {/* Tags Input */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+              Tags
+            </label>
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500 transition-all flex flex-wrap gap-2 items-center">
+              {tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1"
+                >
+                  #{tag}
+                  <button
+                    onClick={() => removeTag(tag)}
+                    className="hover:text-indigo-800 dark:hover:text-indigo-200"
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </span>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleAddTag}
+                placeholder={tags.length > 0 ? "" : "Adicionar tag..."}
+                className="bg-transparent text-sm font-bold text-slate-700 dark:text-white outline-none flex-1 min-w-[80px] p-2"
+              />
+              <button
+                onClick={() => handleAddTag()}
+                className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-colors"
+              >
+                <i className="fas fa-plus text-xs"></i>
+              </button>
             </div>
+          </div>
 
-            {/* Notes Textarea */}
-            <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-                    {isNote ? "Conteúdo da Nota" : "Notas & Detalhes"}
-                </label>
-                <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder={isNote ? "Escreva seus pensamentos..." : "Adicione descrições, links ou anotações..."}
-                    rows={isNote ? 8 : 4}
-                    className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? "text-lg" : ""}`}
-                />
-            </div>
+          {/* Notes Textarea */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+              {isNote ? "Conteúdo da Nota" : "Notas & Detalhes"}
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={
+                isNote
+                  ? "Escreva seus pensamentos..."
+                  : "Adicione descrições, links ou anotações..."
+              }
+              rows={isNote ? 8 : 4}
+              className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? "text-lg" : ""}`}
+            />
+          </div>
         </div>
       </div>
     </div>

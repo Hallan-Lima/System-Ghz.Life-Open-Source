@@ -32,7 +32,7 @@ export const useTasks = () => {
   const initialTab = (searchParams.get("type") as TaskFilterType) || "ALL";
   const [activeTab, setActiveTabState] = useState<TaskFilterType>(initialTab);
 
-  const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
+  const [filter, setFilter] = useState<"all" | "pending" | "done">("pending");
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +56,7 @@ export const useTasks = () => {
   const setActiveTab = useCallback(
     (tab: TaskFilterType) => {
       setActiveTabState(tab);
-      setFilter("all");
+      setFilter("pending");
 
       if (tab === "ALL") {
         searchParams.delete("type");
@@ -133,14 +133,41 @@ export const useTasks = () => {
         return true;
       });
 
-    // Ordenação: Itens fixados (isPinned) aparecem primeiro
+    // Ordenação: 1º Fixados, 2º Prioridade, 3º Data, 4º Título Alfabético
     return list.sort((a, b) => {
-      // Se um está fixado e o outro não, o fixado vem primeiro
+      // 1. Itens fixados (Pinned) vêm primeiro, independente de qualquer coisa
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
-      return 0; // Mantém a ordem original (geralmente por data de criação)
+
+      // 2. Prioridade (HIGH > MEDIUM > LOW)
+      // Mapeamos os valores de texto para peso numérico para o JS conseguir comparar
+      const priorityWeight: Record<string, number> = {
+        HIGH: 3,
+        MEDIUM: 2,
+        LOW: 1,
+      };
+      const pA = priorityWeight[a.priority as string] || 2; // Padrão: 2 (Medium)
+      const pB = priorityWeight[b.priority as string] || 2;
+
+      if (pA !== pB) return pB - pA; // Maior peso vem antes
+
+      // 3. Data (dueDate) - Mais antigas / mais próximas do vencimento primeiro
+      if (a.dueDate && b.dueDate) {
+        const dateA = new Date(a.dueDate).getTime();
+        const dateB = new Date(b.dueDate).getTime();
+        if (dateA !== dateB) return dateA - dateB;
+      } else if (a.dueDate && !b.dueDate) {
+        return -1; // Se A tem data e B não tem, A vem primeiro
+      } else if (!a.dueDate && b.dueDate) {
+        return 1; // Se B tem data e A não tem, B vem primeiro
+      }
+
+      // 4. Ordem Alfabética do Título (Como critério de desempate final)
+      const titleA = a.title || "";
+      const titleB = b.title || "";
+      return titleA.localeCompare(titleB);
     });
-  }, [taskList, activeTab, filter, config]);
+  }, [taskList, activeTab, filter, config]); // Mantenha as dependências intactas!
   // --- ACTIONS ---
 
   const toggleTask = async (id: string) => {

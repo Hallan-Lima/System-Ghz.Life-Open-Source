@@ -47,7 +47,6 @@ export const tasksService = {
    * Obtém a lista de tarefas reais da API e atualiza o cache local.
    */
   getTasks: async (): Promise<Task[]> => {
-    console.log("tasksService.getTasks: Carregando tarefas da API...");
     try {
       const userId = getUserId();
       // Manda o ID do usuário para a API listar apenas as tarefas dele
