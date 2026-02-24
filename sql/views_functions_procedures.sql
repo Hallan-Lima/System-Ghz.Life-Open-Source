@@ -42,6 +42,11 @@ USE ghz_life_AMBIENTE;
             END AS type,
             t.title,
             CASE t.priority WHEN 1 THEN 'LOW' WHEN 2 THEN 'MEDIUM' WHEN 3 THEN 'HIGH' ELSE 'MEDIUM' END AS priority,
+            t.priority_mode AS priorityMode, 
+            t.priority_score AS priorityScore, 
+            t.priority_necessity AS necessity, 
+            t.priority_satisfaction AS satisfaction, 
+            t.priority_frequency AS frequency,
             IF(t.sys_status_id = 5, 1, 0) AS completed,
             t.isPinned AS isPinned,
             t.due_date AS dueDate, t.target_value AS targetValue, t.current_value AS currentValue,
@@ -217,6 +222,11 @@ USE ghz_life_AMBIENTE;
             IN p_type VARCHAR(50),
             IN p_title VARCHAR(255),
             IN p_priority VARCHAR(20),
+            IN p_priority_mode VARCHAR(20),
+            IN p_priority_score INT,
+            IN p_priority_necessity INT,
+            IN p_priority_satisfaction INT,
+            IN p_priority_frequency INT,
             IN p_content TEXT,
             IN p_notes TEXT,
             IN p_tags JSON,
@@ -262,10 +272,12 @@ USE ghz_life_AMBIENTE;
             -- 5. Inserção
             INSERT INTO app_tasks (
                 sys_module_functionality_id, user_id, title, sys_status_id, priority,
+                priority_mode, priority_score, priority_necessity, priority_satisfaction, priority_frequency,
                 content, notes, tags, due_date, recurrence, target_value, current_value,
                 estimated_cost, unit, progress, isPinned
             ) VALUES (
                 v_func_id, v_user_bin, p_title, v_status_id, v_priority_int,
+                p_priority_mode, p_priority_score, p_priority_necessity, p_priority_satisfaction, p_priority_frequency,
                 p_content, p_notes, p_tags, p_due_date, p_recurrence, p_target_value, p_current_value,
                 p_estimated_cost, p_unit, p_progress, 0
             );
@@ -284,6 +296,11 @@ USE ghz_life_AMBIENTE;
             IN p_id INT,
             IN p_title VARCHAR(255),
             IN p_priority VARCHAR(20),
+            IN p_priority_mode VARCHAR(20),
+            IN p_priority_score INT,
+            IN p_priority_necessity INT,
+            IN p_priority_satisfaction INT,
+            IN p_priority_frequency INT,
             IN p_content TEXT,
             IN p_notes TEXT,
             IN p_tags JSON,
@@ -316,6 +333,11 @@ USE ghz_life_AMBIENTE;
                 title = p_title, 
                 sys_status_id = v_status_id, 
                 priority = v_priority_int,
+                priority_mode = p_priority_mode, 
+                priority_score = p_priority_score, 
+                priority_necessity = p_priority_necessity, 
+                priority_satisfaction = p_priority_satisfaction, 
+                priority_frequency = p_priority_frequency,
                 content = p_content, 
                 notes = p_notes, 
                 tags = p_tags, 
@@ -328,9 +350,7 @@ USE ghz_life_AMBIENTE;
                 progress = p_progress, 
                 updated_at = NOW()
             WHERE id = p_id;
-        END$$
-
-    -- ------------------------------------------------------------------------------
+        END$$-- ------------------------------------------------------------------------------
     -- 2.5. ATIVAR/DESATIVAR MÓDULO OU FUNCIONALIDADE PARA O USUÁRIO
     -- Permite que o usuário ative (1) ou desative (0) permissões na sua conta
     -- ------------------------------------------------------------------------------
