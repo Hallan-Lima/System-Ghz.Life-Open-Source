@@ -107,6 +107,7 @@ USE ghz_life_AMBIENTE;
             
             -- Permissões
             IN p_functionality_ids JSON, 
+            IN p_experience_mode VARCHAR(20), -- NOVO PARÂMETRO
             
             -- Retornos
             OUT p_new_uuid VARCHAR(36),
@@ -161,7 +162,7 @@ USE ghz_life_AMBIENTE;
                 INSERT INTO sys_user_token (user_id, refresh_token, expires_at) 
                 VALUES (v_user_bin, v_token_str, DATE_ADD(NOW(), INTERVAL 30 DAY));
 
-                -- D. Insert Permissões (Loop JSON)
+                -- D. Insert Permissões (Loop JSON) com Experience Mode
                 IF p_functionality_ids IS NOT NULL THEN
                     SET v_json_count = JSON_LENGTH(p_functionality_ids);
                     SET v_i = 0;
@@ -170,8 +171,8 @@ USE ghz_life_AMBIENTE;
                         SET v_func_val = JSON_UNQUOTE(JSON_EXTRACT(p_functionality_ids, CONCAT('$[', v_i, ']')));
                         
                         IF v_func_val IS NOT NULL AND v_func_val != 'null' AND v_func_val != '0' THEN
-                            INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id)
-                            VALUES (v_user_bin, CAST(v_func_val AS UNSIGNED));
+                            INSERT INTO sys_module_functionality_user (user_id, sys_module_functionality_id, experience_mode)
+                            VALUES (v_user_bin, CAST(v_func_val AS UNSIGNED), IFNULL(p_experience_mode, 'SIMPLE'));
                         END IF;
 
                         SET v_i = v_i + 1;
@@ -467,6 +468,10 @@ USE ghz_life_AMBIENTE;
                 
                 -- A feature é considerada ATIVA se existir vínculo na tabela e o deleted_at for NULL
                 IF(smfu.id IS NOT NULL, 1, 0) AS feature_enabled,
+                
+                -- NOVA COLUNA: Pega o modo selecionado ou assume SIMPLE por padrão
+                IFNULL(smfu.experience_mode, 'SIMPLE') AS feature_experience_mode,
+                
                 stf.name AS feature_status
                 
             FROM sys_module sm
@@ -482,7 +487,30 @@ USE ghz_life_AMBIENTE;
                 
             ORDER BY sm.id, smf.id;
         END$$
-    
+    -- ------------------------------------------------------------------------------
+    -- 2.7. DEFINIR MODO DE EXPERIÊNCIA DA FUNCIONALIDADE
+    -- Troca o modo da funcionalidade (SIMPLE / ADVANCED) na tela de Configurações
+    -- ------------------------------------------------------------------------------
+        DROP PROCEDURE IF EXISTS sp_set_user_feature_mode$$
+
+        CREATE PROCEDURE sp_set_user_feature_mode(
+            IN p_user_uuid VARCHAR(36),      
+            IN p_functionality_id INT,       
+            IN p_experience_mode VARCHAR(20)            
+        )
+        BEGIN
+            DECLARE v_user_bin BINARY(16);
+            SET v_user_bin = UNHEX(REPLACE(p_user_uuid, '-', ''));
+
+            UPDATE sys_module_functionality_user
+            SET experience_mode = p_experience_mode
+            WHERE user_id = v_user_bin 
+            AND sys_module_functionality_id = p_functionality_id
+            AND deleted_at IS NULL;
+
+            -- Devolve a lista atualizada
+            CALL sp_get_user_modules(p_user_uuid);
+        END$$
     DELIMITER ;
 
 -- ==============================================================================
