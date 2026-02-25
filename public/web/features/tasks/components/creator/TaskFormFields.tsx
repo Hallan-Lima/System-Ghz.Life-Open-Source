@@ -9,6 +9,7 @@ import {
   getSatisfactionLabel,
   getFrequencyLabel,
 } from "../../tasks.utils";
+import { useModules } from "../../../modules/hooks/useModules";
 
 interface TaskFormFieldsProps {
   form: any;
@@ -29,7 +30,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
     unit,
     setUnit,
     currentValue,
-    setCurrentValue, // Novo campo desestruturado
+    setCurrentValue,
     recurrence,
     setRecurrence,
     dueDate,
@@ -57,23 +58,40 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
   const isNote = type === TaskType.NOTE;
   const isGoalOrDream = type === TaskType.GOAL || type === TaskType.DREAM;
 
-  // Verifica se a unidade atual é uma moeda conhecida
   const isFinancial = ["BRL", "USD", "EUR"].includes(unit);
 
-  // Função para alternar entre modo Financeiro e Personalizado
   const toggleUnitMode = () => {
     if (isFinancial) {
-      setUnit("un"); // Volta para genérico
+      setUnit("un");
     } else {
-      setUnit("BRL"); // Vai para moeda padrão
+      setUnit("BRL");
     }
   };
+
+  // --- 1. LÓGICA DE DETECÇÃO DO MODO (SIMPLES x AVANÇADO) ---
+  const { modules } = useModules();
+  const prodModule = modules.find((m) => String(m.id) === "1");
+  const featureMap: Record<string, string> = {
+    [TaskType.DAILY]: "1",
+    [TaskType.GOAL]: "2",
+    [TaskType.DREAM]: "3",
+    [TaskType.SHOPPING]: "4",
+    [TaskType.NOTE]: "5",
+  };
+  const currentFeature = prodModule?.features.find(
+    (f) => String(f.id) === featureMap[type],
+  );
+
+  // A mágica acontece aqui: A variável diz se a tela deve ser simples ou não
+  const isSimpleMode =
+    currentFeature?.experienceMode === "SIMPLE" ||
+    !currentFeature?.experienceMode;
 
   return (
     <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/50 dark:border-slate-800 rounded-[2.5rem] p-1 shadow-xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
       <div className="p-6 space-y-8">
-        {/* SHOPPING: Valor Estimado */}
-        {isShopping && (
+        {/* SHOPPING: Valor Estimado (Apenas Avançado) */}
+        {isShopping && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
               Valor Estimado
@@ -93,10 +111,9 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* GOALS/DREAMS: Meta, Valor Atual e Unidade */}
-        {isGoalOrDream && (
+        {/* GOALS/DREAMS: Meta, Valor Atual e Unidade (Apenas Avançado) */}
+        {isGoalOrDream && !isSimpleMode && (
           <div className="space-y-6">
-            {/* Linha 1: Saldo Atual (Opcional, mas destacado) */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                 Já tenho (Saldo Atual)
@@ -115,7 +132,6 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
               </div>
             </div>
 
-            {/* Linha 2: Meta e Unidade */}
             <div className="grid grid-cols-5 gap-4">
               <div className="col-span-3 space-y-3">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
@@ -141,16 +157,10 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     Unidade
                   </label>
-                  {/* Botão Toggle Tipo de Unidade */}
                   <button
                     type="button"
                     onClick={toggleUnitMode}
                     className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-md"
-                    title={
-                      isFinancial
-                        ? "Mudar para Texto Livre"
-                        : "Mudar para Moeda"
-                    }
                   >
                     {isFinancial ? (
                       <i className="fas fa-font"></i>
@@ -184,8 +194,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* DAILY: Recorrência */}
-        {type === TaskType.DAILY && (
+        {/* DAILY: Recorrência (Apenas Avançado) */}
+        {type === TaskType.DAILY && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
               Repetição
@@ -211,6 +221,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
               ].map((opt) => (
                 <button
                   key={opt.val}
+                  type="button"
                   onClick={() => setRecurrence(opt.val as RecurrenceInterval)}
                   className={`flex-shrink-0 px-4 py-3 rounded-2xl border flex items-center gap-2 transition-all ${
                     recurrence === opt.val
@@ -228,8 +239,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Data (exceto Shopping/Note) */}
-        {!isShopping && !isNote && (
+        {/* Data (Apenas Avançado) */}
+        {!isShopping && !isNote && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
               Prazo Final
@@ -248,7 +259,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Prioridade e Calibração - Agora disponível para todas as categorias exceto Notas */}
+        {/* PRIORIDADE */}
         {!isNote && (
           <div className="space-y-4">
             <div className="flex justify-between items-end px-1">
@@ -256,37 +267,42 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
                 Definição de Prioridade
               </label>
 
-              {/* Toggle Switch - Disponível para Daily, Goal, Dream e Shopping */}
-              <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg flex text-[10px] font-bold">
-                <button
-                  onClick={() => setPriorityMode("manual")}
-                  className={`px-3 py-1.5 rounded-md transition-all ${
-                    priorityMode === "manual"
-                      ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
-                      : "text-slate-400 hover:text-slate-600"
-                  }`}
-                >
-                  Simples
-                </button>
-                <button
-                  onClick={() => setPriorityMode("auto")}
-                  className={`px-3 py-1.5 rounded-md transition-all ${
-                    priorityMode === "auto"
-                      ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
-                      : "text-slate-400 hover:text-slate-600"
-                  }`}
-                >
-                  Avançada
-                </button>
-              </div>
+              {/* Botões de Trocar Modo: Esconde se a tela toda estiver no modo simples */}
+              {!isSimpleMode && (
+                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg flex text-[10px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPriorityMode("manual")}
+                    className={`px-3 py-1.5 rounded-md transition-all ${
+                      priorityMode === "manual"
+                        ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
+                    }`}
+                  >
+                    Simples
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPriorityMode("auto")}
+                    className={`px-3 py-1.5 rounded-md transition-all ${
+                      priorityMode === "auto"
+                        ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
+                        : "text-slate-400 hover:text-slate-600"
+                    }`}
+                  >
+                    Avançada
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* SELEÇÃO MANUAL */}
-            {priorityMode === "manual" && (
+            {/* SELEÇÃO MANUAL - Mostra se for manual OU se estiver forçado no Modo Simples */}
+            {(isSimpleMode || priorityMode === "manual") && (
               <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-950/50 p-1.5 rounded-2xl animate-fade-in">
                 {[TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH].map(
                   (p) => (
                     <button
+                      type="button"
                       key={p}
                       onClick={() => setPriority(p)}
                       className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm ${
@@ -310,8 +326,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
               </div>
             )}
 
-            {/* CALIBRAGEM AUTOMÁTICA (Sliders) */}
-            {priorityMode === "auto" && (
+            {/* CALIBRAGEM AUTOMÁTICA (Sliders) - Só aparece no Avançado */}
+            {!isSimpleMode && priorityMode === "auto" && (
               <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8 animate-fade-in mt-2">
                 {[
                   {
@@ -370,8 +386,8 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Shopping Link */}
-        {isShopping && (
+        {/* Shopping Link (Apenas Avançado) */}
+        {isShopping && !isSimpleMode && (
           <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
               Link do Produto
@@ -389,65 +405,76 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Notes & Tags */}
-        <div
-          className={`pt-4 ${isNote ? "" : "border-t border-slate-200 dark:border-slate-700"} space-y-6`}
-        >
-          {/* Tags Input */}
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-              Tags
-            </label>
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500 transition-all flex flex-wrap gap-2 items-center">
-              {tags.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1"
-                >
-                  #{tag}
+        {/* Notes & Tags (Apenas Avançado, exceto Notas que sempre mostra o campo de texto) */}
+        {(!isSimpleMode || isNote) && (
+          <div
+            className={`pt-4 ${isNote ? "" : "border-t border-slate-200 dark:border-slate-700"} space-y-6`}
+          >
+            {/* Tags Input (Apenas Avançado) */}
+            {!isSimpleMode && (
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                  Tags
+                </label>
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-transparent focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-indigo-500 transition-all flex flex-wrap gap-2 items-center">
+                  {tags.map((tag: string) => (
+                    <span
+                      key={tag}
+                      className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1"
+                    >
+                      #{tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="hover:text-indigo-800 dark:hover:text-indigo-200"
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                    placeholder={tags.length > 0 ? "" : "Adicionar tag..."}
+                    className="bg-transparent text-sm font-bold text-slate-700 dark:text-white outline-none flex-1 min-w-[80px] p-2"
+                  />
                   <button
-                    onClick={() => removeTag(tag)}
-                    className="hover:text-indigo-800 dark:hover:text-indigo-200"
+                    type="button"
+                    onClick={() => handleAddTag()}
+                    className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-colors"
                   >
-                    <i className="fas fa-times"></i>
+                    <i className="fas fa-plus text-xs"></i>
                   </button>
-                </span>
-              ))}
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleAddTag}
-                placeholder={tags.length > 0 ? "" : "Adicionar tag..."}
-                className="bg-transparent text-sm font-bold text-slate-700 dark:text-white outline-none flex-1 min-w-[80px] p-2"
+                </div>
+              </div>
+            )}
+
+            {/* Notes Textarea (Aparece se for uma Nota Simples OU se tiver no Modo Avançado) */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                {isNote ? "Conteúdo da Nota" : "Notas & Detalhes"}
+              </label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={
+                  isNote
+                    ? "Escreva seus pensamentos..."
+                    : "Adicione descrições, links ou anotações..."
+                }
+                rows={isNote ? 8 : 4}
+                className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? "text-lg" : ""}`}
               />
-              <button
-                onClick={() => handleAddTag()}
-                className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-colors"
-              >
-                <i className="fas fa-plus text-xs"></i>
-              </button>
             </div>
           </div>
-
-          {/* Notes Textarea */}
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
-              {isNote ? "Conteúdo da Nota" : "Notas & Detalhes"}
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder={
-                isNote
-                  ? "Escreva seus pensamentos..."
-                  : "Adicione descrições, links ou anotações..."
-              }
-              rows={isNote ? 8 : 4}
-              className={`w-full bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-white font-medium p-4 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-500 outline-none transition-all resize-none text-sm leading-relaxed ${isNote ? "text-lg" : ""}`}
-            />
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

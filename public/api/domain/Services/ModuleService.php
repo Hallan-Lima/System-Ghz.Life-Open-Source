@@ -7,6 +7,8 @@ namespace App\Controllers;
 
 use Domain\Services\ModuleService;
 
+
+//TODO: Ajustar o nome pois controller e service no mesmo lugar esta gerando confusão. Talvez colocar o service em Domain/Services e o controller em App/Controllers mesmo, ou criar uma pasta específica para cada um. O importante é manter a organização clara para evitar confusões futuras.
 class ModuleController
 {
     private ModuleService $service;
@@ -83,6 +85,42 @@ class ModuleController
             responseJson([
                 'success' => false,
                 'message' => 'Erro interno ao atualizar a configuração do módulo/funcionalidade.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Endpoint para alterar entre modo SIMPLES ou AVANÇADO
+     */
+    public function setFeatureMode(): void
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            if (!$input || empty($input['user_id']) || empty($input['functionality_id']) || empty($input['mode'])) {
+                responseJson([
+                    'success' => false,
+                    'message' => 'Parâmetros obrigatórios ausentes: user_id, functionality_id ou mode.'
+                ], 400);
+            }
+
+            $userUuid = $input['user_id'];
+            $functionalityId = (int) $input['functionality_id'];
+            $mode = strtoupper($input['mode']); // Garante que será 'SIMPLE' ou 'ADVANCED'
+
+            $data = $this->service->setFeatureMode($userUuid, $functionalityId, $mode);
+
+            responseJson([
+                'success' => true,
+                'data'    => $data,
+                'message' => 'Modo de experiência atualizado com sucesso.'
+            ]);
+
+        } catch (\Throwable $e) {
+            error_log("Erro ao atualizar modo: " . $e->getMessage());
+            responseJson([
+                'success' => false,
+                'message' => 'Erro interno ao atualizar modo da funcionalidade.'
             ], 500);
         }
     }

@@ -21,6 +21,7 @@ const INITIAL_STATE: RegisterState = {
     enableHabits: false,
   },
   interests: [],
+  experienceMode: "SIMPLE",
 };
 
 /**

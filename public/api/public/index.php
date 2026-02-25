@@ -49,7 +49,8 @@ $routes = [
     
     // --- Módulo: Configuração / Sistema ---
     ['GET', '#^/api/modules$#', ModuleController::class, 'list'],
-    ['POST', '#^/api/modules/toggle$#', ModuleController::class, 'toggleVisibility']
+    ['POST', '#^/api/modules/toggle$#', ModuleController::class, 'toggleVisibility'],
+    ['POST', '#^/api/modules/feature/mode$#', ModuleController::class, 'setFeatureMode']
 ];
 
 // --- 4. Dispatcher (O Motor da API) ---

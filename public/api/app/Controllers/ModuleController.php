@@ -8,6 +8,7 @@ namespace Domain\Services;
 use Infrastructure\Database\Connection;
 use PDO;
 
+//TODO: Ajustar o nome pois controller e service no mesmo lugar esta gerando confusão. Talvez colocar o service em Domain/Services e o controller em App/Controllers mesmo, ou criar uma pasta específica para cada um. O importante é manter a organização clara para evitar confusões futuras.
 class ModuleService
 {
     private PDO $db;
@@ -67,6 +68,31 @@ class ModuleService
     }
 
     /**
+     * Altera o modo de experiência (SIMPLE / ADVANCED) de uma funcionalidade e retorna a lista atualizada.
+     */
+    public function setFeatureMode(string $userUuid, int $functionalityId, string $mode): array
+    {
+        $stmt = $this->db->prepare("CALL sp_set_user_feature_mode(:user_uuid, :func_id, :mode)");
+        $stmt->execute([
+            ':user_uuid' => $userUuid,
+            ':func_id'   => $functionalityId,
+            ':mode'      => $mode
+        ]);
+        
+        $rows = $stmt->fetchAll();
+        if (empty($rows) && $stmt->nextRowset()) {
+            $rows = $stmt->fetchAll();
+        }
+
+        if (empty($rows)) {
+            $stmt->closeCursor();
+            return $this->list($userUuid);
+        }
+
+        return $this->formatModulesMap($rows);
+    }
+
+    /**
      * Helper privado para formatar os dados que vêm do banco em uma estrutura JSON agrupada.
      */
     private function formatModulesMap(array $rows): array
@@ -96,6 +122,7 @@ class ModuleService
                     'label'           => $row['feature_label'],
                     'description'     => $row['feature_desc'],
                     'isEnabled'       => (bool) $row['feature_enabled'],
+                    'experienceMode'  => $row['feature_experience_mode'] ?? 'SIMPLE', 
                     'quickAccessIcon' => $row['feature_icon'],
                     'status'          => $row['feature_status'],
                     'route'           => $row['feature_route']

@@ -202,7 +202,7 @@ const RegisterWizard: React.FC = () => {
                   );
 
                   // TODO: Refletir o status real do módulo vindo da API, e não tratar no código
-                  const isDisabled = (module.status != "Ativo");
+                  const isDisabled = module.status != "Ativo";
 
                   return (
                     <button
@@ -302,111 +302,167 @@ const RegisterWizard: React.FC = () => {
             </div>
 
             <div className="space-y-8">
-              {/* LOOP DINÂMICO DOS MÓDULOS SELECIONADOS */}
-              {availableModules.map((module) => {
-                // 1. Só mostra se o usuário selecionou este módulo no Passo 2
-                if (!formData.selectedModules.includes(module.id)) return null;
-
-                // 2. Só mostra se o módulo estiver ativo e tiver funcionalidades
-                //TODO: Refletir o status real do módulo vindo da API, e não tratar no código
-                if (
-                  module.status !== "Ativo" ||
-                  !module.features ||
-                  module.features.length === 0
-                )
-                  return null;
-
-                return (
-                  <div
-                    key={module.id}
-                    className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800 animate-in fade-in slide-in-from-bottom-4"
-                  >
-                    {/* Cabeçalho do Card do Módulo */}
-                    <div className="flex items-center gap-3 mb-4 border-b border-slate-800/50 pb-3">
-                      <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 text-${module.color}-500`}
-                      >
-                        <i className={module.icon}></i>
-                      </div>
-                      <h3 className="font-bold text-white text-sm uppercase tracking-wide">
-                        {module.title}
-                      </h3>
+              {/* --- STEP 3: PERSONALIZACAO --- */}
+              {step === 3 && (
+                <div className="space-y-6 animate-in slide-in-from-right fade-in duration-300">
+                  <div className="text-center mb-8">
+                    <div className="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
+                      <i className="fas fa-sliders-h text-2xl"></i>
                     </div>
+                    <h2 className="text-2xl font-black text-white tracking-tight">
+                      Personalização
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-2 font-medium px-4">
+                      Escolha como deseja usar o sistema e quais recursos quer
+                      ativar agora.
+                    </p>
+                  </div>
 
-                    {/* Lista de Funcionalidades (Features) */}
-                    <div className="space-y-3">
-                      {module.features.map((feature) => {
-                        // Verifica se a funcionalidade está selecionada (usamos o array 'interests' para salvar IDs de features)
-                        const isFeatureActive = formData.interests.includes(
-                          feature.id,
-                        );
-                        const isFeatureDisabled = feature.status !== "Ativo"; // TODO: Refletir o status real da feature vinda da API, e não tratar no código
+                  {/* --- NOVA PERGUNTA GLOBAL DE MODO DE EXPERIÊNCIA --- */}
+                  <div className="bg-indigo-900/20 rounded-3xl p-5 border border-indigo-500/30 mb-8 animate-in fade-in zoom-in duration-500">
+                    <h3 className="font-bold text-white text-sm uppercase tracking-wide mb-4 pl-1">
+                      Como você prefere usar o sistema?
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => updateForm("experienceMode", "SIMPLE")}
+                        className={`p-4 rounded-2xl border text-left transition-all ${
+                          formData.experienceMode === "SIMPLE" ||
+                          !formData.experienceMode
+                            ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/50"
+                            : "bg-slate-900/50 border-slate-800 text-slate-400 hover:bg-slate-800"
+                        }`}
+                      >
+                        <i className="fas fa-bolt text-xl mb-2 block"></i>
+                        <h4 className="font-black text-sm">Direto ao Ponto</h4>
+                        <p className="text-[10px] mt-1 opacity-80 leading-tight">
+                          Rápido, simples e sem configurações complexas.
+                        </p>
+                      </button>
 
-                        return (
-                          <button
-                            key={feature.id}
-                            disabled={isFeatureDisabled}
-                            onClick={() =>
-                              !isFeatureDisabled &&
-                              toggleArrayItem("interests", feature.id)
-                            }
-                            className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all group ${
-                              isFeatureDisabled
-                                ? "border-slate-800 opacity-50 cursor-not-allowed bg-slate-900/30"
-                                : isFeatureActive
-                                  ? `bg-${module.color}-500/10 border-${module.color}-500` // Usa a cor do módulo
-                                  : "border-slate-800 hover:bg-slate-800"
-                            }`}
-                            // Fallback de style caso a classe dinâmica do Tailwind não funcione
-                            style={
-                              isFeatureActive && !isFeatureDisabled
-                                ? {
-                                    borderColor: `var(--color-${module.color}-500)`,
-                                  }
-                                : {}
-                            }
-                          >
-                            <div className="text-left flex-1">
-                              <div className="flex items-center gap-2">
-                                <p
-                                  className={`font-black text-sm ${isFeatureActive ? "text-white" : "text-slate-300"}`}
-                                >
-                                  {feature.label}
-                                </p>
-                                {isFeatureDisabled && (
-                                  <span className="text-[9px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold">
-                                    Em breve
-                                  </span>
-                                )}
-                              </div>
-                              <p
-                                className={`text-[10px] mt-0.5 ${isFeatureActive ? `text-${module.color}-200` : "text-slate-500"}`}
-                              >
-                                {feature.description ||
-                                  "Funcionalidade do sistema"}
-                              </p>
-                            </div>
-
-                            {!isFeatureDisabled && (
-                              <div
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                  isFeatureActive
-                                    ? `bg-${module.color}-500 border-${module.color}-500`
-                                    : "border-slate-600 group-hover:border-slate-500"
-                                }`}
-                              >
-                                {isFeatureActive && (
-                                  <i className="fas fa-check text-[10px] text-white"></i>
-                                )}
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
+                      <button
+                        onClick={() => updateForm("experienceMode", "ADVANCED")}
+                        className={`p-4 rounded-2xl border text-left transition-all ${
+                          formData.experienceMode === "ADVANCED"
+                            ? "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-900/50"
+                            : "bg-slate-900/50 border-slate-800 text-slate-400 hover:bg-slate-800"
+                        }`}
+                      >
+                        <i className="fas fa-sliders-h text-xl mb-2 block"></i>
+                        <h4 className="font-black text-sm">Controle Total</h4>
+                        <p className="text-[10px] mt-1 opacity-80 leading-tight">
+                          Acesso a todas as métricas, custos e prioridades.
+                        </p>
+                      </button>
                     </div>
                   </div>
-                );
-              })}
+
+                  {/* LOOP DINÂMICO DOS MÓDULOS SELECIONADOS */}
+                  {availableModules.map((module) => {
+                    // 1. Só mostra se o usuário selecionou este módulo no Passo 2
+                    if (!formData.selectedModules.includes(module.id))
+                      return null;
+
+                    // 2. Só mostra se o módulo estiver ativo e tiver funcionalidades
+                    if (
+                      module.status !== "Ativo" ||
+                      !module.features ||
+                      module.features.length === 0
+                    )
+                      return null;
+
+                    return (
+                      <div
+                        key={module.id}
+                        className="bg-slate-900/50 rounded-3xl p-5 border border-slate-800 animate-in fade-in slide-in-from-bottom-4"
+                      >
+                        {/* Cabeçalho do Card do Módulo */}
+                        <div className="flex items-center gap-3 mb-4 border-b border-slate-800/50 pb-3">
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 text-${module.color}-500`}
+                          >
+                            <i className={module.icon}></i>
+                          </div>
+                          <h3 className="font-bold text-white text-sm uppercase tracking-wide">
+                            {module.title}
+                          </h3>
+                        </div>
+
+                        {/* Lista de Funcionalidades (Features) */}
+                        <div className="space-y-3">
+                          {module.features.map((feature) => {
+                            const isFeatureActive = formData.interests.includes(
+                              feature.id,
+                            );
+                            const isFeatureDisabled =
+                              feature.status !== "Ativo";
+
+                            return (
+                              <button
+                                key={feature.id}
+                                disabled={isFeatureDisabled}
+                                onClick={() =>
+                                  !isFeatureDisabled &&
+                                  toggleArrayItem("interests", feature.id)
+                                }
+                                className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all group ${
+                                  isFeatureDisabled
+                                    ? "border-slate-800 opacity-50 cursor-not-allowed bg-slate-900/30"
+                                    : isFeatureActive
+                                      ? `bg-${module.color}-500/10 border-${module.color}-500`
+                                      : "border-slate-800 hover:bg-slate-800"
+                                }`}
+                                style={
+                                  isFeatureActive && !isFeatureDisabled
+                                    ? {
+                                        borderColor: `var(--color-${module.color}-500)`,
+                                      }
+                                    : {}
+                                }
+                              >
+                                <div className="text-left flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <p
+                                      className={`font-black text-sm ${isFeatureActive ? "text-white" : "text-slate-300"}`}
+                                    >
+                                      {feature.label}
+                                    </p>
+                                    {isFeatureDisabled && (
+                                      <span className="text-[9px] bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded uppercase font-bold">
+                                        Em breve
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p
+                                    className={`text-[10px] mt-0.5 ${isFeatureActive ? `text-${module.color}-200` : "text-slate-500"}`}
+                                  >
+                                    {feature.description ||
+                                      "Funcionalidade do sistema"}
+                                  </p>
+                                </div>
+
+                                {!isFeatureDisabled && (
+                                  <div
+                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                      isFeatureActive
+                                        ? `bg-${module.color}-500 border-${module.color}-500`
+                                        : "border-slate-600 group-hover:border-slate-500"
+                                    }`}
+                                  >
+                                    {isFeatureActive && (
+                                      <i className="fas fa-check text-[10px] text-white"></i>
+                                    )}
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Manteve-se a seção genérica de interesses/hobbies caso ainda faça sentido para o perfil do usuário, 
                   mas agora ela fica no final, separada da configuração técnica dos módulos */}

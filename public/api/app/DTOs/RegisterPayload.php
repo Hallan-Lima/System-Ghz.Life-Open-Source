@@ -17,8 +17,9 @@ class RegisterPayload
             'birthDate' => $data['birthDate'] ?? date('Y-m-d'),
 
             // Configurações
-            'selectedModules' => $data['selectedModules'] ?? [], // Array de IDs
-            'interests' => $data['interests'] ?? []
+            'selectedModules' => $data['selectedModules'] ?? [],
+            'interests' => $data['interests'] ?? [],
+            'experienceMode' => $data['experienceMode'] ?? 'SIMPLE', // SIMPLE ou ADVANCED
         ];
     }
 }

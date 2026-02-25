@@ -25,6 +25,7 @@ export interface RegisterState {
   confirmPassword: string;
   gender: string;
   birthDate: string;
+  experienceMode?: "SIMPLE" | "ADVANCED";
 
   // Passo 2: Módulos (IDs)
   selectedModules: string[];

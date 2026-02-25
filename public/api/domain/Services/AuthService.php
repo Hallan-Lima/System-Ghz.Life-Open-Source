@@ -47,6 +47,7 @@ class AuthService
                     :birthDate, 
                     :email, 
                     :functionalities, 
+                    :experienceMode,
                     @uuid, 
                     @token
                 )
@@ -59,7 +60,8 @@ class AuthService
                 ':gender'          => $genderId,
                 ':birthDate'       => $payload['birthDate'],
                 ':email'           => $payload['email'],
-                ':functionalities' => $jsonFunctionalities // Agora enviamos a string JSON
+                ':functionalities' => $jsonFunctionalities,
+                ':experienceMode'  => $payload['experienceMode']
             ]);
 
             // Limpa o cursor para permitir a próxima query de leitura dos OUT params

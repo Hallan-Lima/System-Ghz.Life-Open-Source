@@ -85,4 +85,30 @@ export const modulesService = {
       return null;
     }
   },
+
+  /**
+   * Altera o modo de experiência de uma funcionalidade específica.
+   */
+  setFeatureMode: async (
+    userId: string,
+    functionalityId: number,
+    mode: "SIMPLE" | "ADVANCED",
+  ): Promise<AppModule[]> => {
+    try {
+      const response = await api.post("/modules/feature/mode", {
+        user_id: userId,
+        functionality_id: functionalityId,
+        mode: mode,
+      });
+      if (response.data?.success) {
+        return response.data.data;
+      }
+      throw new Error(
+        response.data?.message || "Erro ao atualizar o modo de experiência.",
+      );
+    } catch (error) {
+      console.error("Erro no modulesService.setFeatureMode:", error);
+      throw error;
+    }
+  },
 };

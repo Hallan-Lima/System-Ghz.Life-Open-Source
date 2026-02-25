@@ -9,6 +9,7 @@ export interface AppFeature {
   isEnabled: boolean;
   status?: string; // ex.: "Ativo" | "Inativo"
   status_id?: number; // ex.: 1 = Ativo, 2 = Inativo
+  experienceMode?: "SIMPLE" | "ADVANCED";
   // Campos para o Menu de Ação Rápida
   quickAccessIcon?: string;
   route?: string;
