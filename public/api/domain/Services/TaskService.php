@@ -82,9 +82,9 @@ class TaskService
             'tags' => $tagsJson,
             'due_date' => $payload['dueDate'] ?? null,
             'recurrence' => $payload['recurrence'] ?? null,
-            'target_value' => $payload['targetValue'] ?? null,
-            'current_value' => $payload['currentValue'] ?? null,
-            'estimated_cost' => $payload['estimatedCost'] ?? null,
+            'target_value' => $payload['targetValue'] ?? 0,
+            'current_value' => $payload['currentValue'] ?? 0,
+            'estimated_cost' => $payload['estimatedCost'] ?? 0,
             'unit' => $payload['unit'] ?? 'un',
             'progress' => $payload['progress'] ?? 0,
             'completed' => ($payload['completed'] ?? false) ? 1 : 0

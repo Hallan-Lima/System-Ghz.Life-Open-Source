@@ -139,11 +139,13 @@ const TaskItemGoal: React.FC<TaskItemGoalProps> = ({
             <h4 className="font-black text-lg text-slate-800 dark:text-white leading-tight">
               {task.title}
             </h4>
-            {task.dueDate && (
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-                Prazo: {new Date(task.dueDate).toLocaleDateString("pt-BR")}
-              </p>
-            )}
+            {task.dueDate &&
+              task.dueDate.toString().trim() !== "" &&
+              !isNaN(new Date(task.dueDate).getTime()) && (
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                  Prazo: {new Date(task.dueDate).toLocaleDateString("pt-BR")}
+                </p>
+              )}
           </div>
         </div>
 
