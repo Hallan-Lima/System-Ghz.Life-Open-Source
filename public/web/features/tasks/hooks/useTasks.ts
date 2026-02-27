@@ -31,7 +31,7 @@ export const useTasks = () => {
   // Inicializa a aba ativa baseada na URL ou padrão ALL (Tudo)
   const initialTab = (searchParams.get("type") as TaskFilterType) || "ALL";
   const [activeTab, setActiveTabState] = useState<TaskFilterType>(initialTab);
-
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "done">("pending");
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +57,7 @@ export const useTasks = () => {
     (tab: TaskFilterType) => {
       setActiveTabState(tab);
       setFilter("pending");
+      setSelectedTag(null);
 
       if (tab === "ALL") {
         searchParams.delete("type");
@@ -67,6 +68,41 @@ export const useTasks = () => {
     },
     [searchParams, setSearchParams],
   );
+
+  const formatTag = (tag: string) => {
+    if (!tag) return "";
+    return tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
+  };
+
+  const availableTags = useMemo(() => {
+    const tags = new Set<string>();
+    
+    taskList.forEach((t) => {
+      // 1. Verifica o filtro de Aba (Tab)
+      let isModuleActive = false;
+      if (activeTab === "ALL") {
+        isModuleActive = true; 
+      } else {
+        isModuleActive = t.type === activeTab;
+      }
+
+      if (!isModuleActive) return;
+
+      // 2. Verifica o filtro de Status
+      let matchesStatus = true;
+      if (filter === "done") matchesStatus = t.completed;
+      if (filter === "pending") matchesStatus = !t.completed;
+      
+      if (!matchesStatus) return;
+
+      // 3. Formata e adiciona a tag
+      if (t.tags && t.tags.length > 0) {
+        t.tags.forEach((tag) => tags.add(formatTag(tag)));
+      }
+    });
+
+    return Array.from(tags).sort();
+  }, [taskList, activeTab, filter]);
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -131,6 +167,14 @@ export const useTasks = () => {
         if (filter === "done") return t.completed;
         if (filter === "pending") return !t.completed;
         return true;
+      })
+      .filter((t) => {
+        if (selectedTag) {
+          return t.tags && t.tags.some(
+            (tag) => tag.toLowerCase() === selectedTag.toLowerCase()
+          );
+        }
+        return true;
       });
 
     // Ordenação (Cascata de 5 Regras)
@@ -182,7 +226,7 @@ export const useTasks = () => {
       const titleB = b.title || "";
       return titleA.localeCompare(titleB);
     });
-  }, [taskList, activeTab, filter, config]); // Mantenha as dependências intactas!
+  }, [taskList, activeTab, filter, config, selectedTag]);
   // --- ACTIONS ---
 
   const toggleTask = async (id: string) => {
@@ -294,6 +338,9 @@ export const useTasks = () => {
     setActiveTab,
     filter,
     setFilter,
+    selectedTag, 
+    setSelectedTag, 
+    availableTags, 
     config,
     toggleTask,
     togglePin,

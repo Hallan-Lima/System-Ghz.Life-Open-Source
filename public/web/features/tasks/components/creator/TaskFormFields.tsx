@@ -50,22 +50,28 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
     setTagInput,
     notes,
     setNotes,
+    isEditing,
+    taskToEdit,
   } = form;
 
-  const { handleAddTag, removeTag } = actions;
+  const {
+    handleAddTag,
+    removeTag,
+    handleDuplicate,
+    handleDelete,
+    handleToggleStatus,
+    handleTogglePin,
+    handleArchive,
+  } = actions;
 
   const isShopping = type === TaskType.SHOPPING;
   const isNote = type === TaskType.NOTE;
   const isGoalOrDream = type === TaskType.GOAL || type === TaskType.DREAM;
-
   const isFinancial = ["BRL", "USD", "EUR"].includes(unit);
 
   const toggleUnitMode = () => {
-    if (isFinancial) {
-      setUnit("un");
-    } else {
-      setUnit("BRL");
-    }
+    if (isFinancial) setUnit("un");
+    else setUnit("BRL");
   };
 
   // --- 1. LÓGICA DE DETECÇÃO DO MODO (SIMPLES x AVANÇADO) ---
@@ -81,8 +87,6 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
   const currentFeature = prodModule?.features.find(
     (f) => String(f.id) === featureMap[type],
   );
-
-  // A mágica acontece aqui: A variável diz se a tela deve ser simples ou não
   const isSimpleMode =
     currentFeature?.experienceMode === "SIMPLE" ||
     !currentFeature?.experienceMode;
@@ -90,7 +94,89 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
   return (
     <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/50 dark:border-slate-800 rounded-[2.5rem] p-1 shadow-xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
       <div className="p-6 space-y-8">
-        {/* SHOPPING: Valor Estimado (Apenas Avançado) */}
+        {/* --- QUICK ACTIONS TOOLBAR --- */}
+        {isEditing && taskToEdit && (
+          <div className="flex items-center justify-between gap-1.5 pb-3 pt-1 w-full animate-in fade-in zoom-in duration-300">
+            {/* Botão Concluir */}
+            {!isNote && (
+              <button
+                type="button"
+                onClick={handleToggleStatus}
+                className={`relative flex-1 h-[50px] rounded-[10px] flex flex-col items-center justify-center transition-all duration-300 ${
+                  taskToEdit.completed
+                    ? "bg-gradient-to-b from-emerald-400 to-emerald-500 text-white shadow-sm shadow-emerald-500/20 scale-[1.02] border border-emerald-400"
+                    : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-emerald-200 hover:text-emerald-500 active:scale-95"
+                }`}
+              >
+                <i className={`text-[15px] drop-shadow-sm mb-0.5 ${taskToEdit.completed ? "fas fa-check-circle" : "far fa-circle"}`}></i>
+                <span className="text-[7.5px] font-black uppercase tracking-wider leading-none m-2">
+                  {taskToEdit.completed ? "Concluído" : "Concluir"}
+                </span>
+              </button>
+            )}
+
+            {/* Botão Fixar */}
+            <button
+              type="button"
+              onClick={handleTogglePin}
+              className={`relative flex-1 h-[50px] rounded-[10px] flex flex-col items-center justify-center transition-all duration-300 ${
+                taskToEdit.isPinned
+                  ? "bg-gradient-to-b from-amber-400 to-amber-500 text-white shadow-sm shadow-amber-500/20 scale-[1.02] border border-amber-400"
+                  : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-amber-200 hover:text-amber-500 active:scale-95"
+              }`}
+            >
+              <i className={`fas fa-thumbtack text-[15px] drop-shadow-sm transition-transform duration-300 mb-0.5 ${taskToEdit.isPinned ? "-rotate-45" : ""}`}></i>
+              <span className="text-[7.5px] font-black uppercase tracking-wider leading-none m-2">
+                {taskToEdit.isPinned ? "Fixado" : "Fixar"}
+              </span>
+            </button>
+
+            {/* Botão Duplicar */}
+            <button
+              type="button"
+              onClick={handleDuplicate}
+              className="relative flex-1 h-[50px] rounded-[10px] flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-indigo-200 hover:text-indigo-500 active:scale-95 transition-all duration-300"
+            >
+              <i className="far fa-copy text-[15px] mb-0.5"></i>
+              <span className="text-[7.5px] font-black uppercase tracking-wider leading-none m-2">
+                Duplicar
+              </span>
+            </button>
+
+            {/* Botão Arquivar (Para Notas) */}
+            {isNote && (
+              <button
+                type="button"
+                onClick={handleToggleStatus}
+                className={`relative flex-1 h-[50px] rounded-[10px] flex flex-col items-center justify-center transition-all duration-300 ${
+                  taskToEdit.completed
+                    ? "bg-gradient-to-b from-slate-500 to-slate-600 dark:from-slate-600 dark:to-slate-700 text-white shadow-sm shadow-slate-500/20 scale-[1.02] border border-slate-500"
+                    : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-slate-300 hover:text-slate-700 dark:hover:border-slate-600 dark:hover:text-slate-300 active:scale-95"
+                }`}
+              >
+                <i className={`text-[15px] mb-0.5 drop-shadow-sm ${taskToEdit.completed ? "fas fa-box-archive" : "fas fa-archive"}`}></i>
+                <span className="text-[7.5px] font-black uppercase tracking-wider leading-none m-2">
+                  {taskToEdit.completed ? "Arquivado" : "Arquivar"}
+                </span>
+              </button>
+            )}
+
+            {/* Botão Excluir */}
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="relative flex-1 h-[50px] rounded-[10px] flex flex-col items-center justify-center bg-white dark:bg-slate-800 text-slate-500 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-rose-200 hover:text-rose-500 active:scale-95 transition-all duration-300"
+            >
+              <i className="far fa-trash-alt text-[15px] mb-0.5"></i>
+              <span className="text-[7.5px] font-black uppercase tracking-wider leading-none m-2">
+                Excluir
+              </span>
+            </button>
+          </div>
+        )}
+        {/* ------------------------------- */}
+
+        {/* SHOPPING: Valor Estimado */}
         {isShopping && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
@@ -111,7 +197,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* GOALS/DREAMS: Meta, Valor Atual e Unidade (Apenas Avançado) */}
+        {/* GOALS/DREAMS */}
         {isGoalOrDream && !isSimpleMode && (
           <div className="space-y-6">
             <div className="space-y-3">
@@ -194,7 +280,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* DAILY: Recorrência (Apenas Avançado) */}
+        {/* DAILY: Recorrência */}
         {type === TaskType.DAILY && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
@@ -239,7 +325,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Data (Apenas Avançado) */}
+        {/* Data */}
         {!isShopping && !isNote && !isSimpleMode && (
           <div className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
@@ -273,22 +359,14 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
                   <button
                     type="button"
                     onClick={() => setPriorityMode("manual")}
-                    className={`px-3 py-1.5 rounded-md transition-all ${
-                      priorityMode === "manual"
-                        ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
-                        : "text-slate-400 hover:text-slate-600"
-                    }`}
+                    className={`px-3 py-1.5 rounded-md transition-all ${priorityMode === "manual" ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
                   >
                     Simples
                   </button>
                   <button
                     type="button"
                     onClick={() => setPriorityMode("auto")}
-                    className={`px-3 py-1.5 rounded-md transition-all ${
-                      priorityMode === "auto"
-                        ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm"
-                        : "text-slate-400 hover:text-slate-600"
-                    }`}
+                    className={`px-3 py-1.5 rounded-md transition-all ${priorityMode === "auto" ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
                   >
                     Avançada
                   </button>
@@ -386,7 +464,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Shopping Link (Apenas Avançado) */}
+        {/* Shopping Link */}
         {isShopping && !isSimpleMode && (
           <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
@@ -405,7 +483,7 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({ form, actions }) => {
           </div>
         )}
 
-        {/* Notes & Tags (Apenas Avançado, exceto Notas que sempre mostra o campo de texto) */}
+        {/* Notes & Tags */}
         {(!isSimpleMode || isNote) && (
           <div
             className={`pt-4 ${isNote ? "" : "border-t border-slate-200 dark:border-slate-700"} space-y-6`}

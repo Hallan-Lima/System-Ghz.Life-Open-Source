@@ -19,7 +19,7 @@ export const useTaskCreator = () => {
   const location = useLocation();
 
   // Verifica se estamos em modo de edição via location state
-  const taskToEdit = location.state?.taskToEdit as Task | undefined;
+  const [taskToEdit, setTaskToEdit] = useState<Task | undefined>(location.state?.taskToEdit as Task | undefined);
   const isEditing = !!taskToEdit;
 
   const defaultType = location.state?.defaultType || TaskType.DAILY;
@@ -80,6 +80,30 @@ export const useTaskCreator = () => {
 
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((t) => t !== tagToRemove));
+  };
+
+  // --- QUICK ACTIONS TOOLBAR ---
+  const handleDuplicate = () => {
+    setTaskToEdit(undefined); // Remove a referência de edição, transformando em "Modo Criação"
+    setTitle((prev) => prev + " (Cópia)"); // Adiciona o sufixo no título
+  };
+
+  const handleDelete = async () => {
+    if (!taskToEdit?.id) return;
+    await tasksService.deleteTask(taskToEdit.id);
+    navigate(-1);
+  };
+
+  const handleToggleStatus = async () => {
+    if (!taskToEdit?.id) return;
+    const updated = await tasksService.toggleTaskCompletion(taskToEdit.id);
+    setTaskToEdit(updated);
+  };
+
+  const handleTogglePin = async () => {
+    if (!taskToEdit?.id) return;
+    const updated = await tasksService.toggleTaskPin(taskToEdit.id);
+    setTaskToEdit(updated);
   };
 
   const handleSave = async () => {
@@ -154,6 +178,8 @@ export const useTaskCreator = () => {
   return {
     isEditing,
     form: {
+      isEditing,
+      taskToEdit,
       type,
       setType,
       title,
@@ -191,6 +217,10 @@ export const useTaskCreator = () => {
       removeTag,
       handleSave,
       handleBack,
+      handleDuplicate,
+      handleDelete,
+      handleToggleStatus,
+      handleTogglePin,
     },
   };
 };

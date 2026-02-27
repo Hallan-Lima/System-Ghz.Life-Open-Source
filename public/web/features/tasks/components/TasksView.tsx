@@ -5,6 +5,7 @@ import { TaskType } from "../../../domain/tasks.types";
 
 // Sub-components
 import TaskTabs from "./TaskTabs";
+import TaskTagFilters from "./TaskTagFilters";
 import TaskFilters from "./TaskFilters";
 import TaskItemDaily from "./list-items/TaskItemDaily";
 import TaskItemGoal from "./list-items/TaskItemGoal";
@@ -22,6 +23,9 @@ const TasksView: React.FC = () => {
     setActiveTab,
     filter,
     setFilter,
+    selectedTag,      
+    setSelectedTag,   
+    availableTags,    
     config,
     toggleTask,
     togglePin,
@@ -99,11 +103,21 @@ const TasksView: React.FC = () => {
       <div className="space-y-6">
         <TaskTabs activeTab={activeTab} onTabChange={setActiveTab} />
         
-        <TaskFilters 
-            currentFilter={filter} 
-            onFilterChange={setFilter} 
-            activeTab={activeTab as TaskType}
-        />
+        {/* Agrupando os filtros */}
+        <div className="space-y-3">
+          <TaskFilters 
+              currentFilter={filter} 
+              onFilterChange={setFilter} 
+              activeTab={activeTab as TaskType}
+          />
+          
+          {/* COMPONENTE DE TAGS */}
+          <TaskTagFilters 
+            tags={availableTags} 
+            selectedTag={selectedTag} 
+            onSelectTag={setSelectedTag} 
+          />
+        </div>
         
         <div className="space-y-4 pb-20">
             {renderContent()}
