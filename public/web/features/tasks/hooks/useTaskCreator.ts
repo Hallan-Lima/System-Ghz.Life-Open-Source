@@ -72,8 +72,16 @@ export const useTaskCreator = () => {
   // Actions
   const handleAddTag = (e?: React.KeyboardEvent) => {
     if (e && e.key !== "Enter") return;
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
+    
+    if (tagInput.trim()) {
+      const newTags = tagInput
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t !== "");
+
+      const combinedTags = Array.from(new Set([...tags, ...newTags]));
+      
+      setTags(combinedTags);
       setTagInput("");
     }
   };
@@ -119,6 +127,18 @@ export const useTaskCreator = () => {
         return;
       }
 
+      let finalTags = [...tags];
+      if (tagInput.trim()) {
+        const pendingTags = tagInput
+          .split(",")
+          .map((t) => t.trim())
+          .filter((t) => t !== "");
+        finalTags = Array.from(new Set([...finalTags, ...pendingTags]));
+        
+        setTags(finalTags);
+        setTagInput("");
+      }
+
       const finalTarget = targetValue ? Number(targetValue) : undefined;
       const finalCurrent = currentValue ? Number(currentValue) : undefined;
       const initialProgress = finalTarget && finalCurrent ? Math.round((finalCurrent / finalTarget) * 100) : 0;
@@ -152,7 +172,7 @@ export const useTaskCreator = () => {
         recurrence: recurrence === "none" ? undefined : recurrence,
         content: notes,
         notes,
-        tags,
+        tags: finalTags,
       };
 
       if (isEditing && taskToEdit) {
