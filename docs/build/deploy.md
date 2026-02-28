@@ -33,14 +33,14 @@ Sempre que finalizar uma nova funcionalidade ou correção, siga estes passos no
 
 2. **Crie a Tag da nova versão:**
 ```bash
-git tag v1.0.0-alpha
+git tag v1.0.0-alpha.x
 
 ```
 
 
 3. **Envie a Tag para o GitHub (Isso inicia o Deploy!):**
 ```bash
-git push origin v1.0.0-alpha
+git push origin v1.0.0-alpha.x
 
 ```
 
@@ -73,9 +73,9 @@ O arquivo `.env` de produção **NUNCA** deve ser comitado. O GitHub Actions fab
 
 ---
 
-## 🚑 4. Resolução de Problemas Comuns (Troubleshooting)
+## 🚑 4. Dicas Comuns
 
-### Problema 1: Erro de "Timeout" ou "530 Login Incorrect" no FTP (Deploy Failed)
+### Dica 1: Erro de "Timeout" ou "530 Login Incorrect" no FTP (Deploy Failed)
 
 **Causa:** O GitHub não conseguiu acessar a Hostinger. Geralmente erro de digitação nos Secrets ou bloqueio.
 **Como resolver:**
@@ -84,14 +84,14 @@ O arquivo `.env` de produção **NUNCA** deve ser comitado. O GitHub Actions fab
 2. Vá no hPanel da Hostinger, redefina a senha do usuário FTP afetado e atualize imediatamente nos Secrets do GitHub.
 3. No GitHub Actions, clique em **"Re-run failed jobs"** (não precisa gerar nova tag).
 
-### Problema 2: Erro `Cannot find module @rollup/rollup-linux-x64-gnu` no Frontend
+### Dica 2: Erro `Cannot find module @rollup/rollup-linux-x64-gnu` no Frontend
 
 **Causa:** O projeto foi testado no Windows, gerando um `package-lock.json` focado em Windows. O GitHub Actions (que é Linux) tenta ler esse arquivo e trava.
 **Como resolver:**
 
 * Certifique-se de que o `deploy.yml` possui o comando `rm -f package-lock.json` logo antes do `npm install` no job do frontend. Isso força o Linux a gerar dependências frescas.
 
-### Problema 3: O Frontend sobe, mas a tela fica totalmente BRANCA
+### Dica 3: O Frontend sobe, mas a tela fica totalmente BRANCA
 
 **Causa:** Conflito de injeção de dependências. O arquivo `index.html` possui uma tag `<script type="importmap">` gerada por IAs, que manda o navegador baixar o React da internet, mas o Vite já o empacotou no build.
 **Como resolver:**
@@ -100,10 +100,33 @@ O arquivo `.env` de produção **NUNCA** deve ser comitado. O GitHub Actions fab
 * **Apague** completamente o bloco `<script type="importmap">...</script>`.
 * O Vite se encarregará de importar o React automaticamente na versão de produção. Faça o commit e crie uma nova tag.
 
-### Problema 4: Onde configuro as variáveis da minha máquina local?
+### Dica 4: Onde configuro as variáveis da minha máquina local?
 
 **Causa:** Confusão entre `.env` local e pipeline.
 **Como resolver:**
 
 * Crie o arquivo `public/api/.env` (para o PHP) e `public/web/.env.development` (para o React) apenas na sua máquina.
 * **Certifique-se de que eles estão listados no `.gitignore**` para que o Git não os envie para o repositório. O código PHP deve sempre buscar com `getenv('VARIAVEL')`.
+
+### Dica 4: Apagar uma tag que ja existe
+Se você quer uma tag com o nome de outra que ja existe no GitHub, como v0.4.0-alpha, nós precisamos apagar a tag que deu erro lá no GitHub, fazer o commit, recriar a tag e mandar de novo.
+
+**Como resolver:** 
+
+    Bash
+    # 1. Apaga a tag que deu erro no seu computador
+    git tag -d v0.4.0-alpha
+
+    # 2. Apaga a tag que deu erro lá no GitHub
+    git push origin :refs/tags/v0.4.0-alpha
+
+    # 3. Faz o commit com as correções
+    git add .
+    git commit -m "Corrige erro do Linux no deploy e ajusta FTP"
+    git push origin main
+
+    # 4. Recria a tag (agora ela vai grudar nesse novo commit corrigido)
+    git tag v0.4.0-alpha
+
+    # 5. Envia a tag pro GitHub (o que vai acionar o robô de novo)
+    git push origin v0.4.0-alpha
