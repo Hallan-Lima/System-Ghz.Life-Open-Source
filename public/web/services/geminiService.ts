@@ -10,8 +10,16 @@ import config from "../src/config";
  * Responsável por gerar insights cruzando dados de Finanças, Saúde e Produtividade.
  */
 
-// Inicialização do cliente Gemini com a chave de API via variável de ambiente
-const ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
+// Inicialização condicional: Só tenta iniciar a IA se a chave existir
+let ai: any = null;
+
+if (config.geminiApiKey && config.geminiApiKey !== 'SUA_CHAVE_LOCAL_AQUI') {
+  try {
+    ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
+  } catch (error) {
+    console.warn("Falha ao inicializar o cliente do Gemini:", error);
+  }
+}
 
 /**
  * Gera um insight curto e motivacional com base no estado atual do usuário.
