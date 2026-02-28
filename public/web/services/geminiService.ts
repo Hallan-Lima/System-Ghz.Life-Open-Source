@@ -26,6 +26,12 @@ export const getGhzAssistantInsights = async (
   tasks: Task[], 
   health: HealthStats
 ): Promise<string> => {
+
+  if (!ai) {
+    console.warn("Ghz AI: API Key não configurada.");
+    return "Concentre-se no hoje! Beba água, revise suas metas e mantenha o controle financeiro.";
+  }
+
   // Construção do Prompt de Contexto Otimizado
   const prompt = `
     Atue como o assistente pessoal inteligente do app "Ghz.Life".
@@ -47,7 +53,7 @@ export const getGhzAssistantInsights = async (
   try {
     // Chamada à API Gemini utilizando o modelo Flash para baixa latência
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: prompt,
     });
     
