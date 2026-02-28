@@ -77,10 +77,10 @@ USE ghz_life_AMBIENTE;
             0 AS `feature_enabled`,
             `stf`.`name` AS `feature_status`
         FROM
-            (((`ghz_life_ambiente`.`sys_module` `sm`
-            LEFT JOIN `ghz_life_ambiente`.`sys_module_functionality` `smf` ON (`sm`.`id` = `smf`.`sys_module_id`))
-            LEFT JOIN `ghz_life_ambiente`.`sys_status` `stm` ON (`stm`.`id` = `sm`.`sys_status_id`))
-            LEFT JOIN `ghz_life_ambiente`.`sys_status` `stf` ON (`stf`.`id` = `smf`.`sys_status_id`))
+            (((`sys_module` `sm`
+            LEFT JOIN `sys_module_functionality` `smf` ON (`sm`.`id` = `smf`.`sys_module_id`))
+            LEFT JOIN `sys_status` `stm` ON (`stm`.`id` = `sm`.`sys_status_id`))
+            LEFT JOIN `sys_status` `stf` ON (`stf`.`id` = `smf`.`sys_status_id`))
         ORDER BY `sm`.`id` , `smf`.`id`;
 
     

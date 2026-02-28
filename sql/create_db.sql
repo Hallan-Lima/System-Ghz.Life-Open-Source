@@ -207,6 +207,11 @@ SET FOREIGN_KEY_CHECKS = 0;
         current_value DECIMAL(18,2) NULL,
         estimated_cost DECIMAL(18,2) NULL,
         unit VARCHAR(20) NULL, -- 'R$', 'km', 'kg'
+        priority_mode VARCHAR(20) NOT NULL DEFAULT 'SIMPLE', -- 'SIMPLE' ou 'ADVANCED'
+        priority_score DECIMAL(5,2) NOT NULL DEFAULT 0.00, -- Cálculo de prioridade avançada
+        priority_necessity DECIMAL(5,2) NOT NULL DEFAULT 0.00, -- Necessidade (0-100)
+        priority_satisfaction DECIMAL(5,2) NOT NULL DEFAULT 0.00, -- Satisfação (0-100)
+        priority_frequency DECIMAL(5,2) NOT NULL DEFAULT 0.00, -- Frequência (0-100)
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
         deleted_at DATETIME NULL,
