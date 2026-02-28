@@ -70,7 +70,6 @@ gulpfile.tmp.*
 # Compiled source #
 /dist
 .env
-.env.development
 
 
 ################################################################################
@@ -89,3 +88,4 @@ gulpfile.tmp.*
 /html-starter
 /html-demo
 /html-starter-demo
+public/web/.env.development
