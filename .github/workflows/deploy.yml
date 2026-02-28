@@ -1,0 +1,67 @@
+name: Deploy API e Frontend
+
+on:
+  push:
+    tags:
+      - 'v*' 
+
+jobs:
+  # ==========================================
+  # 1. JOB DE DEPLOY DA API (PHP)
+  # ==========================================
+  deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Checkout do código
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Criar arquivo .env de Produção da API
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST_BFF }}" >> public/api/.env
+          echo "DB_PORT=3306" >> public/api/.env
+          echo "DB_NAME=${{ secrets.DB_NAME_PROD }}" >> public/api/.env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> public/api/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> public/api/.env
+
+      - name: 🧹 Limpar arquivos inseguros
+        run: rm -f public/api/info.php
+
+      - name: 🚀 Deploy da API via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_BFF }} 
+          password: ${{ secrets.FTP_PASSWORD_BFF }}
+          local-dir: ./public/api/
+          server-dir: ./
+
+  # ==========================================
+  # 2. JOB DE DEPLOY DO FRONTEND (REACT/VITE)
+  # ==========================================
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Checkout do código
+        uses: actions/checkout@v3
+
+      - name: 📦 Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: ⚙️ Criar .env do React e Gerar Build
+        run: |
+          cd public/web
+          # Usando um único '>' para CRIAR o arquivo do zero usando o Secret do GitHub
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .env.production
+          npm install
+          npm run build
+
+      - name: 🚀 Deploy do Frontend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_GHZLIFE }}
+          password: ${{ secrets.FTP_PASSWORD_GHZLIFE }}
+          local-dir: ./public/web/dist/
+          server-dir: ./
