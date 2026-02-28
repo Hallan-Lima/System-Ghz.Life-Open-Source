@@ -12,11 +12,19 @@ import config from "../../../src/config";
  * Responsável por cruzar dados do usuário e enviar para o Gemini.
  */
 class AiService {
-  private client: GoogleGenAI;
+  private client: any = null; // Alterado para aceitar null
 
   constructor() {
-    // Inicializa o cliente com a chave de API do ambiente
-    this.client = new GoogleGenAI({ apiKey: config.geminiApiKey });
+    // Só tenta inicializar o cliente se a chave existir e não for a string padrão
+    if (config.geminiApiKey && config.geminiApiKey !== 'SUA_CHAVE_LOCAL_AQUI') {
+      try {
+        this.client = new GoogleGenAI({ apiKey: config.geminiApiKey });
+      } catch (error) {
+        console.warn("Ghz AI: Falha ao inicializar o Gemini", error);
+      }
+    } else {
+      console.warn("Ghz AI: Chave de API não configurada. IA desativada.");
+    }
   }
 
   /**
@@ -101,11 +109,11 @@ class AiService {
           systemInstruction: systemInstruction,
         },
         history: history
-            .filter(h => h.id !== 'welcome-msg') // Remove msg local inicial se houver duplicidade
-            .map(h => ({
-                role: h.sender === 'user' ? 'user' : 'model',
-                parts: [{ text: h.text }]
-            }))
+          .filter(h => h.id !== 'welcome-msg') // Remove msg local inicial se houver duplicidade
+          .map(h => ({
+            role: h.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: h.text }]
+          }))
       });
 
       // 4. Envia a mensagem com Retry Logic (Exponential Backoff)
@@ -114,26 +122,26 @@ class AiService {
 
       while (true) {
         try {
-            const result = await chat.sendMessage({ message: userMessage });
-            return result.text || "Desculpe, não consegui processar sua resposta agora.";
+          const result = await chat.sendMessage({ message: userMessage });
+          return result.text || "Desculpe, não consegui processar sua resposta agora.";
         } catch (error: any) {
-            currentAttempt++;
-            const errorCode = error.status || error.code || error.error?.code || error.error?.status;
-            
-            // Verifica se é erro de cota (429) ou serviço indisponível (503)
-            // 429: Too Many Requests / Resource Exhausted
-            // 503: Service Unavailable
-            const isRetryable = errorCode === 429 || errorCode === 503;
+          currentAttempt++;
+          const errorCode = error.status || error.code || error.error?.code || error.error?.status;
 
-            if (isRetryable && currentAttempt <= maxRetries) {
-                // Backoff: 2s, 4s, 8s... (Aumentado para garantir recuperação em picos)
-                const delay = Math.pow(2, currentAttempt) * 1000; 
-                console.warn(`Ghz AI: Erro ${errorCode}. Retentando em ${delay}ms... (Tentativa ${currentAttempt}/${maxRetries})`);
-                await this.sleep(delay);
-                continue;
-            }
+          // Verifica se é erro de cota (429) ou serviço indisponível (503)
+          // 429: Too Many Requests / Resource Exhausted
+          // 503: Service Unavailable
+          const isRetryable = errorCode === 429 || errorCode === 503;
 
-            throw error; // Lança para o catch externo se não for retryable ou esgotou tentativas
+          if (isRetryable && currentAttempt <= maxRetries) {
+            // Backoff: 2s, 4s, 8s... (Aumentado para garantir recuperação em picos)
+            const delay = Math.pow(2, currentAttempt) * 1000;
+            console.warn(`Ghz AI: Erro ${errorCode}. Retentando em ${delay}ms... (Tentativa ${currentAttempt}/${maxRetries})`);
+            await this.sleep(delay);
+            continue;
+          }
+
+          throw error; // Lança para o catch externo se não for retryable ou esgotou tentativas
         }
       }
 
@@ -142,10 +150,10 @@ class AiService {
       const errorCode = error.status || error.code || error.error?.code || error.error?.status;
       const errorMessage = error.message || error.error?.message || '';
 
-      const isQuotaError = 
-        errorCode === 429 || 
+      const isQuotaError =
+        errorCode === 429 ||
         errorCode === 'RESOURCE_EXHAUSTED' ||
-        errorMessage.includes('429') || 
+        errorMessage.includes('429') ||
         errorMessage.includes('quota') ||
         errorMessage.includes('RESOURCE_EXHAUSTED');
 
@@ -154,7 +162,7 @@ class AiService {
         console.warn("Ghz AI: Cota excedida (429). Retornando mensagem amigável ao usuário.");
         return "😴 Minha capacidade de processamento gratuito excedeu por hoje (Erro 429). A IA precisa descansar um pouco. Tente novamente mais tarde.";
       }
-      
+
       console.error("Erro na API Gemini (Detalhado):", JSON.stringify(error, null, 2));
       return "Estou tendo dificuldades para conectar aos servidores da IA no momento. Por favor, tente novamente em alguns instantes.";
     }
