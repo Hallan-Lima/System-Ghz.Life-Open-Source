@@ -54,6 +54,7 @@ jobs:
           cd public/web
           # Usando um único '>' para CRIAR o arquivo do zero usando o Secret do GitHub
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > .env.production
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.production
           rm -f package-lock.json
           npm install
           npm run build
