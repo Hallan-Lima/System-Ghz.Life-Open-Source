@@ -28,7 +28,7 @@ if (in_array($origin, $allowedOrigins)) {
         http_response_code(403);
         exit;
     }
-}4
+}
 
 // Permite requisições de qualquer origem. Em produção, você pode restringir ao seu domínio.
 header("Access-Control-Allow-Origin: *");
