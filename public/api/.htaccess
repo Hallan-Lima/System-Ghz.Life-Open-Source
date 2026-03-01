@@ -1,0 +1,16 @@
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Se o que foi acessado não for um arquivo real (!-f)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # Nem um diretório real (!-d)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Redirecione tudo para a pasta public onde está o index.php
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
+</IfModule>

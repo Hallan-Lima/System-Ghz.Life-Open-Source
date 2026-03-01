@@ -22,18 +22,21 @@ jobs:
           echo "DB_NAME=${{ secrets.DB_NAME_PROD }}" >> public/api/.env
           echo "DB_USER=${{ secrets.DB_USER }}" >> public/api/.env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> public/api/.env
+          echo "APP_ENV=production" >> public/api/.env
 
       - name: 🧹 Limpar arquivos inseguros
         run: rm -f public/api/info.php
 
-      - name: 🚀 Deploy da API via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 🚀 Deploy da API via SFTP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME_BFF }} 
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME_BFF }}
           password: ${{ secrets.FTP_PASSWORD_BFF }}
-          local-dir: ./public/api/
-          server-dir: ./
+          port: 65002
+          source: "public/api/*"
+          target: "./"
+          strip_components: 2 # Remove os dois primeiros níveis de diretórios (public/api) para evitar criar subpastas indesejadas
 
   # ==========================================
   # 2. JOB DE DEPLOY DO FRONTEND (REACT/VITE)
@@ -59,11 +62,13 @@ jobs:
           npm install
           npm run build
 
-      - name: 🚀 Deploy do Frontend via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 🚀 Deploy do Frontend via SFTP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME_GHZLIFE }}
           password: ${{ secrets.FTP_PASSWORD_GHZLIFE }}
-          local-dir: ./public/web/dist/
-          server-dir: ./
+          port: 65002
+          source: "public/web/dist/*"
+          target: "./"
+          strip_components: 2 # Remove os dois primeiros níveis de diretórios (public/web/dist) para evitar criar subpastas indesejadas

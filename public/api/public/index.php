@@ -101,13 +101,22 @@ foreach ($routes as [$method, $pattern, $controllerClass, $action]) {
             exit;
 
         } catch (Throwable $e) {
-            // Captura erros fatais no código para não devolver página branca/erro HTML
             error_log("Erro na API: " . $e->getMessage());
-            responseJson([
+            
+            $payload = [
                 'error' => true,
-                'message' => 'Erro interno no processamento da requisição.',
-                'debug' => $e->getMessage() // Remova em produção
-            ], 500);
+                'message' => 'Erro interno no processamento da requisição.'
+            ];
+
+            $appEnv = getenv('APP_ENV') ?: 'production';
+
+            if ($appEnv === 'localhost') {
+                $payload['debug'] = $e->getMessage();
+                $payload['file'] = $e->getFile();
+                $payload['line'] = $e->getLine();
+            }
+
+            responseJson($payload, 500);
         }
     }
 }
