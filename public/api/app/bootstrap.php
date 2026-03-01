@@ -4,6 +4,24 @@
  * Router Frontal - Carregamento de Dependências
  */
 
+// --- 0. CARREGADOR DO ARQUIVO .ENV ---
+$envPath = __DIR__ . '/../.env';
+if (file_exists($envPath)) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Ignora comentários
+        $parts = explode('=', $line, 2);
+        if (count($parts) === 2) {
+            $name = trim($parts[0]);
+            $value = trim($parts[1]);
+            // Joga a variável na memória do PHP para o getenv() enxergar
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+    }
+}
+
 // --- DTOs ---
 require_once __DIR__ . '/../app/DTOs/TaskPayload.php';
 require_once __DIR__ . '/../app/DTOs/RegisterPayload.php';
