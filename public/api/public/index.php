@@ -13,6 +13,23 @@ use App\Controllers\AuthController;
 use App\Controllers\ModuleController;
 
 // --- 2. Configuração de CORS (Cross-Origin Resource Sharing) ---
+$allowedOrigins = [
+    'https://ghzlife.halltech.site',
+    'http://localhost:3000'
+];
+
+// 2. Pega a origem de quem está tentando acessar
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(403);
+        exit;
+    }
+}4
+
 // Permite requisições de qualquer origem. Em produção, você pode restringir ao seu domínio.
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
