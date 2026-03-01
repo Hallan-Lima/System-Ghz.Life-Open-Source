@@ -37,7 +37,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 65002
           source: "public/api/*"
-          target: "/home/u151563763/domains/bff.halltech.site/public_html" # Caminho absoluto exato!
+          target: "/home/u151563763/domains/bff.halltech.site/public_html"
           strip_components: 2
 
   # ==========================================
