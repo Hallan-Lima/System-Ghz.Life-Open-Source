@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # 1. Força o uso de HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 2. Impede listagem de diretórios
+    Options -Indexes
+
+    # 3. Regra de Ouro para Single Page Applications (React/Vite)
+    # Se o que foi digitado na URL não for um arquivo real...
+    RewriteCond %{REQUEST_FILENAME} !-f
+    # Nem uma pasta real...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Então redireciona silenciosamente para o index.html
+    RewriteRule ^ index.html [QSA,L]
+</IfModule>
+
+# 4. Segurança extra: Esconde arquivos e pastas que começam com ponto (como .git ou o próprio .htaccess)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
