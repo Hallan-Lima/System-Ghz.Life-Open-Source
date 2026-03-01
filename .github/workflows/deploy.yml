@@ -26,17 +26,19 @@ jobs:
 
       - name: 🧹 Limpar arquivos inseguros
         run: rm -f public/api/info.php
+      - name: 🧹 Limpar arquivos inseguros
+        run: rm -f public\api\README.md
 
       - name: 🚀 Deploy da API via SFTP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME_BFF }}
-          password: ${{ secrets.FTP_PASSWORD_BFF }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
           port: 65002
           source: "public/api/*"
-          target: "./"
-          strip_components: 2 # Remove os dois primeiros níveis de diretórios (public/api) para evitar criar subpastas indesejadas
+          target: "/home/u151563763/domains/bff.halltech.site/public_html" # Caminho absoluto exato!
+          strip_components: 2
 
   # ==========================================
   # 2. JOB DE DEPLOY DO FRONTEND (REACT/VITE)
@@ -61,14 +63,14 @@ jobs:
           rm -f package-lock.json
           npm install
           npm run build
-
+      
       - name: 🚀 Deploy do Frontend via SFTP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME_GHZLIFE }}
-          password: ${{ secrets.FTP_PASSWORD_GHZLIFE }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
           port: 65002
           source: "public/web/dist/*"
-          target: "./"
-          strip_components: 2 # Remove os dois primeiros níveis de diretórios (public/web/dist) para evitar criar subpastas indesejadas
+          target: "/home/u151563763/domains/ghzlife.halltech.site/public_html"
+          strip_components: 3 
