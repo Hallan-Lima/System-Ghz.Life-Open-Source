@@ -42,6 +42,8 @@ class AuthService
             $stmt = $this->db->prepare("
                 CALL sp_register_complete_user(
                     :nickname, 
+                    :first_name,
+                    :last_name,
                     :password, 
                     :gender, 
                     :birthDate, 
@@ -56,6 +58,8 @@ class AuthService
             // Execução com os parâmetros mapeados
             $stmt->execute([
                 ':nickname'        => $payload['nickname'],
+                ':first_name'      => $payload['firstName'] ?? '',
+                ':last_name'       => $payload['lastName'] ?? '',
                 ':password'        => $passwordHash,
                 ':gender'          => $genderId,
                 ':birthDate'       => $payload['birthDate'],
@@ -105,6 +109,8 @@ class AuthService
                     HEX(SUBSTR(u.id, 11, 6))
                 )) AS user_id,
                 u.nickname,
+                u.first_name,
+                u.last_name,
                 u.password_hash,
                 ue.email,
                 u.sys_gender_id,
@@ -243,12 +249,11 @@ class AuthService
         }
 
         // 5. Monta o objeto UserConfig
-        $names = explode(' ', $user['nickname']);
         $userConfig = [
             'user_id' => $user['user_id'],
             'nickname' => $user['nickname'],
-            'firstName' => $names[0],
-            'lastName' => end($names),
+            'firstName' => $user['first_name'] ?? $user['nickname'],
+            'lastName' => $user['last_name'] ?? '',
             'email' => $user['email'],
             'password' => '',
             'confirmPassword' => '',

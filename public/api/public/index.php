@@ -11,6 +11,7 @@ require_once __DIR__ . '/../app/bootstrap.php';
 use App\Controllers\TaskController;
 use App\Controllers\AuthController;
 use App\Controllers\ModuleController;
+use App\Controllers\UserController;
 
 // --- 2. Configuração de CORS (Cross-Origin Resource Sharing) ---
 $allowedOrigins = [
@@ -67,7 +68,10 @@ $routes = [
     // --- Módulo: Configuração / Sistema ---
     ['GET', '#^/api/modules$#', ModuleController::class, 'list'],
     ['POST', '#^/api/modules/toggle$#', ModuleController::class, 'toggleVisibility'],
-    ['POST', '#^/api/modules/feature/mode$#', ModuleController::class, 'setFeatureMode']
+    ['POST', '#^/api/modules/feature/mode$#', ModuleController::class, 'setFeatureMode'],
+    
+    // --- Módulo: Usuários / Perfil ---
+    ['PUT', '#^/api/users/profile$#', UserController::class, 'updateProfile']
 ];
 
 // --- 4. Dispatcher (O Motor da API) ---

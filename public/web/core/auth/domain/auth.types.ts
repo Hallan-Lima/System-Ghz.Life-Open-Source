@@ -16,6 +16,9 @@ export interface OnboardingSlide {
  * Define o estado completo do formulário de registro (Wizard).
  */
 export interface RegisterState {
+  // Dados de Sessão
+  user_id?: string;
+
   // Passo 1: Identidade
   nickname: string;
   firstName: string;

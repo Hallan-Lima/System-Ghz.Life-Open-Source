@@ -100,6 +100,8 @@ SET FOREIGN_KEY_CHECKS = 0;
     CREATE TABLE user (
         id BINARY(16) NOT NULL PRIMARY KEY, -- UUID v7 ou v4 Binário
         nickname VARCHAR(50) NOT NULL,
+        first_name VARCHAR(100) DEFAULT NULL,
+        last_name VARCHAR(100) DEFAULT NULL,
         password_hash VARCHAR(500) NOT NULL,
         sys_gender_id INT NOT NULL,
         birthdate DATE NOT NULL,

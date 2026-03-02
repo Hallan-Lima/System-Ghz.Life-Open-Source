@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { RegisterState } from "@/core/auth/domain/auth.types";
 import config from "@/src/config";
+import { api } from "@/shared/api/apiClient";
 
 /**
  * @author HallTech AI
@@ -12,7 +13,7 @@ export const useEditProfile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  
+
   // Estado inicial vazio, será populado pelo useEffect
   const [formData, setFormData] = useState<RegisterState>({
     nickname: "",
@@ -57,18 +58,18 @@ export const useEditProfile = () => {
 
   const handlePreferenceToggle = (arrayField: 'interests' | 'healthGoals', item: string) => {
     setFormData(prev => {
-        const currentList = prev[arrayField] || [];
-        if (currentList.includes(item)) {
-            return { ...prev, [arrayField]: currentList.filter(i => i !== item) };
-        }
-        return { ...prev, [arrayField]: [...currentList, item] };
+      const currentList = prev[arrayField] || [];
+      if (currentList.includes(item)) {
+        return { ...prev, [arrayField]: currentList.filter(i => i !== item) };
+      }
+      return { ...prev, [arrayField]: [...currentList, item] };
     });
   };
 
   // Validação dos dados obrigatórios
   const isValid = useMemo(() => {
     const { nickname, firstName, lastName, email, birthDate, gender, password, confirmPassword } = formData;
-    
+
     // Verifica se os campos de texto obrigatórios estão preenchidos
     if (!nickname?.trim() || !firstName?.trim() || !lastName?.trim() || !email?.trim()) {
       return false;
@@ -82,9 +83,9 @@ export const useEditProfile = () => {
     // Validação de senha (como carregamos a senha atual, ela não deve estar vazia)
     // Se o usuário estiver alterando, a confirmação deve bater
     if (!password || password.trim() === '') {
-        return false;
+      return false;
     }
-    
+
     if (password !== confirmPassword) {
       return false;
     }
@@ -102,19 +103,30 @@ export const useEditProfile = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-        // Salva no LocalStorage
-        localStorage.setItem(config.configStorageKey, JSON.stringify(formData));
-        
-        setSuccess(true);
-        setTimeout(() => {
-            navigate(-1); // Volta para a tela anterior após salvar
-        }, 1000);
+      // Envia requisição PUT verdadeira para salvar dados no banco
+      await api.put('/users/profile', {
+        user_id: formData.user_id, // Presume que isso veio do localStorage no state inicial
+        nickname: formData.nickname,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        birthDate: formData.birthDate,
+        gender: formData.gender,
+        password: formData.password && formData.password !== '' ? formData.password : undefined
+      });
+
+      // Salva no LocalStorage Cache pra manter a UI Sincronizada com a Sessão ativa
+      localStorage.setItem(config.configStorageKey, JSON.stringify(formData));
+
+      setSuccess(true);
+      setTimeout(() => {
+        navigate(-1); // Volta para a tela anterior após salvar
+      }, 1000);
 
     } catch (e) {
-        console.error("Erro ao salvar perfil", e);
-        alert("Erro ao salvar alterações.");
+      console.error("Erro ao salvar perfil", e);
+      alert("Erro ao salvar as configurações de Perfil na Nuvem.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 

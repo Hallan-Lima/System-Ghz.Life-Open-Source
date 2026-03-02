@@ -98,6 +98,8 @@ USE ghz_life_AMBIENTE;
         CREATE PROCEDURE sp_register_complete_user(
             -- Dados Pessoais
             IN p_nickname VARCHAR(50),
+            IN p_first_name VARCHAR(100),
+            IN p_last_name VARCHAR(100),
             IN p_password_hash VARCHAR(500),
             IN p_gender_id INT,
             IN p_birthdate DATE,
@@ -147,10 +149,10 @@ USE ghz_life_AMBIENTE;
                 -- sys_status_id = 1 (Ativo)
                 -- sys_subscription_plan_id = 1 (Free)
                 INSERT INTO user (
-                    id, nickname, password_hash, sys_gender_id, birthdate, 
+                    id, nickname, first_name, last_name, password_hash, sys_gender_id, birthdate, 
                     sys_status_id, sys_subscription_plan_id
                 ) VALUES (
-                    v_user_bin, p_nickname, p_password_hash, p_gender_id, p_birthdate, 
+                    v_user_bin, p_nickname, p_first_name, p_last_name, p_password_hash, p_gender_id, p_birthdate, 
                     1, 1
                 );
 
@@ -203,6 +205,8 @@ USE ghz_life_AMBIENTE;
                     HEX(SUBSTR(u.id, 11, 6))
                 )) AS user_id,
                 u.nickname,
+                u.first_name,
+                u.last_name,
                 u.sys_status_id,
                 u.password_hash
             FROM user u

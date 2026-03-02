@@ -47,7 +47,11 @@ $dependencies = [
     
     // Modules
     __DIR__ . '/../domain/Services/ModuleService.php',
-    __DIR__ . '/../app/Controllers/ModuleController.php'
+    __DIR__ . '/../app/Controllers/ModuleController.php',
+
+    // Users / Profile
+    __DIR__ . '/../domain/Services/UserService.php',
+    __DIR__ . '/../app/Controllers/UserController.php'
 ];
 
 foreach ($dependencies as $path) {
