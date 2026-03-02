@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 
 interface QuickActionMenuProps {
   isOpen: boolean;

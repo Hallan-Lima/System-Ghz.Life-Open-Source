@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { financeService } from "@/modules/finance/features/services/finance.service";
 import { tasksService } from "@/modules/tasks/features/services/tasks.service";
 import { healthService } from "@/modules/health/features/services/health.service";
-import { settingsService } from "@/modules/settings/features/services/settings.service";
+import { settingsService } from "@/core/settings/features/services/settings.service";
 import { ChatMessage } from "../ai.types";
 import config from "@/src/config";
 

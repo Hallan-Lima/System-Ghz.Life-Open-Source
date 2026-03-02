@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '@/modules/notifications/features/hooks/useNotifications';
+import { useNotifications } from '@/core/notifications/features/hooks/useNotifications';
 
 interface MobileHeaderProps {
   onSettingsClick: () => void;

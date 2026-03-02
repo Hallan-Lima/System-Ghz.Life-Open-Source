@@ -9,7 +9,7 @@ import {
   getSatisfactionLabel,
   getFrequencyLabel,
 } from "../../tasks.utils";
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 
 interface TaskFormFieldsProps {
   form: any;

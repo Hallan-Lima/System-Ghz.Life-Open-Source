@@ -1,21 +1,21 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ModulesProvider } from '@/modules/modules/features/modules/context/ModulesContext'; 
-import { NotificationsProvider } from '@/modules/notifications/features/context/NotificationsContext';
+import { ModulesProvider } from '@/core/modules/features/modules/context/ModulesContext'; 
+import { NotificationsProvider } from '@/core/notifications/features/context/NotificationsContext';
 
-import DashboardPage from '@/modules/dashboard/pages/DashboardPage';
+import DashboardPage from '@/core/dashboard/pages/DashboardPage';
 import FinancePage from '@/modules/finance/pages/FinancePage';
 import TasksPage from '@/modules/tasks/pages/TasksPage';
 import TaskCreatorPage from '@/modules/tasks/pages/TaskCreatorPage';
 import HealthPage from '@/modules/health/pages/HealthPage';
 import AiPage from '@/modules/ai/pages/AiPage';
-import ModulesPage from '@/modules/modules/pages/ModulesPage';
-import SettingsPage from '@/modules/settings/pages/SettingsPage';
-import EditProfilePage from '@/modules/settings/pages/EditProfilePage';
-import MenuOrderingPage from '@/modules/settings/pages/MenuOrderingPage';
-import NotificationsPage from '@/modules/notifications/pages/NotificationsPage';
-import LoginPage from '@/modules/auth/pages/Login';
-import RegisterPage from '@/modules/auth/pages/Register';
+import ModulesPage from '@/core/modules/pages/ModulesPage';
+import SettingsPage from '@/core/settings/pages/SettingsPage';
+import EditProfilePage from '@/core/settings/pages/EditProfilePage';
+import MenuOrderingPage from '@/core/settings/pages/MenuOrderingPage';
+import NotificationsPage from '@/core/notifications/pages/NotificationsPage';
+import LoginPage from '@/core/auth/pages/Login';
+import RegisterPage from '@/core/auth/pages/Register';
 import AuthGuard from '@/shared/router/guards';
 
 const App: React.FC = () => {

@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 import { TaskFilterType } from '@/modules/tasks/features/hooks/useTasks';
 
 interface TaskTabsProps {

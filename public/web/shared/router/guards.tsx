@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom'; // Importa Outlet
-import { authService } from '@/modules/auth/features/services/auth.service';
+import { authService } from '@/core/auth/features/services/auth.service';
 
 /**
  * @author HallTech AI

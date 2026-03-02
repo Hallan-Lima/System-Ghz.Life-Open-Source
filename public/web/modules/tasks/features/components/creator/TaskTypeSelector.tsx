@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { TaskType } from "@/modules/tasks/domain/tasks.types";
 import { getTaskTypeConfig } from "../../tasks.utils";
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 
 interface TaskTypeSelectorProps {
   currentType: TaskType;

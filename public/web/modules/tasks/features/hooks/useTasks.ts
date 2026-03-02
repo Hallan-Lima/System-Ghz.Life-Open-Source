@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Task, TaskType } from "@/modules/tasks/domain/tasks.types";
 import { tasksService } from "../services/tasks.service";
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 
 /**
  * @author HallTech AI

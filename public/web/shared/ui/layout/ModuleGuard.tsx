@@ -6,8 +6,8 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useModules } from '@/modules/modules/features/modules/hooks/useModules';
-import { getModuleRouteForPath } from '@/modules/modules/features/modules/moduleRoutes';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
+import { getModuleRouteForPath } from '@/core/modules/features/modules/moduleRoutes';
 import config from '@/src/config';
 
 interface ModuleGuardProps {
