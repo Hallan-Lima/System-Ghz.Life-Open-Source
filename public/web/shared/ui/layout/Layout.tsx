@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
 import MobileBottomNav from './MobileBottomNav';
+import QuickActionMenu from './QuickActionMenu';
+import { useModules } from '@/core/modules/features/modules/hooks/useModules';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -15,11 +17,14 @@ interface LayoutProps {
  */
 const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { modules } = useModules();
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Example navigation items, should match the app's routing
   const sidebarItems = [
-    { to: '/', icon: 'fas fa-home', label: 'Início' },
+    { to: '/dashboard', icon: 'fas fa-home', label: 'Início' },
     { to: '/tasks', icon: 'fas fa-list-check', label: 'Tarefas' },
     { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças' },
     { to: '/health', icon: 'fas fa-heartbeat', label: 'Saúde' },
@@ -27,14 +32,61 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   ];
 
   const mobileLeftItems = [
-    { to: '/', icon: 'fas fa-home', label: 'Início' },
-    { to: '/tasks', icon: 'fas fa-list-check', label: 'Tarefas' },
+    { to: '/dashboard', icon: 'fas fa-home', label: 'Início' },
+    { to: '/modules', icon: 'fas fa-layer-group', label: 'Módulos' },
   ];
 
-  const mobileRightItems = [
-    { to: '/finance', icon: 'fas fa-wallet', label: 'Finanças' },
-    { to: '/settings', icon: 'fas fa-cog', label: 'Ajustes' },
-  ];
+  const mobileRightItems = useMemo(() => {
+    const items: Array<{ to: string, icon: string, label: string }> = [];
+    
+    // Pega até 2 módulos ativos para preencher o lado direito
+    const rightSideModules = modules.filter(m => m.isEnabled).slice(0, 2);
+
+    rightSideModules.forEach(m => {
+      let route = '/dashboard';
+      const title = m.title?.toLowerCase() || '';
+      
+      if (title.includes('produtiv') || title.includes('tarefa')) route = '/tasks';
+      else if (title.includes('finanç') || title.includes('financeiro')) route = '/finance';
+      else if (title.includes('saúd') || title.includes('health') || title.includes('bem-estar')) route = '/health';
+      else if (title.includes('social')) route = '/social';
+      else if (title.includes('ia') || title.includes('inteligênci')) route = '/ia';
+      
+      items.push({
+        to: route,
+        icon: m.icon || 'fas fa-cube',
+        label: m.title
+      });
+    });
+
+    // Fallback de design para não quebrar a simetria flex-col caso usuário não possua módulos suficientes ativos
+    // Editado: Removido push de Ajustes da direita. Se houver apenas 1 módulo, ficará apenas 1 módulo.
+    if (items.length === 0) {
+      items.push({ to: '/tasks', icon: 'fas fa-list-check', label: 'Carregando' });
+    }
+
+    return items;
+  }, [modules]);
+
+  // FAB contextual logic
+  const isTasksPage = location.pathname.startsWith('/tasks');
+  const isModulesPage = location.pathname.startsWith('/modules');
+
+  const handleFabClick = () => {
+    if (isTasksPage) {
+      navigate('/tasks/new');
+    } else if (isModulesPage) {
+      navigate('/modules/order');
+    } else {
+      setIsMobileMenuOpen(!isMobileMenuOpen);
+    }
+  };
+
+  const getFabIcon = () => {
+    if (isTasksPage) return "fas fa-plus";
+    if (isModulesPage) return "fas fa-sort-amount-down"; // Ícone de gestão de ordem
+    return "fas fa-plus"; // Restante usa o + giratório
+  };
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
@@ -72,9 +124,18 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         <MobileBottomNav 
           leftItems={mobileLeftItems}
           rightItems={mobileRightItems}
-          onFabClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          isMenuOpen={isMobileMenuOpen}
+          onFabClick={handleFabClick}
+          isMenuOpen={!isTasksPage && !isModulesPage && isMobileMenuOpen}
+          fabIcon={getFabIcon()}
         />
+
+        {/* Quick Action Overlay (FAB Menu) - Oculto na tela de Tarefas pois o botão redireciona */}
+        {!isTasksPage && !isModulesPage && (
+          <QuickActionMenu 
+            isOpen={isMobileMenuOpen} 
+            onClose={() => setIsMobileMenuOpen(false)} 
+          />
+        )}
 
       </div>
     </div>
